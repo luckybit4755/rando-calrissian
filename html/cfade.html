@@ -1,0 +1,85 @@
+<HTML>
+	<HEAD>
+		<TITLE>cfade</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				//document.getElementsByTagName( 'a' )[ 0 ].click();
+			}
+		</script>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			var n = 4096;
+			var near = 0.01;
+			var acceleration = 0.0005;
+			var dampening = 0.96;
+			var fps = 22;
+
+			var min = 16;
+			var max = 128;
+
+			var body = document.body;
+			while ( body.childNodes.length ) body.removeChild( body.firstChild );
+
+			/* for some weird reason fullscreen is weird with body background color atm */
+			var div = document.createElement( 'div' );
+			div.style.width = n;
+			div.style.height = n;
+			div.style.top = -33;
+			div.style.left = -33;
+
+			body.style[ 'overflow-x' ] = body.style[ 'overflow-y' ] = 'hidden';
+
+			body.appendChild( div );
+
+			div.onclick = function() {
+				var fz = 'webkitRequestFullScreen requestFullScreen'.split( ' ' );
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in div ) {
+						div[ f ]();
+						console.log( 'huh' );
+						break;
+					}
+				}
+			};
+
+			var now = [];
+			var next = [];
+			var diff = [0,0,0];
+			for ( var i = 0 ; i < diff.length ; i++ ) {
+				now.push( Math.random() );
+				next.push( Math.random() );
+			}
+
+			var draw = function() {
+				var color = 'rgb(x,x,x)';
+				for ( var i = 0 ; i < diff.length ; i++ ) {
+					var d = now[ i ] - next[ i ];
+					var d2 = d * d;
+					if ( d2 < near ) {
+						next[ i ] = Math.random();
+						if( 0 ) console.log( 'change:' + i + ' to ' + next[ i ] );
+					} else {
+						now[ i ] += diff[ i ];	
+						diff[ i ] = dampening * diff[ i ] + ( d < 0 ? acceleration : -acceleration );
+					}
+					var c = '' + Math.floor( max * Math.max( min / 255.0, Math.min( 1, now[ i ] ) ) );
+					color = color.replace( /x/, '' + c );
+				}
+
+				body.style.backgroundColor = div.style.backgroundColor = color;
+				setTimeout( function() { draw() }, 1000 / fps );
+			};
+			draw();
+
+		} )();">cfade</a>
+	</BODY>
+</HTML>

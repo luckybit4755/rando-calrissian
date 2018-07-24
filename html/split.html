@@ -1,0 +1,362 @@
+<HTML>
+	<HEAD>
+		<TITLE>split</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+				color:#AAAA77;
+				background:black;
+			}
+		</style>
+		<script type="text/javascript">
+			const COLORS = 'red green yellow purple blue'.split( ' ' );
+			const LIGHT = 1 / Math.sqrt( 2 );
+			const MAX = 1024 * 2;
+
+			const intAttribute = function( element, attributeName ) {
+				return parseInt( element.getAttribute( attributeName ) );
+			};
+
+			const sumAttributes = function( element, attributeNames ) {
+				var sum = 0;
+				for ( var i = 0 ; i < attributeNames.length ; i++ ) {
+					sum += intAttribute( element, attributeNames[ i ] );
+				};
+				return sum;
+			};
+
+			const floatingPrecision = function( value, precision ) {
+				precision = precision || 1000;
+				return Math.floor( value * precision ) / precision;
+			};
+
+			const displaceMidpoints = function( points, history, displacement ) {
+				if ( points.length > MAX ) {
+					console.log( "that's enough of that, thanks!" );
+					return;
+				}
+
+				if ( !displacement ) {
+					displacement = floatingPrecision( Math.random() - Math.random() * 0.7 );
+					if ( history ) {
+						history.displacements.push( displacement );
+					}
+				}
+
+				var nu = [];
+
+				for ( var i = 0 ; i < points.length ; i++ ) {
+					var point = points[ i ];
+					var next = points[ ( i + 1 ) % points.length ];
+					var xNormal = +( next.y - point.y ) * displacement;
+					var yNormal = -( next.x - point.x ) * displacement;
+					nu.push( point );
+					nu.push(
+						{
+							  x: ( point.x + next.x ) / 2 + xNormal
+							, y: ( point.y + next.y ) / 2 + yNormal
+						}
+					);
+				};
+
+				return nu;
+			};
+
+			const spreadPoints = function( points, center, radius ) {
+				var max = 0;
+				for ( var i = 0 ; i < points.length ; i++ ) {
+					var point = points[ i ];
+					var dx = point.x - center;
+					var dy = point.y - center;
+					var distance = Math.sqrt( dx * dx + dy * dy );
+					if ( distance > max ) {
+						max = distance;
+					}
+				}
+				
+				var ratio = max / radius;	
+				for ( var i = 0 ; i < points.length ; i++ ) {
+					var point = points[ i ];
+					var dx = point.x - center;
+					var dy = point.y - center;
+					point.x = center + dx / ratio;
+					point.y = center + dy / ratio;
+				}
+			};
+
+			window.onload = function() {
+				const CANVAS  = document.getElementsByTagName( 'canvas' )[ 0 ];
+				const CONTEXT = CANVAS.getContext( '2d' );
+				const CENTER  = sumAttributes( CANVAS, [ 'width', 'height' ] ) / 2 * 0.5;
+				const RADIUS  = CENTER * 0.9;
+
+				// some gross "global" variables for the truly lazy developer
+				var DEPTH = 8;
+				var CLEAR_FLAG = true;
+				var MODE  = {major:0,minor:0};
+
+				const newPoints = function( count, history, angle ) {
+					count = count || Math.floor( 3 + 3 * Math.random() );
+					var points = [];
+
+					if ( angle === undefined ) {
+						angle = Math.PI * 2 * Math.random();
+						if ( history ) {
+							history.setup = { count:count, angle:floatingPrecision(angle) };
+						}
+					}
+
+					var increment = Math.PI * 2 / count;
+					for ( var i = 0 ; i < count ; i++, angle += increment ) {
+						points.push( 
+							{
+								  x: CENTER + RADIUS * Math.cos( angle )
+								, y: CENTER + RADIUS * Math.sin( angle )
+							}
+						);
+					}
+					console.log( JSON.stringify( points ) );
+					return points;
+				};
+				
+				const drawRibbon = function( a, b, mode ) {
+					var dx = b.x - a.x;
+					var dy = b.y - a.y;
+					var ox = dx;
+					var oy = dy;
+					var length = Math.sqrt( dx * dx + dy * dy );
+					if ( 0 != length ) {
+						dx /= length;
+						dy /= length;
+					}
+
+					var dot = LIGHT * dx + LIGHT * dy;
+					var gray = 55 + 200 * ( dot + 1 ) / 2;
+
+					if ( undefined === mode ) {
+						mode = 0;
+					}
+
+					gray *= 0.7;
+
+					switch( mode % 4 ) {
+						case 1: CONTEXT.fillStyle = 'rgb(x,x,x)'.replace( /x/g, '' + gray ); break;
+						case 2: CONTEXT.fillStyle = 'rgb(x,x,222)'.replace( /x/g, '' + gray ); break;
+						case 3: CONTEXT.fillStyle = 'rgb(x,x,x)'
+							.replace( /x/, gray )
+							.replace( /x/, 128+gray/2 )
+							.replace( /x/, 255-gray )
+						; break;
+						case 3: CONTEXT.fillStyle = 'rgb(x,x,x)'
+							.replace( /x/, 128+gray/2 )
+							.replace( /x/, gray )
+							.replace( /x/, 255-gray )
+						; break;
+						default: CONTEXT.fillStyle = 'rgb(x,x,x)'
+							.replace( /x/, 128+gray/2 )
+							.replace( /x/, 255-gray )
+							.replace( /x/, gray )
+						; break;
+					}
+
+					//CONTEXT.fillRect( a.x, a.y, ox, oy ); return;
+
+					CONTEXT.strokeStyle = CONTEXT.fillStyle;
+					CONTEXT.lineWidth = 3.3;
+					CONTEXT.beginPath();
+					CONTEXT.moveTo( a.x, a.y );
+					CONTEXT.lineTo( b.x, b.y );
+					CONTEXT.closePath();
+					CONTEXT.stroke();
+				};
+
+				const drawRibbons = function( points, history, mode ) {
+					CONTEXT.save();
+
+					var n = DEPTH;
+					CONTEXT.translate( n, n );
+
+					for ( var j = 0 ; j < n ; j++ ) {
+						for ( var i = 0 ; i < points.length ; i++ ) {
+							drawRibbon( points[ i ], points[ ( i + 1 ) % points.length ] );
+							CONTEXT.lineTo( points[ i ].x, points[ i ].y );
+						}
+
+						CONTEXT.translate( -2, -2 );
+					}
+
+					CONTEXT.restore();
+				};
+
+				const drawLines = function( points, history, mode ) {
+					if ( undefined !== mode ) {
+						CONTEXT.strokeStyle = COLORS[ mode % COLORS.length ];
+					}
+
+					CONTEXT.beginPath();
+					CONTEXT.moveTo( points[ 0 ].x, points[ 0 ].y );
+					for ( var i = 1 ; i < points.length ; i++ ) {
+						CONTEXT.lineTo( points[ i ].x, points[ i ].y );
+					};
+					CONTEXT.closePath();
+					CONTEXT.stroke();
+				};
+
+				const drawLabels = function( points, history, mode ) {
+					if ( undefined !== mode ) {
+						CONTEXT.fillStyle = COLORS[ mode % COLORS.length ];
+					}
+					for ( var i = 0 ; i < points.length ; i++ ) {
+						CONTEXT.fillText( '' + i, points[ i ].x, points[ i ].y );
+					};
+				};
+
+				const clearContext = function() {
+					CONTEXT.fillStyle = 'black';
+					CONTEXT.fillRect( 0, 0, CENTER * 2, CENTER * 2 );
+				};
+
+				const draw = function( points, history, mode ) {
+					if( CLEAR_FLAG ) {
+						clearContext();
+					}
+
+					if ( undefined === mode ) {
+						drawLines( points, history );
+					} else {
+						switch( mode.major % 3 ) {
+							case 1: drawRibbons( points, history, mode.minor ); break;
+							case 2: drawLabels( points, history, mode.minor  ); break;
+							default: drawLines( points, history, mode.minor   ); break;
+						}
+					}
+
+					if ( history ) {
+						console.log( JSON.stringify( history ) );
+
+						const encoded = btoa( JSON.stringify( history ) );
+
+						var href = (
+							document.location.toString().replace( /\?.*/, '' )
+							+ '?history='
+							+ encoded
+						);
+
+						var a = document.getElementsByTagName( 'a' )[ 0 ];
+						a.setAttribute( 'href', href );
+						a.setAttribute( 'target', encoded );
+						while ( a.firstChild ) a.removeChild( a.firstChild );
+						a.appendChild( document.createTextNode( 'link to this shape' ) );
+					}
+				};
+
+				const main = function() {
+					var points = false;
+					var history = false;
+
+					const restart = function() {
+						CONTEXT.strokeStyle = COLORS[ Math.floor( Math.random() * COLORS.length ) ];
+						history = {setup:{},displacements:[]};
+						points = newPoints( false,history );
+						clearContext();
+						draw( points, history, MODE );
+						console.log( 'restart' );
+					};
+
+					const historic = function() {
+						var location = document.location.toString();
+						if ( !/\?history=/.test( location ) ) return;
+
+						var encoded = location.replace( /.*\?history=/, '' );
+						history = JSON.parse( atob( encoded ) );
+						console.log( JSON.stringify( history ) );
+
+						points = newPoints( history.setup.count, null, history.setup.angle );
+						for( var i = 0 ; i < history.displacements.length ; i++ ) {
+							points = displaceMidpoints( points, null, history.displacements[ i ] );
+							spreadPoints( points, CENTER, RADIUS );
+						}
+						draw( points, history, MODE );
+
+						return true;
+					};
+
+					const split = function() {
+						var nu = displaceMidpoints( points, history );
+						if ( !nu ) return;
+
+						points = nu;
+						spreadPoints( points, CENTER, RADIUS );
+						draw( points, history, MODE );
+
+						return points;
+					};
+
+					const auto = function() {
+						restart();
+						while ( split() );
+					};
+
+					const inputHandlers = function() {
+						const mode   = function() { MODE.major++; draw( points, null, MODE );  };
+						const detail = function() { MODE.minor++; draw( points, null, MODE ); };
+						const clear  = function() { CLEAR_FLAG = !CLEAR_FLAG; draw( points, null, MODE ); };
+
+						CANVAS.onclick = function() { split(); };
+						document.onkeypress = function( e ) {
+							switch( e.charCode ) {
+								case 32:  /* _ */ split(); break;
+								case 120: /* x */ restart(); break;
+								case 100: /* d */ if ( --DEPTH < 1 ) DEPTH = 1; draw( points, null, MODE ); break;
+								case 68:  /* D */ DEPTH++; draw( points ); break;
+								case 97:  /* a */ auto(); break;
+								case 99:  /* c */ clear(); break;
+								case 109: /* m */ mode(); break;
+								case 77:  /* M */ detail(); break;
+								default: console.log( e );
+							}
+						};
+
+						var buttons = document.getElementsByTagName( 'button' );
+						for ( var i = 0 ; i < buttons.length ; i++ ) {
+							var button = buttons[ i ];
+							var id = button.getAttribute( 'id' );
+							button.appendChild( document.createTextNode( id ) );
+							( function( id ) { button.onclick = function() { eval( id + '()' ) }; })( id );
+						}
+					};
+
+					inputHandlers();
+					historic() || auto();
+				};
+
+				main();
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<center><!-- yeah, yeah.. I know... -->
+			<canvas width="512" height="512"></canvas>
+			<div>
+				<button id="restart"></button>
+				<button id="split"></button>
+				<button id="auto"></button>
+				<button id="mode"></button>
+				<button id="detail"></button>
+				<button id="clear"></button>
+			</div>
+			<div>
+				keys: 
+					<b>x</b>=restart
+				   	<b>space</b>=split
+					<b>a</b>=auto
+					<b>m</b>=mode
+					<b>M</b>=detail
+			</div>
+			<div>clicking on the canvas will also split</div>
+			<div>"clear" just toggles clearing the screen after each new split or auto</div>
+			<div><a></a></div>
+		</center>
+	</BODY>
+</HTML>

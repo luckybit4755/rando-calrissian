@@ -1,0 +1,207 @@
+<HTML>
+	<HEAD>
+		<TITLE>cmotion</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				if ( -1 != document.location.toString().indexOf( 'testMode' ) ) {
+					document.getElementsByTagName( 'a' )[ 0 ].click();
+				}
+			}
+		</script>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const size = 1 * 256;
+			const fps = 33;
+			const acceleration = 0.1;
+			const dampening = 0.99;
+			const particleCount = 23;
+
+			const playHarder = !true;
+			const squareCount = 1;
+			const dPower = 0;
+			
+			const divo = particleCount * 0.25;
+
+			/* setup the target here */
+			const target = document.createElement( 'canvas' );
+			const context = target.getContext( '2d' );
+			target.width = target.height = target.style.width = target.style.height = size;
+
+			var body = document.body;
+			while ( body.childNodes.length ) body.removeChild( body.firstChild );
+			body.appendChild( target );
+
+			/* full screen api's are a nightmare at the moment... */
+
+			target.onclick = function() {
+				var fz = 'webkitRequestFullScreen requestFullScreen'.split( ' ' );
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in target ) {
+						target[ f ]();
+						break;
+					}
+				}
+			};
+
+			var fsCounter = 0;
+			var onFsChange = function() {
+				if ( fsCounter++ % 2 ) {
+					target.style.height = target.style.width = size;
+				} else {
+					target.style.height = window.innerHeight;
+					target.style.width = window.innerWidth;
+				}
+			};
+			var fz = 'webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange'.split( ' ' );
+			for ( var i = 0 ; i < fz.length ; i++ ) {
+				document.addEventListener( fz[ i ], onFsChange, false );
+			}
+
+			/* back to business */
+
+			const r = function() {
+				return size * Math.random();
+			};
+
+			const Particle = function( dimensions ) {
+				dimensions = dimensions || 3;
+				this.goal = [];
+				this.position = [];
+				this.color = [];
+				this.rgb = 'rgb(x,x,x)';
+				this.velocity = [];
+				for ( var i = 0 ; i < dimensions ; i++ ) {
+					this.velocity.push( 0 );
+					this.goal.push( r() );
+					this.position.push( r() );
+					this.color.push( 255 * Math.random() );
+					this.rgb = this.rgb.replace( /x/, Math.floor( this.color[ i ] ) );
+				};
+			};
+			
+			Particle.prototype.toScreen = function() {
+				var screenCoordinates = [];
+				for ( var i = 0 ; i < this.position.length ; i++ ) {
+					var n = Math.floor( this.position[ i ] ) % size;
+					if ( n < 0 ) n += size;
+					screenCoordinates.push( n );
+				}
+				return screenCoordinates;
+			};
+
+			Particle.prototype.draw = function( context ) {
+				var screen = this.toScreen();
+				context.fillStyle = this.rgb;
+				context.fillRect( screen[ 0 ] - 1, screen[ 1 ] - 1, 3, 3 );
+			};
+
+			Particle.prototype.move = function() {
+				for ( var i = 0 ; i < this.position.length ; i++ ) {
+					this.position[ i ] += this.velocity[ i ];
+				}
+				for ( var i = 0 ; i < this.position.length ; i++ ) {
+					if(0)this.velocity[ i ] *= dampening;
+					this.velocity[ i ] += ( this.position[ i ] < this.goal[ i ] ) ? acceleration : -acceleration;
+				}
+			};
+
+			Particle.prototype.newGoal = function() {
+				this.goal = [];
+				for ( var i = 0 ; i < this.position.length ; i++ ) {
+					this.goal.push( r() );
+				}
+			};
+
+			var particles = [];
+			for ( var i = 0 ; i < particleCount ; i++ ) {
+				particles.push( new Particle() );
+			}
+
+			var counter = 0;
+			var frames = 0;
+			var reset = 33 * 3;
+
+			var imageData = context.getImageData( 0, 0, size, size );
+
+			var draw = function() {
+				frames++;
+
+				var screened = [];
+				for ( var i = 0 ; i < particles.length ; i++ ) {
+					var particle = particles[ i ];
+
+					/* for debugging */
+					particle.draw( context );
+
+					particle.move();
+					screened.push( particle.toScreen() );
+
+					if ( counter > reset ) {
+						particle.newGoal();
+					}
+				}
+
+				if ( ++counter > reset ) {
+					counter = 0;
+				}
+
+				var index = 0;
+				for( var y = 0 ; y < size ; y++ ) {
+					for( var x = 0 ; x < size ; x++, index += 4 ) {
+						imageData.data[ index + 0 ] = 0;
+						imageData.data[ index + 1 ] = 0;
+						imageData.data[ index + 2 ] = 0;
+						imageData.data[ index + 3 ] = 255;
+
+						for ( var i = 0 ; i < screened.length ; i++ ) {
+							var dx = screened[ i ][ 0 ] - x;
+							var dy = screened[ i ][ 1 ] - y;
+							var d = 1;
+
+							if ( playHarder ) {
+							   	d = dx * dx + dy * dy;
+								if ( dPower ) { 
+									d = Math.pow( d, dPower );
+								} else {
+									for ( var j = 0 ; j < squareCount ; j++, d = Math.sqrt( d ) );
+								}
+							} else {
+								if ( dx < 0 ) dx = -dx;
+								if ( dy < 0 ) dy = -dy;
+								d = ( dx + dy ) / divo;
+							}
+							
+							imageData.data[ index + 0 ] += particles[ i ].color[ 0 ] / d;
+							imageData.data[ index + 1 ] += particles[ i ].color[ 1 ] / d;
+							imageData.data[ index + 2 ] += particles[ i ].color[ 2 ] / d;
+						}
+
+						imageData.data[ index + 0 ] *= 1;
+						imageData.data[ index + 1 ] *= 1;
+						imageData.data[ index + 2 ] *= 1;
+					}
+				}
+
+				context.putImageData( imageData, 0, 0 );
+			
+				if ( !fsCounter && frames / fps < 1 ) {	
+					context.fillStyle = 'white';
+					context.fillText( 'click for fullscreen', 33, size - 33 );
+				}
+
+				setTimeout( function() { draw() }, 1000 / fps );
+			};
+			draw();
+
+		} )();">cmotion</a>
+	</BODY>
+</HTML>
