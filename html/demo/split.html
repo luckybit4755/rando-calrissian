@@ -38,7 +38,7 @@
 				}
 
 				if ( !displacement ) {
-					displacement = floatingPrecision( Math.random() - Math.random() * 0.7 );
+					displacement = floatingPrecision( ( Math.random() - Math.random() ) * 1.3 );
 					if ( history ) {
 						history.displacements.push( displacement );
 					}
@@ -90,11 +90,16 @@
 				const CONTEXT = CANVAS.getContext( '2d' );
 				const CENTER  = sumAttributes( CANVAS, [ 'width', 'height' ] ) / 2 * 0.5;
 				const RADIUS  = CENTER * 0.9;
+				const FPS     = 15;
 
 				// some gross "global" variables for the truly lazy developer
 				var DEPTH = 8;
 				var CLEAR_FLAG = true;
+				var AUTO_FLAG = true;
 				var MODE  = {major:0,minor:0};
+				var ROTATION = 0;
+				var ROTATION_INCREMENT = 1;
+				var FRAME_COUNT = 0;
 
 				const newPoints = function( count, history, angle ) {
 					count = count || Math.floor( 3 + 3 * Math.random() );
@@ -116,7 +121,6 @@
 							}
 						);
 					}
-					console.log( JSON.stringify( points ) );
 					return points;
 				};
 				
@@ -125,7 +129,9 @@
 					var dy = b.y - a.y;
 					var ox = dx;
 					var oy = dy;
-					var length = Math.sqrt( dx * dx + dy * dy );
+					//var length = Math.sqrt( dx * dx + dy * dy );
+					var length = ( dx * dx + dy * dy );
+
 					if ( 0 != length ) {
 						dx /= length;
 						dy /= length;
@@ -163,7 +169,7 @@
 					//CONTEXT.fillRect( a.x, a.y, ox, oy ); return;
 
 					CONTEXT.strokeStyle = CONTEXT.fillStyle;
-					CONTEXT.lineWidth = 3.3;
+					CONTEXT.lineWidth = 1;//3.3;
 					CONTEXT.beginPath();
 					CONTEXT.moveTo( a.x, a.y );
 					CONTEXT.lineTo( b.x, b.y );
@@ -172,6 +178,12 @@
 				};
 
 				const drawRibbons = function( points, history, mode ) {
+						for ( var i = 0 ; i < points.length ; i++ ) {
+							drawRibbon( points[ i ], points[ ( i + 1 ) % points.length, mode ] );
+							CONTEXT.lineTo( points[ i ].x, points[ i ].y );
+						}
+
+						//return
 					CONTEXT.save();
 
 					var n = DEPTH;
@@ -222,18 +234,28 @@
 						clearContext();
 					}
 
+					//if ( 1 != mode.major % 3 ) {
+
+					CONTEXT.save();
+					ROTATION += ROTATION_INCREMENT;
+					CONTEXT.translate( +CENTER, +CENTER );
+					CONTEXT.rotate( ROTATION *Math.PI/180 );
+					CONTEXT.translate( -CENTER, -CENTER );
+					//}
+
 					if ( undefined === mode ) {
-						drawLines( points, history );
-					} else {
-						switch( mode.major % 3 ) {
-							case 1: drawRibbons( points, history, mode.minor ); break;
-							case 2: drawLabels( points, history, mode.minor  ); break;
-							default: drawLines( points, history, mode.minor   ); break;
-						}
+						mode = 0;
 					}
 
+					switch( mode.major % 3 ) {
+						case 1: drawRibbons( points, history, mode.minor ); break;
+						case 2: drawLabels( points, history, mode.minor  ); break;
+						default: drawLines( points, history, mode.minor   ); break;
+					}
+					CONTEXT.restore();
+
 					if ( history ) {
-						console.log( JSON.stringify( history ) );
+						//console.log( JSON.stringify( history ) );
 
 						const encoded = btoa( JSON.stringify( history ) );
 
@@ -260,7 +282,6 @@
 						history = {setup:{},displacements:[]};
 						points = newPoints( false,history );
 						clearContext();
-						draw( points, history, MODE );
 						console.log( 'restart' );
 					};
 
@@ -277,7 +298,6 @@
 							points = displaceMidpoints( points, null, history.displacements[ i ] );
 							spreadPoints( points, CENTER, RADIUS );
 						}
-						draw( points, history, MODE );
 
 						return true;
 					};
@@ -293,27 +313,42 @@
 						return points;
 					};
 
-					const auto = function() {
+					const nu = function() {
 						restart();
 						while ( split() );
+						MODE.minor++;
+					};
+
+					const fullscreen = function() {
+						var fz = 'webkitRequestFullScreen requestFullScreen'.split( ' ' );
+						for ( var i = 0 ; i < fz.length ; i++ ) {
+							var f = fz[ i ];
+							if ( f in CANVAS ) {
+								CANVAS[ f ]();
+								break;
+							}
+						}
 					};
 
 					const inputHandlers = function() {
 						const mode   = function() { MODE.major++; draw( points, null, MODE );  };
 						const detail = function() { MODE.minor++; draw( points, null, MODE ); };
-						const clear  = function() { CLEAR_FLAG = !CLEAR_FLAG; draw( points, null, MODE ); };
+						const clear  = function() { CLEAR_FLAG = !CLEAR_FLAG; };
+						const auto   = function() { AUTO_FLAG = !AUTO_FLAG; };
 
 						CANVAS.onclick = function() { split(); };
 						document.onkeypress = function( e ) {
 							switch( e.charCode ) {
 								case 32:  /* _ */ split(); break;
-								case 120: /* x */ restart(); break;
-								case 100: /* d */ if ( --DEPTH < 1 ) DEPTH = 1; draw( points, null, MODE ); break;
-								case 68:  /* D */ DEPTH++; draw( points ); break;
+								case 68:  /* D */ DEPTH++; break;
+								case 77:  /* M */ detail(); break;
 								case 97:  /* a */ auto(); break;
 								case 99:  /* c */ clear(); break;
+								case 100: /* d */ if ( --DEPTH < 1 ) DEPTH = 1; break;
+								case 102: /* f */ fullscreen(); break;
 								case 109: /* m */ mode(); break;
-								case 77:  /* M */ detail(); break;
+								case 110: /* n */ nu(); break;
+								case 120: /* x */ restart(); break;
 								default: console.log( e );
 							}
 						};
@@ -328,7 +363,22 @@
 					};
 
 					inputHandlers();
-					historic() || auto();
+					historic() || nu();
+
+					var frame = function() {
+						FRAME_COUNT++;
+						if ( AUTO_FLAG && 0 == FRAME_COUNT % ( FPS * 3 ) ) {
+							nu();
+						}
+						draw( points, history, MODE );
+						setTimeout(
+							function() {
+								requestAnimationFrame( frame );
+							}
+							, 1000 / FPS
+						);
+					};
+					frame();
 				};
 
 				main();
@@ -341,21 +391,18 @@
 			<div>
 				<button id="restart"></button>
 				<button id="split"></button>
+				<button id="nu"></button>
 				<button id="auto"></button>
-				<button id="mode"></button>
-				<button id="detail"></button>
-				<button id="clear"></button>
+				<button id="fullscreen"></button>
 			</div>
 			<div>
 				keys: 
 					<b>x</b>=restart
 				   	<b>space</b>=split
+					<b>n</b>=nu
 					<b>a</b>=auto
-					<b>m</b>=mode
-					<b>M</b>=detail
+					<b>f</b>=fullscreen
 			</div>
-			<div>clicking on the canvas will also split</div>
-			<div>"clear" just toggles clearing the screen after each new split or auto</div>
 			<div><a></a></div>
 		</center>
 	</BODY>
