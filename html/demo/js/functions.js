@@ -11,27 +11,29 @@ const fullscreen = function( element ) {
 };
 
 const frame = function( drawCallback, fps ) {
-	drawCallback.frame = {count:0,timeOut:false};
-	drawCallback.frame.count = 0;
 	fps = fps || 24;
 
-	var frameFunction = function() {
-		this.start = function() {
-			drawCallback.frame.count++;
-			drawCallback();
-			drawCallback.frame.timeOut = setTimeout(
-				function() {
-					requestAnimationFrame( frame );
-				}
-				, 1000 / fps
-			);
-		}
+	var frameFunction = function() {};
+	frameFunction.count = 0;
+	frameFunction.timeOut = false;
 
-		this.stop = function() {
-			if ( drawCallback.frame.timeOut ) {
-				clearTimeout( drawCallback.frame.timeOut );
+	frameFunction.start = function() {
+		frameFunction.count++;
+		drawCallback();
+
+		frameFunction.timeOut = setTimeout(
+			function() {
+				requestAnimationFrame( frameFunction.start );
 			}
-		};
+			, 1000 / fps
+		);
+	};
+
+	frameFunction.stop = function() {
+		if ( frameFunction.timeOut ) {
+			clearTimeout( frameFunction.timeOut );
+			frameFunction.timeOut = false;
+		}
 	};
 
 	return frameFunction;
