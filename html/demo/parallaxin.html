@@ -12,6 +12,8 @@
         <script src="js/functions.js"></script>
 
 		<script type="text/javascript">
+			var DRAW_TAILS = false;
+
 			window.onload = function() {
 				const CANVAS = getByTag( 'canvas' );
 				const CONTEXT = CANVAS.getContext( '2d' );
@@ -24,7 +26,7 @@
 				const H = parseInt( CANVAS.height );
 
 				const Z = W / 88.0;
-				const ZF = 0.1;
+				const ZF = 0.2;
 				const ZMIN = Z * ZF;
 				const ZRND = Z * ( 1 - ZF );
 
@@ -36,9 +38,12 @@
 					STARS.push( 0 );
 					STARS.push( 0 );
 				}
-
 				const DRAW = function() {
-					CONTEXT.fillStyle = 'rgba(0,0,0,0.8)';
+					if ( DRAW_TAILS ) {
+						CONTEXT.fillStyle = 'rgba(0,0,0,0.6)';
+					} else {
+						CONTEXT.fillStyle = 'rgba(0,0,0,0.8)';
+					}
 					CONTEXT.fillRect( 0, 0, W, H );
 
 					for ( var i = 0 ; i < STARS.length ; i += 3 ) {
@@ -47,7 +52,7 @@
 						var z = STARS[ i + 2 ];
 						if ( x >= W ) {
 							/* reset the star */
-							STARS[ i + 0 ] = W / 4.4 - Math.random() * W;
+							STARS[ i + 0 ] = -( Math.random() * W );
 							STARS[ i + 1 ] = Math.random() * H;
 							STARS[ i + 2 ] = ZMIN + Math.random() * ZRND;
 						} else {
@@ -63,11 +68,26 @@
 							CONTEXT.fillStyle = 'rgb(' + gray * r + ',' + gray * g +',' + gray * b + ')';
 
 							/* this puts a little jiggle and a wiggle */
-							if ( false ) {
-								y += Math.random() * z * 0.5; 
-							}
+							if ( DRAW_TAILS ) {
+								var q = Math.random() * z * 0.5; 
+								var ox = x;
+								var oy = y;
+								y += q;
+								x += q;
+								CONTEXT.beginPath();
+									CONTEXT.moveTo( x - z * 1, y );
+										CONTEXT.lineTo( x - z * 0.3, y - size * 0.2 );
+											CONTEXT.lineTo( x - 0, y - size * 0.8 ); 
+												CONTEXT.lineTo( x + z * 0.25, y ); /*point */
+											CONTEXT.lineTo( x - 0, y + size * 0.8 );
+										CONTEXT.lineTo( x - z * 0.3, y + size * 0.2 );
+									/*CONTEXT.lineTo( x - z * 1, y ); implied */
+								CONTEXT.closePath();
+								CONTEXT.fill();
 
-							CONTEXT.fillRect( x, y, size, size );
+							} else {
+								CONTEXT.fillRect( x, y, size, size );
+							}
 
 							/* move along the x-axis */
 							STARS[ i + 0 ] += z;
@@ -76,7 +96,7 @@
 				};
 
 				const LOOP = frame( DRAW, 24 );
-				for ( var i = 0 ; i < 33 * 2 ; i++ ) DRAW();
+				for ( var i = 0 ; i < 33 * 4 ; i++ ) DRAW();
 				LOOP.start();
 			}
 		</script>
