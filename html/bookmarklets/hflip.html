@@ -1,0 +1,29 @@
+<HTML>
+	<HEAD>
+		<TITLE>hflip</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+		</style>
+
+		<script type="text/javascript">
+			if( false ) window.onload = function() { document.getElementsByTagName( 'a' )[ 0 ].click(); }
+		</script>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			var images = document.getElementsByTagName('img');
+			for ( var i = 0 ; i < images.length ; i++ ) {
+				var image = images[ i ];
+				image.style[ '-moz-transform' ]    = 'scale(-1, 1)';
+				image.style[ '-webkit-transform' ] = 'scale(-1, 1)';
+				image.style[ '-o-transform' ]      = 'scale(-1, 1)';
+				image.style[ 'transform' ]         = 'scale(-1, 1)';
+				image.style[ 'filter' ]            = 'FlipH';
+			}
+		} )();">hflip</a>
+		<div><img src="images/usb.png"/></div>
+	</BODY>
+</HTML>
