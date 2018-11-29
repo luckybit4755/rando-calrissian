@@ -1,0 +1,97 @@
+<HTML>
+	<HEAD>
+		<TITLE>web-audio-microphone-analyser</TITLE>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				try {
+					microphone_analyser_start();
+				} catch( e ) {
+					/* may need this if audio needs to be user initiated */
+					var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					canvas.getContext( '2d' ).fillText( 'click me', 33, 33 );
+					canvas.onclick = function() { microphone_analyser_start() };
+				};
+			};
+
+			const microphone_analyser_start = function() {
+				/* request the microphone */
+				navigator.mediaDevices.getUserMedia( { audio:true } )
+				.then( function( microphone ) { 
+					microphone_analyser_run( microphone );
+				})
+				.catch( function( err ) {
+					console.log( 'could not get microphone access' );
+					console.log( err );
+				});
+			};
+
+			const microphone_analyser_run = function( microphone ) {
+				/* get the web audio context */
+				var audioContext = new AudioContext();
+
+				/* setup the analyser and the data space */
+
+				var analyser = audioContext.createAnalyser();
+				analyser.fftSize = 2048;
+				var bufferLength = analyser.frequencyBinCount;
+				var dataArray = new Uint8Array( bufferLength );
+
+				/* connect it to the microphone using a stream */
+
+				var microphone_stream = audioContext.createMediaStreamSource( microphone );
+				microphone_stream.connect( analyser );
+
+				/* get the canvas and context to draw stuff */
+
+				var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				var context = canvas.getContext( '2d' );
+
+				context.lineWidth = 2;
+				context.strokeStyle = 'black';
+				context.fillStyle = 'gray';
+				
+				/* draw some stuff */
+
+				var draw = function() {
+					/* request next frame */
+
+					setTimeout( function() { requestAnimationFrame( draw ); } , 1000 / 24 );
+
+					/* analyse the data */
+
+					analyser.getByteTimeDomainData( dataArray );
+
+					/* clear the canvas */
+
+					context.fillRect(0, 0, canvas.width, canvas.height);
+
+					/* draw the analysis */
+
+					var x = 0;
+					var sliceWidth = canvas.width * 1.0 / bufferLength;
+
+					context.beginPath();
+					for (var i = 0; i < bufferLength; i++, x+= sliceWidth ) {
+						var y = canvas.height * ( dataArray[ i ] / 256 );
+							
+						if ( 0 === i ) {
+							context.moveTo(x, y);
+						} else {
+							context.lineTo(x, y);
+						}
+					}
+
+					context.stroke();
+				};
+
+				/* initial call to draw function */
+
+				draw();
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="1024" height="512"></canvas>
+	</BODY>
+</HTML>
