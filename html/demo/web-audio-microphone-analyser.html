@@ -74,12 +74,7 @@
 					context.beginPath();
 					for (var i = 0; i < bufferLength; i++, x+= sliceWidth ) {
 						var y = canvas.height * ( dataArray[ i ] / 256 );
-							
-						if ( 0 === i ) {
-							context.moveTo(x, y);
-						} else {
-							context.lineTo(x, y);
-						}
+						( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
 					}
 
 					context.stroke();
