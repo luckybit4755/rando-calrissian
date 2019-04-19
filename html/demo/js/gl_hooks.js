@@ -13,8 +13,15 @@
  *
  * only tested under chrome and firefox
  *
+ * val: need to check out http://glmatrix.net/
+ *
+ *
  */
 var gl_hookz = function( selector ) {
+	/* this is me being lazy */
+	mat4 = glMatrix.mat4;
+
+
 	if ( !selector ) selector = 'canvas';
 
 	var canvas = $( selector )[ 0 ];
@@ -29,7 +36,7 @@ var gl_hookz = function( selector ) {
 		return;
 	}
 
-	if ( true ) {
+	if ( typeof WebGLDebugUtils !== 'undefined') {
 		gl = WebGLDebugUtils.makeDebugContext( gl );
 	}
 
@@ -151,6 +158,7 @@ var gl_hookz = function( selector ) {
 			console.log( 'attribute.ok: ' + name );
 		}
 	}
+
 	
 	/* for all the uniforms found in the shader program, hook them up */
 
@@ -159,9 +167,12 @@ var gl_hookz = function( selector ) {
 		var uniform = {
 			name:name
 			, location:gl.getUniformLocation( shaderProgram, name )
-			, mat4:mat4.identity( mat4.create() )
-			, tmp_mat4:mat4.identity( mat4.create() )
+			, mat4:     mat4.identity( mat4.create() )
+			, tmp_mat4: mat4.identity( mat4.create() )
 		};
+
+console.log( 'fck ' + name + ' and ' + uniform.tmp_mat4 );
+
 		if ( -1 == uniform.location ) {
 			console.log( 'uniform.oops: ' + name );
 		} else {
@@ -173,14 +184,21 @@ var gl_hookz = function( selector ) {
 			var uniform_type = false;
 			
 			console.log( 'trying to bind ' + name + ' some errors here are "ok"' );
-			try { 
-				gl.uniform1i( uniform.location, 0 ); 
-				uniform_type = 'scalar';
-			} catch( e ) {}
-			try { 
-				gl.uniformMatrix4fv( uniform.location, false, uniform.mat4 ); 
-				uniform_type = 'vec4';
-		   	} catch( e ) {}
+
+			if ( !uniform_type ) {
+				try { 
+					gl.uniformMatrix4fv( uniform.location, false, uniform.mat4 ); 
+					uniform_type = 'vec4';
+				} catch( e ) {}
+			}
+
+			if ( !uniform_type ) {
+				try { 
+					gl.uniform1i( uniform.location, 0 ); 
+					uniform_type = 'scalar';
+				} catch( e ) {}
+			}
+
 
 			if ( !uniform_type ) {
 				gl.hookz.unused[ name ] = true;
@@ -292,51 +310,49 @@ var gl_hookz = function( selector ) {
 	gl.hookz.util.scale = function( name, scale ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.scale( uniform.tmp_mat4, [scale,scale,scale], uniform.mat4 );
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.scale( uniform.mat4, uniform.tmp_mat4, [scale,scale,scale] );
 		}
 	}
 
 	gl.hookz.util.rotate = function( name, angle, axis ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.rotate( uniform.tmp_mat4, angle, axis, uniform.mat4 );
+			// valerie: verifiy this is fixed now
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.rotate( uniform.mat4, uniform.tmp_mat4, angle, axis );
 		}
 	};
 
 	gl.hookz.util.rotateX = function( name, angle ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.rotateX( uniform.tmp_mat4, angle, uniform.mat4 );
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.rotateX( uniform.mat4, uniform.tmp_mat4, angle );
 		}
 	};
 
 	gl.hookz.util.rotateY = function( name, angle ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.rotateY( uniform.tmp_mat4, angle, uniform.mat4 );
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.rotateY( uniform.mat4, uniform.tmp_mat4, angle );
 		}
 	};
 
 	gl.hookz.util.rotateZ = function( name, angle ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.rotateZ( uniform.tmp_mat4, angle, uniform.mat4 );
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.rotateZ( uniform.mat4, uniform.tmp_mat4, angle ); 
 		}
 	};
 
 	gl.hookz.util.translate = function( name, values ) {
 		var uniform = gl.hookz.shader.uniforms[ name ];
 		if ( uniform ) {
-			mat4.set( uniform.mat4, uniform.tmp_mat4 );
-			mat4.translate( uniform.tmp_mat4, values, uniform.mat4 );
-			/*console.log( uniform.mat4 ); */
-		} else {
-			console.log( 'could not find uniform vector named ' + name );
+			mat4.copy( uniform.tmp_mat4, uniform.mat4 );
+			mat4.translate( uniform.mat4, uniform.tmp_mat4, values );
 		}
 	};
 
