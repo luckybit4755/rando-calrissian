@@ -1,0 +1,96 @@
+<HTML>
+	<HEAD>
+		<TITLE>simple3</TITLE>
+		
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+
+		<!--
+			trying to get familiar with the webgl stuff.
+			want to make as simple an example as possible
+		-->
+
+		<!-- plan to remove this dependency asap -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	
+		<script src="js/gl_hooks.js"></script>
+		
+		<!-- https://github.com/toji/gl-matrix -->
+		<script src="js/gl-matrix-min.js"></script> 
+
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!-- vertex shader -->
+
+        <script id="shader-vs" type="x-shader/x-vertex">
+			precision mediump float;
+
+            attribute vec3 aVertexPosition;
+            attribute vec4 aVertexColor;
+            attribute vec3 aVertexNormal;
+
+            uniform mat4 uRotationMatrix;
+
+            varying vec4 vColor; // copy to the fragment shader
+
+            void main() {
+				gl_Position = uRotationMatrix * vec4( aVertexPosition, 1.0);
+				vColor = uRotationMatrix * vec4( aVertexNormal, 1.0 ) * aVertexColor * 0.5 + 0.5 * aVertexColor;
+            }
+		</script>
+
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!-- fragment shader -->
+
+        <script id="shader-fs" type="x-shader/x-fragment">
+			precision mediump float;
+
+			varying vec4 vColor; // copied from the vertex shader
+            void main(void) {
+                gl_FragColor = vColor;
+            }
+		</script>
+
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!-- the driver code -->
+
+		<script type="text/javascript">
+			window.onload = function() {
+				var gl = gl_hookz();
+				
+				gl.hookz.util.vertexData( 'aVertexPosition'
+                	, +0.0, +1.0, +0.0 /* vertex of point 1 */
+                	, -1.0, -1.0, +1.0 /* vertex of point 2 */
+                	, +1.0, -1.0, +1.0 /* vertex of point 3 */
+				);
+				gl.hookz.util.colorData( 'aVertexColor'
+					, 1.0, 0.0, 0.0, 1.0 /* color of point 1 */
+					, 0.0, 1.0, 0.0, 1.0 /* color of point 2 */
+					, 0.0, 0.0, 1.0, 1.0 /* color of point 3 */
+				);
+				gl.hookz.util.vertexData( 'aVertexNormal'
+					, 0.0, 0.0, 1.0 /* normal of point 1 */
+					, 0.0, 0.0, 1.0 /* normal of point 2 */
+					, 0.0, 0.0, 1.0 /* normal of point 3 */
+				);
+
+				var angle = 0;
+
+				setInterval(
+                    function() {
+						gl.hookz.util.identity( 'uRotationMatrix' );
+						gl.hookz.util.scale( 'uRotationMatrix', 0.5 );
+						gl.hookz.util.rotateX( 'uRotationMatrix', angle );
+						gl.hookz.util.rotateY( 'uRotationMatrix', angle );
+						gl.hookz.util.rotateZ( 'uRotationMatrix', angle );
+						gl.hookz.util.updateMatrix( 'uRotationMatrix' );	
+
+						gl.drawArrays( gl.TRIANGLES, 0,  3 );
+
+						angle += 0.1;
+				},100);
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
