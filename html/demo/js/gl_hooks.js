@@ -23,8 +23,7 @@ var gl_hookz = function( selector ) {
 
 
 	if ( !selector ) selector = 'canvas';
-
-	var canvas = $( selector )[ 0 ];
+	var canvas = document.querySelector( selector );
 	if ( !canvas ) {
 		console.log( 'could not find canvas for selector "' + selector + '"' );
 		return;
@@ -65,61 +64,63 @@ var gl_hookz = function( selector ) {
 	var shaderProgram = gl.createProgram();
 
 	/* assume we just have one of each type... */
-	$( [ "fragment", "vertex" ] ).each( 
-		function( i, v ) {
-			var type = {fragment:gl.FRAGMENT_SHADER,vertex:gl.VERTEX_SHADER}[ v ];
-			var shader = gl.createShader( type );
-			var src = $( 'script[type="x-shader/x-' + v + '"]' ).text();
+	var shader_types = [ "fragment", "vertex" ];
+	for ( var i = 0 ; i < shader_types.length ; i++ ) {
+		var shader_type = shader_types[ i ];
 
-			console.log( 'processing ' + v );
+		var type = {fragment:gl.FRAGMENT_SHADER,vertex:gl.VERTEX_SHADER}[ shader_type ];
+		var shader = gl.createShader( type );
+		
+		var src = ( document.querySelector( 'script[type="x-shader/x-' + shader_type + '"]' ) ).innerHTML;
 
-			/* 
-				this madness tries to pull out the names of attributes and 
-				uniforms from the script .. it is kinda nuts
-			*/
+		console.log( 'processing ' + shader_type );
 
-			var xrc = src
-				.replace( /\/\/.*/g, '' )        /* remove eol comments */
-				.replace( /\n/g, ' ' )           /* put everything on one line */
-				.replace( /\/\*[^*]*\*\//g, '' ) /* not great way to remove block comments (can't have splats in the body!) */
-				.replace( /;/g, ';\n' )          /* use semis to make new lines */
-				.replace( /[\t ]+/g, ' ' )       /* normalize spacing */
-				.replace( /;.*/g, '' )           /* trim from semi to eol */
-			;
-			/* console.log( xrc ); */
-			xrc = xrc.split( '\n' )
+		/* 
+			this madness tries to pull out the names of attributes and 
+			uniforms from the script .. it is kinda nuts
+		*/
 
-			var pullNames = function( pattern, cb ) {
-				var x = new RegExp( '^ *' + pattern + ' .*' );
-				var cut = new RegExp( '^ *' + pattern + ' *[a-zA-Z_][a-zA-Z_0-9]* ' );
-				for ( var i = 0 ; i < xrc.length ; i++ ) {
-					if ( xrc[ i ].match( x ) ) {
-						var attributes = xrc[ i ]
-							.replace( cut, '' )
-							.split( ',' )
-						;
-						console.log( '- ' + pattern + '>' + attributes );
-						for ( var j = 0 ; j < attributes.length ; j++ ) {
-							console.log( '- ' + pattern + '>>' + attributes[ j ] );
-							cb( attributes[ j ] );
-						}
+		var xrc = src
+			.replace( /\/\/.*/g, '' )        /* remove eol comments */
+			.replace( /\n/g, ' ' )           /* put everything on one line */
+			.replace( /\/\*[^*]*\*\//g, '' ) /* not great way to remove block comments (can't have splats in the body!) */
+			.replace( /;/g, ';\n' )          /* use semis to make new lines */
+			.replace( /[\t ]+/g, ' ' )       /* normalize spacing */
+			.replace( /;.*/g, '' )           /* trim from semi to eol */
+		;
+		/* console.log( xrc ); */
+		xrc = xrc.split( '\n' )
+
+		var pullNames = function( pattern, cb ) {
+			var x = new RegExp( '^ *' + pattern + ' .*' );
+			var cut = new RegExp( '^ *' + pattern + ' *[a-zA-Z_][a-zA-Z_0-9]* ' );
+			for ( var i = 0 ; i < xrc.length ; i++ ) {
+				if ( xrc[ i ].match( x ) ) {
+					var attributes = xrc[ i ]
+						.replace( cut, '' )
+						.split( ',' )
+					;
+					console.log( '- ' + pattern + '>' + attributes );
+					for ( var j = 0 ; j < attributes.length ; j++ ) {
+						console.log( '- ' + pattern + '>>' + attributes[ j ] );
+						cb( attributes[ j ] );
 					}
 				}
-			};
-			pullNames( 'attribute', function( name ) { gl.hookz.shader.attribute_names.push( name ); } );
-			pullNames( 'uniform', function( name ) { gl.hookz.shader.uniform_names.push( name ); } );
-
-			gl.shaderSource( shader, src );
-			gl.compileShader( shader );
-			var compiled = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-			if ( compiled ) {
-				console.log( 'compiled ' + v );
-				gl.attachShader( shaderProgram, shader );
-			} else {
-				console.log( v + ' failed to compile:' + gl.getShaderInfoLog( shader ) );
 			}
+		};
+		pullNames( 'attribute', function( name ) { gl.hookz.shader.attribute_names.push( name ); } );
+		pullNames( 'uniform', function( name ) { gl.hookz.shader.uniform_names.push( name ); } );
+
+		gl.shaderSource( shader, src );
+		gl.compileShader( shader );
+		var compiled = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+		if ( compiled ) {
+			console.log( 'compiled ' + shader_type );
+			gl.attachShader( shaderProgram, shader );
+		} else {
+			console.log( shader_type + ' failed to compile:' + gl.getShaderInfoLog( shader ) );
 		}
-	);
+	}
 
 	console.log( 'attributes:' + gl.hookz.shader.attribute_names.join( ',' ) );
 	console.log( 'uniforms:' + gl.hookz.shader.uniform_names.join( ',' ) );
