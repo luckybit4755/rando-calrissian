@@ -2,7 +2,7 @@
 	<HEAD>
 		<TITLE>simple3</TITLE>
 		
-		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
 
 		<!--
 			trying to get familiar with the webgl stuff.
@@ -15,7 +15,7 @@
 		<!-- https://github.com/toji/gl-matrix -->
 		<script src="js/gl-matrix-min.js"></script> 
 
-		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
 		<!-- vertex shader -->
 
         <script id="shader-vs" type="x-shader/x-vertex">
@@ -35,7 +35,7 @@
             }
 		</script>
 
-		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
 		<!-- fragment shader -->
 
         <script id="shader-fs" type="x-shader/x-fragment">
@@ -47,47 +47,60 @@
             }
 		</script>
 
-		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
 		<!-- the driver code -->
 
 		<script type="text/javascript">
 			window.onload = function() {
 				var gl = gl_hookz();
+				var util = gl.hookz.util;
+
+				/* alternative to string literals.. */
+				var names = gl.hookz.names; 
 				
-				gl.hookz.util.vertexData( 'aVertexPosition'
+				util.copyXYZ( names.aVertexPosition
                 	, +0.0, +1.0, +0.0 /* vertex of point 1 */
                 	, -1.0, -1.0, +1.0 /* vertex of point 2 */
                 	, +1.0, -1.0, +1.0 /* vertex of point 3 */
 				);
-				gl.hookz.util.colorData( 'aVertexColor'
+				util.copyRGBA( names.aVertexColor
 					, 1.0, 0.0, 0.0, 1.0 /* color of point 1 */
 					, 0.0, 1.0, 0.0, 1.0 /* color of point 2 */
 					, 0.0, 0.0, 1.0, 1.0 /* color of point 3 */
 				);
-				gl.hookz.util.vertexData( 'aVertexNormal'
+				util.copyXYZ( names.aVertexNormal
 					, 0.0, 0.0, 1.0 /* normal of point 1 */
 					, 0.0, 0.0, 1.0 /* normal of point 2 */
 					, 0.0, 0.0, 1.0 /* normal of point 3 */
 				);
+				gl.hookz.util.facesData( 'triangle', 0, 1 ,2 );
 
 				var angle = 0;
 
-				setInterval(
-                    function() {
-						gl.hookz.util.identity( 'uRotationMatrix' );
-						gl.hookz.util.scale( 'uRotationMatrix', 0.5 );
-						gl.hookz.util.rotateX( 'uRotationMatrix', angle );
-						gl.hookz.util.rotateY( 'uRotationMatrix', angle );
-						gl.hookz.util.rotateZ( 'uRotationMatrix', angle );
-						gl.hookz.util.updateMatrix( 'uRotationMatrix' );	
+				var draw = function() {
+					util.identity( names.uRotationMatrix );
+					util.scale( names.uRotationMatrix, 0.5 );
+					util.rotateX( names.uRotationMatrix, angle );
+					util.rotateY( names.uRotationMatrix, angle );
+					util.rotateZ( names.uRotationMatrix, angle );
+					util.updateMatrix( names.uRotationMatrix );	
+						
+				//	gl.drawArrays( gl.TRIANGLES, 0,  3 );
+					gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT,0);
 
-						gl.drawArrays( gl.TRIANGLES, 0,  3 );
+					angle += 0.1;
 
-						angle += 0.1;
-				},100);
+					setTimeout( function() { requestAnimationFrame( draw ); } , 100 );
+				};
+
+				draw();
 			};
 		</script>
 	</HEAD>
+	
+	<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+	<!-- html just for the canvas -->
+
 	<BODY>
 		<canvas width="512" height="512"></canvas>
 	</BODY>
