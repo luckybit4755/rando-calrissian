@@ -1,6 +1,6 @@
 <HTML>
 	<HEAD>
-		<TITLE>fracto3</TITLE>
+		<TITLE>figuro3</TITLE>
 		
 		<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
 
@@ -55,17 +55,22 @@
 				var util = gl.hookz.util;
 				var names = gl.hookz.names; 
 
-				var vertices = [];
-				var colors = [];
+				var figures = [];
 
 				var wrap = function( v ) {
 					if ( v < 0 ) v = -v;
 					if ( v > 1 ) v -= Math.floor( v );
+					return 0.1 + 0.6 * v; // less pastel, please
 					return v;
 				};
 
-				var fracto = function() {
-					var n = Math.floor( 13 + Math.random() * 33 );
+				var figuro = function() {
+					var vertices = [];
+					var colors = [];
+
+					var figure = {vertices:vertices,colors:colors};
+
+					var n = Math.floor( 33 + Math.random() * 44 );
 
 					var x = 0.5 * Math.random();
 					var y = 0.5 * Math.random();
@@ -85,7 +90,6 @@
 					}
 					
 					for ( var i = 0 ; i < n ; i++ ) {
-						console.log(z);
 						vertices.push( x ); 
 						vertices.push( y ); 
 						vertices.push( z );
@@ -110,36 +114,49 @@
 						angle += angle_inc;
 					}
 
-					util.setXYZ( names.aVertexPosition, vertices );
-					util.setRGBA( names.aVertexColor, colors );
+					figure.lineCount = figure.vertices.length / 3 - 1;
 
-					console.log( n + ' and ' + vertices.length / 3 );
+					return figure;
 				};
 
-				(
-				document.getElementsByTagName( 'canvas' )[ 0 ].onclick = function() { 
-					//vertices = [];
-					//colors = [];
-					fracto() 
-				}
-				)();
+				var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				( canvas.onclick = function() { figures = [ figuro() ]; } )(); 
 
+				var fade = 0.99;
 				var angle = 0;
 
+				gl.lineWidth( 2 ); // <-- doesn't work
+				gl.clearColor(0.0, 0.0, 0.5, 0.8); //<-- does nothing
+
+				gl.disable( gl.DEPTH_TEST );
+				gl.enable( gl.BLEND );
+				gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
 				var draw = function() {
+					figures.push( figuro() );
+					if ( figures.length > 3 * 33 ) {
+						figures = figures.slice( 1 );
+					}
+
 					util.identity( names.uRotationMatrix );
 					util.rotateX( names.uRotationMatrix, angle );
 					util.rotateY( names.uRotationMatrix, angle );
 					util.rotateZ( names.uRotationMatrix, angle );
 					util.updateMatrix( names.uRotationMatrix );	
 					angle += 0.1;
-					
-					if ( !true ) {	
-						gl.drawArrays( gl.LINE_LOOP, 0,  vertices.length / 3 );
-					} else {
-						gl.drawArrays( gl.LINE_STRIP, 0, vertices.length / 3 )
-					}
 
+					for ( var i = 0 ; i < figures.length ; i++ ) {
+						var figure = figures[ i ];
+					
+						util.setXYZ( names.aVertexPosition, figure.vertices );
+						util.setRGBA( names.aVertexColor, figure.colors );
+
+						gl.drawArrays( gl.LINE_STRIP, 0, figure.lineCount );
+
+						for ( var j = 3 ; j < figure.colors.length ; j += 4 ) {
+							figure.colors[ j ] *= fade;
+						}
+					}
 
 					setTimeout( function() { requestAnimationFrame( draw ); } , 100 );
 				};
