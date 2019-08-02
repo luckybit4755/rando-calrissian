@@ -1,0 +1,131 @@
+<HTML>
+	<HEAD>
+		<TITLE>2d-gradient</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+				background:black;
+			}
+			canvas {
+				border:3px dashed black;
+			}
+		</style>
+
+		<script src="js/functions.js"></script>
+
+		<script type="text/javascript">
+			const r = function() { return Math.random() };
+
+			window.onload = function() {
+				var canvas = getByTag( 'canvas' );
+				var context = canvas.getContext( '2d' );
+				var w = canvas.width;
+				var h = canvas.height;
+
+				var stops = [];
+				let count = 1 + Math.floor( 4 * r() );
+				for ( let i = 0 ; i < count ; i++ ) {
+					let stop = { position:[], max:0, min:33, color:[] };
+					stops.push( stop );
+
+					for ( var j = 0 ; j < 2 ; j++ ) {
+						stop.position.push( r() );
+					}
+
+					for ( var j = 0 ; j < 3 ; j++ ) {
+						stop.color.push( 255 * r() );
+					}
+
+					for ( let x = 0 ; x < 2 ; x++ ) {
+						let distance_x = stop.position[ 0 ] - x;
+						distance_x *= distance_x;
+
+						for ( let y = 0 ; y < 2 ; y++ ) {
+							let distance_y = stop.position[ 1 ] - y;
+							distance_y *= distance_y;
+
+							let distance = distance_x + distance_y;
+							stop.max = stop.max > distance ? stop.max : distance;
+							stop.min = stop.min < distance ? stop.min : distance;
+						}
+					}
+					stop.diff = stop.max - stop.min;
+					console.log( JSON.stringify( stop ) );
+				}
+
+				var imageData = context.getImageData( 0, 0, w, h );
+
+				let data_index = 0;
+				
+				let position = [ 0, 0 ];
+				let color = [ 0, 0, 0 ];
+
+				for ( let i_y = 0 ; i_y < h ; i_y++ ) {
+					let y = i_y / h;
+					position[ 1 ] = y;
+
+					for ( let i_x = 0 ; i_x < w ; i_x++ ) {
+						let x = i_x / w;
+						position[ 0 ] = x;
+
+						color[ 0 ] = color[ 1 ] = color[ 2 ] = 0;
+
+						for ( let stop_index = 0 ; stop_index < stops.length ; stop_index++ ) {
+							let stop = stops[ stop_index ];
+							let distance = 0;
+
+							for ( let idk = 0 ; idk < position.length ; idk++ ) {
+								let distance_bit = position[ idk ] - stop.position[ idk ];
+								distance += distance_bit * distance_bit;
+							}
+
+							let distance_scaled = ( distance - stop.min ) / stop.diff; // 0 to 1
+							let distance_value = ( 1 - distance_scaled ) / stops.length;
+
+							for ( let idk = 0 ; idk < color.length ; idk++ ) {
+								color[ idk ] += distance_value * stop.color[ idk ];
+							}
+						}
+
+						for ( let idk = 0 ; idk < color.length ; idk++ ) {
+							color[ idk ] = Math.floor( color[ idk ] );
+						}
+
+						imageData.data[ data_index++ ] = color[ 0 ];
+						imageData.data[ data_index++ ] = color[ 1 ];
+						imageData.data[ data_index++ ] = color[ 2 ];
+						imageData.data[ data_index++ ] = 255;
+					}
+				}
+
+				context.putImageData( imageData, 0, 0 );
+
+				let size = 2;
+				for ( let stop_index = 0 ; stop_index < stops.length ; stop_index++ ) {
+					let stop = stops[ stop_index ];
+					let x = w * stop.position[ 0 ];
+					let y = h * stop.position[ 1 ];
+
+					let fill = 'rgb(x,x,x)';
+					for ( let idk = 0 ; idk < stop.color.length ; idk++ ) {
+						fill = fill.replace( /x/, 255 - stop.color[ idk ] );
+					}
+					context.fillStyle = fill;
+					context.fillRect( x - size - 1, y - size - 1, 2 * size + 2, 2 * size + 2 );
+					
+					fill = 'rgb(x,x,x)';
+					for ( let idk = 0 ; idk < stop.color.length ; idk++ ) {
+						fill = fill.replace( /x/, stop.color[ idk ] );
+					}
+					
+					context.fillStyle = fill;
+					context.fillRect( x - size, y - size, 2 * size, 2 * size );
+				}
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
