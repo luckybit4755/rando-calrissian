@@ -1,0 +1,282 @@
+<HTML>
+	<HEAD>
+		<TITLE>mine-sweeper</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+			controls {
+				display:block;
+			}
+			control {
+				display:inline-block;
+			}
+			row {
+				display:block;
+			}
+
+			cell {
+				display:inline-block;
+				height: 1.2em;
+				width:  1.2em;
+				padding-bottom: 0.2em;
+				text-align: center;
+				border-top:    1px solid #DDD;
+				border-left:   1px solid #DDD;
+				border-right:  1px solid #444;
+				border-bottom: 1px solid #444;
+				background:              #AAA;
+				cursor: crosshair;
+				-webkit-user-select: none; /* Safari */
+				-moz-user-select: none; /* Firefox */
+				-ms-user-select: none; /* IE10+/Edge */
+				user-select: none; /* Standard */
+			}
+
+			cell:hover:not(.clucked) {
+				border:1px solid yellow;
+			 }
+
+			.clucked {
+				border-top:    1px solid #ABB;
+				border-left:   1px solid #ABB;
+				border-right:  1px solid #A99;
+				border-bottom: 1px solid #A99;
+			}
+
+			.mine {
+				background:red;
+			}
+
+			.count1 { color:Blue	   ; }
+			.count2 { color:Green	   ; }
+			.count3 { color:Red	       ; }
+			.count4 { color:Purple	   ; }
+			.count5 { color:Maroon	   ; }
+			.count6 { color:Turquoise  ; }
+			.count7 { color:Black	   ; }
+			.count8 { color:Gray	   ; }
+		</style>
+
+		<script type="text/javascript">
+			const identifier = function( node, identified ) {
+				if ( !node ) node = document.body;
+				if ( !identified ) identified = {};
+				
+				if ( node && node.hasAttribute && node.hasAttribute( 'id' ) ) {
+					identified[ node.getAttribute( 'id' ) ] = node;
+				}
+				if ( node && node.childElementCount ) {
+					for ( var i = 0 ; i < node.childElementCount ; i++ ) {
+						identifier( node.children[ i ], identified )	
+					}
+				}
+				return identified;
+			};
+
+			const load = function() {
+				var identified = identifier();
+				//console.log( identified );
+				identified.create.onclick = function() { create( identified ) };
+				identified.create.click();
+			};
+
+			const create = function( identified ) {
+				let debug = false;
+
+				if ( !validateInputs( identified ) ) return
+
+				createElements( identified )
+				mineTheBoard( identified, debug );
+				countTheNeighbors( identified, debug );
+
+				identified.board.onclick = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					clucked( e.target, identified, e.shiftKey );
+				}
+			};
+
+			const validateInputs = function( identified ) {
+				identified.columns.value = parseInt(   identified.columns.value );
+				identified.rows.value    = parseInt(   identified.rows.value    );
+				identified.percent.value = parseFloat( identified.percent.value );
+				return !isNaN( identified.columns.value + identified.rows.value + identified.percent.value );
+			};
+
+			const createElements = function( identified ) {
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+
+				identified.board = identified.board || document.getElementsByTagName( 'board' )[ 0 ];
+				identified.board.innerHTML = '';
+
+				for ( let row = 0 ; row < rows ; row++ ) {
+					let rowElement = document.createElement( 'row' );
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = document.createElement( 'cell' );
+						cellElement.innerHTML = '&nbsp;';
+						cellElement.row = row; 
+						cellElement.column = column;
+						rowElement.appendChild( cellElement );
+					}
+					identified.board.appendChild( rowElement );
+				}
+			};
+
+			const mineTheBoard = function( identified, debug ) {
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+
+				let percent = identified.percent.value;
+				let mined = Math.floor( rows * columns * percent );
+
+				let count = 0;
+				while ( count < mined ) {
+					let row = Math.floor( Math.random() * rows );
+					let column = Math.floor( Math.random() * columns );
+					let cellElement = identified.board.childNodes[ row ].childNodes[ column ];
+
+					if ( !cellElement.mined ) {
+						cellElement.mined = Math.random() < percent;
+						if ( cellElement.mined ) {
+							if ( debug ) {
+								cellElement.innerHTML = '*';
+							} else {
+								cellElement.innerHTML = '&nbsp;';
+							}
+							count++;
+						}
+					}
+				}
+
+				identified.board.mined = mined;
+				identified.board.free = rows * columns - mined;
+				identified.board.cleared = 0;
+
+				//console.log( count + ' of ' + mined );
+			};
+				
+			const countTheNeighbors = function( identified, debug ) {
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+
+				for ( let row = 0 ; row < rows ; row++ ) {
+					let rowElement = identified.board.childNodes[ row ];
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = rowElement.childNodes[ column ];
+						if ( cellElement.mined ) continue;
+
+						let neighborCount = 0;
+						for ( let i = row - 1 ; i < row + 2 ; i++ ) {
+							if( i < 0 || i >= rows ) continue;
+							let neighborRow = identified.board.childNodes[ i ];
+							for( let j = column - 1 ; j < column + 2 ; j++ ) {
+								if( j < 0 || j >= columns ) continue;
+								let neighborCell = neighborRow.childNodes[ j ];
+								if ( neighborCell.mined ) {
+									neighborCount++;
+								}
+							}
+						}
+
+						cellElement.innerHTML = '&nbsp;';
+						cellElement.neighborCount = neighborCount;
+
+						if ( debug && cellElement.neighborCount ) {
+							cellElement.innerHTML = neighborCount;
+							cellElement.setAttribute( 'class', 'count' + neighborCount );
+						}
+					}
+				}
+			};
+
+			const clucked = function( cellElement, identified, shifted ) {
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+
+				let isClucked = /clucked/.test( cellElement.getAttribute( 'class' ) );
+
+				if ( shifted ) {
+					if ( isClucked ) return;
+
+					cellElement.marked = cellElement.marked ? false : true;
+					if ( cellElement.marked ) {
+						cellElement.innerHTML = '?';
+					} else {
+						cellElement.innerHTML = '&nbsp;';
+					}
+					return;
+				}
+
+				if ( cellElement.marked || isClucked ) {
+					return;
+				}
+
+				if ( cellElement.mined ) {
+					for ( let i = 0 ; i < rows ; i++ ) {
+						for ( let j = 0 ; j < columns ; j++ ) {
+							let neighborCell = identified.board.childNodes[ i ].childNodes[ j ];
+							if( neighborCell.mined ) {
+								neighborCell.innerHTML = '*';
+								neighborCell.setAttribute( 'class', 'mine' );
+							}
+						}
+					}
+
+					return uLose( identified );
+				}
+
+				identified.board.cleared++;
+				winCheck( identified );
+
+				if ( cellElement.neighborCount ) {
+					cellElement.setAttribute( 'class', 'clucked count' + cellElement.neighborCount );
+					cellElement.innerHTML = cellElement.neighborCount;
+				} else {
+					cellElement.setAttribute( 'class', 'clucked' );
+
+					for ( let i = cellElement.row - 1 ; i < cellElement.row + 2 ; i++ ) {
+						if( i < 0 || i >= rows ) continue;
+						for ( let j = cellElement.column - 1 ; j < cellElement.column + 2 ; j++ ) {
+							if( j < 0 || j >= columns ) continue;
+							let neighborCell = identified.board.childNodes[ i ].childNodes[ j ];
+							clucked( neighborCell, identified );
+						}
+					}
+				}
+			};
+
+			const winCheck = function( identified ) {
+				if ( identified.board.cleared == identified.board.free ) {
+					return uWin( identified );
+				} 
+				
+				if ( identified.board.cleared > identified.board.free ) {
+					console.log( 'sheat: ' + identified.board.cleared + ' vs ' + identified.board.free );
+				}
+			};
+
+			const uWin = function( identified ) {
+				alert( 'u win' );
+				identified.board.onclick = false;
+			};
+
+			const uLose = function( identified ) {
+				alert( 'u fckd up!' );
+				identified.board.onclick = function() { create( identified ) };
+			};
+
+			window.onload = function() { load() }
+		</script>
+	</HEAD>
+	<BODY>
+		<controls>
+			<control><label>rows:</label>    <input id="rows"    value="22"   size="5"></input></control>
+			<control><label>columns:</label> <input id="columns" value="22"   size="5"></input></control>
+			<control><label>percent:</label> <input id="percent" value="0.13" size="5"></input></control>
+			<control><button id="create">create</button></control>
+		</controls>
+		<board></board>
+	</BODY>
+</HTML>
