@@ -5,13 +5,35 @@
 		<style>
 			body {
 				font-family: Comic Sans MS, sans;
+				text-align:center;
 			}
+
 			controls {
 				display:block;
 			}
+
 			control {
 				display:inline-block;
 			}
+
+			bevel  {
+				display:inline-block;
+				margin-bottom: 0.5em;
+				border-top:    0.33em solid #DDD;
+				border-left:   0.33em solid #DDD;
+				border-right:  0.33em solid #444;
+				border-bottom: 0.33em solid #444;
+				background:              #AAA;
+			}
+
+			board {
+				display:inline-block;
+				border-top:    0.33em solid #444;
+				border-left:   0.33em solid #444;
+				border-right:  0.33em solid #DDD;
+				border-bottom: 0.33em solid #DDD;
+			}
+
 			row {
 				display:block;
 			}
@@ -27,16 +49,16 @@
 				border-right:  1px solid #444;
 				border-bottom: 1px solid #444;
 				background:              #AAA;
-				cursor: crosshair;
+				cursor: default;
 				-webkit-user-select: none; /* Safari */
-				-moz-user-select: none; /* Firefox */
-				-ms-user-select: none; /* IE10+/Edge */
-				user-select: none; /* Standard */
+				-moz-user-select:    none; /* Firefox */
+				-ms-user-select:     none; /* IE10+/Edge */
+				user-select:         none; /* Standard */
 			}
 
 			cell:hover:not(.clucked) {
 				border:1px solid yellow;
-			 }
+			}
 
 			.clucked {
 				border-top:    1px solid #ABB;
@@ -49,6 +71,10 @@
 				background:red;
 			}
 
+			.mismarked {
+				background:yellow;
+			}
+
 			.count1 { color:Blue	   ; }
 			.count2 { color:Green	   ; }
 			.count3 { color:Red	       ; }
@@ -57,35 +83,57 @@
 			.count6 { color:Turquoise  ; }
 			.count7 { color:Black	   ; }
 			.count8 { color:Gray	   ; }
+
+			info {
+				display:block;
+			}
+			
+			counter {
+				display:inline-block;
+				background:black;
+				color:red;
+				text-align:right;
+				width:2em;
+			}
+	
+			.helpClear {
+				background: #AFA;
+			}
+
+			.helpMark {
+				background: #FAA;
+			}
 		</style>
 
 		<script type="text/javascript">
-			const identifier = function( node, identified ) {
-				if ( !node ) node = document.body;
-				if ( !identified ) identified = {};
-				
-				if ( node && node.hasAttribute && node.hasAttribute( 'id' ) ) {
-					identified[ node.getAttribute( 'id' ) ] = node;
-				}
-				if ( node && node.childElementCount ) {
-					for ( var i = 0 ; i < node.childElementCount ; i++ ) {
-						identifier( node.children[ i ], identified )	
-					}
-				}
-				return identified;
-			};
+			const POSSIBLE_MINE_TEXT   = '* &#x2617; &#x2612; &#x2605; &#x2629; &#x2613;';
+			const POSSIBLE_MARKED_TEXT = '? &#x2600; &#x2602; &#x2611; &#x2668;';
+
+			let MINE_TEXT = '*';
+			let CLEAR_TEXT = '&nbsp;';
+			let MARKED_TEXT = '?';
 
 			const load = function() {
 				var identified = identifier();
-				//console.log( identified );
 				identified.create.onclick = function() { create( identified ) };
 				identified.create.click();
+
+				// tried to automate this, but cannot find the name to function connection
+				// windows[ name ] doesn't work... it finds the element not the function
+				identified.help.onclick = function() { help( identified ) };
+				identified.auto.onclick = function() { auto( identified ) };
 			};
 
 			const create = function( identified ) {
+				if ( identified.lol ) {
+					clearInterval( identified.lol );
+				}
+
 				let debug = false;
 
 				if ( !validateInputs( identified ) ) return
+
+				setTextValues();
 
 				createElements( identified )
 				mineTheBoard( identified, debug );
@@ -94,7 +142,10 @@
 				identified.board.onclick = function( e ) {
 					if ( 'CELL' != e.target.nodeName ) return;
 					clucked( e.target, identified, e.shiftKey );
+					//help( identified ); //snit
 				}
+
+				winCheck( identified );
 			};
 
 			const validateInputs = function( identified ) {
@@ -115,7 +166,7 @@
 					let rowElement = document.createElement( 'row' );
 					for ( let column = 0 ; column < columns ; column++ ) {
 						let cellElement = document.createElement( 'cell' );
-						cellElement.innerHTML = '&nbsp;';
+						cellElement.innerHTML = CLEAR_TEXT;
 						cellElement.row = row; 
 						cellElement.column = column;
 						rowElement.appendChild( cellElement );
@@ -141,9 +192,9 @@
 						cellElement.mined = Math.random() < percent;
 						if ( cellElement.mined ) {
 							if ( debug ) {
-								cellElement.innerHTML = '*';
+								cellElement.innerHTML = MINE_TEXT;
 							} else {
-								cellElement.innerHTML = '&nbsp;';
+								cellElement.innerHTML = CLEAR_TEXT;
 							}
 							count++;
 						}
@@ -153,6 +204,7 @@
 				identified.board.mined = mined;
 				identified.board.free = rows * columns - mined;
 				identified.board.cleared = 0;
+				identified.board.marked = 0;
 
 				//console.log( count + ' of ' + mined );
 			};
@@ -165,7 +217,9 @@
 					let rowElement = identified.board.childNodes[ row ];
 					for ( let column = 0 ; column < columns ; column++ ) {
 						let cellElement = rowElement.childNodes[ column ];
-						if ( cellElement.mined ) continue;
+						if ( cellElement.mined ) {
+							continue;
+						}
 
 						let neighborCount = 0;
 						for ( let i = row - 1 ; i < row + 2 ; i++ ) {
@@ -180,7 +234,7 @@
 							}
 						}
 
-						cellElement.innerHTML = '&nbsp;';
+						cellElement.innerHTML = CLEAR_TEXT;
 						cellElement.neighborCount = neighborCount;
 
 						if ( debug && cellElement.neighborCount ) {
@@ -198,14 +252,19 @@
 				let isClucked = /clucked/.test( cellElement.getAttribute( 'class' ) );
 
 				if ( shifted ) {
-					if ( isClucked ) return;
+					if ( isClucked ) {
+						return;
+					}
 
 					cellElement.marked = cellElement.marked ? false : true;
 					if ( cellElement.marked ) {
-						cellElement.innerHTML = '?';
+						cellElement.innerHTML = pickOne( POSSIBLE_MARKED_TEXT );
+						identified.board.marked++;
 					} else {
-						cellElement.innerHTML = '&nbsp;';
+						cellElement.innerHTML = CLEAR_TEXT;
+						identified.board.marked--;
 					}
+					winCheck( identified );
 					return;
 				}
 
@@ -218,8 +277,12 @@
 						for ( let j = 0 ; j < columns ; j++ ) {
 							let neighborCell = identified.board.childNodes[ i ].childNodes[ j ];
 							if( neighborCell.mined ) {
-								neighborCell.innerHTML = '*';
+								neighborCell.innerHTML = MINE_TEXT;
 								neighborCell.setAttribute( 'class', 'mine' );
+							} else {
+								if ( neighborCell.marked ) {
+									neighborCell.setAttribute( 'class', 'mismarked' );
+								}
 							}
 						}
 					}
@@ -233,8 +296,10 @@
 				if ( cellElement.neighborCount ) {
 					cellElement.setAttribute( 'class', 'clucked count' + cellElement.neighborCount );
 					cellElement.innerHTML = cellElement.neighborCount;
+					cellElement.clucked = true;
 				} else {
 					cellElement.setAttribute( 'class', 'clucked' );
+					cellElement.clucked = true;
 
 					for ( let i = cellElement.row - 1 ; i < cellElement.row + 2 ; i++ ) {
 						if( i < 0 || i >= rows ) continue;
@@ -248,6 +313,9 @@
 			};
 
 			const winCheck = function( identified ) {
+				identified.minedCount.innerHTML = identified.board.mined;
+				identified.markedCount.innerHTML = identified.board.marked;
+
 				if ( identified.board.cleared == identified.board.free ) {
 					return uWin( identified );
 				} 
@@ -257,26 +325,234 @@
 				}
 			};
 
+			const pickOne = function( text ) {
+				let values = text.split( ' ' );
+				return values[ Math.floor( Math.random() * values.length ) ];
+			};
+
+			const setTextValues = function() {
+				MINE_TEXT = pickOne( POSSIBLE_MINE_TEXT );
+				MARKED_TEXT = pickOne( POSSIBLE_MARKED_TEXT );
+				CLEAR_TEXT = '&nbsp;';
+			};
+
+			const auto = function( identified ) {
+				help( identified, true );
+			};
+
+			const help = function( identified, automatic ) {
+				console.log( 'let me help' );
+for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
+
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+
+				// bulk unhelp...
+				for ( let row = 0 ; row < rows ; row++ ) {
+					if ( automatic ) { 
+						break;
+					}
+					let rowElement = identified.board.childNodes[ row ];
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = rowElement.childNodes[ column ];
+						let klass = cellElement.getAttribute( 'class' );
+						if ( klass ) {
+							klass = klass.replace( /\s+help[A-Za-z]*/, '' );
+							cellElement.setAttribute( 'class', klass );
+						}
+					}
+				}
+
+				let couldMark = [];
+				let couldClear = [];
+
+				for ( let row = 0 ; row < rows ; row++ ) {
+					let rowElement = identified.board.childNodes[ row ];
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = rowElement.childNodes[ column ];
+						if ( !cellElement.clucked || !cellElement.neighborCount ) {
+							continue;
+						}
+
+						let unmarked = [];
+						let marked = [];
+						let idk = 0;
+
+						for ( let i = row - 1 ; i < row + 2 ; i++ ) {
+							if( i < 0 || i >= rows ) {
+								continue;
+							}
+							let neighborRow = identified.board.childNodes[ i ];
+							for( let j = column - 1 ; j < column + 2 ; j++ ) {
+								if( j < 0 || j >= columns ) {
+									continue;
+								}
+								let neighborCell = neighborRow.childNodes[ j ];
+
+								if ( !neighborCell.clucked ) {
+									idk++;
+								}
+
+								if ( neighborCell.marked ) { 
+									marked.push( neighborCell );
+								} else {
+									if ( !neighborCell.clucked ) {
+										unmarked.push( neighborCell );
+									}
+								}
+
+
+							}
+						}
+
+						// undermarked
+						if ( idk == cellElement.neighborCount ) {
+							couldMark = couldMark.concat( unmarked );
+						}
+
+						// overmarked
+						if ( marked.length > cellElement.neighborCount ) {
+							couldMark = couldMark.concat( marked );
+						}
+
+						// markers say this is ok (is it, idk?)
+						if ( marked.length == cellElement.neighborCount ) {
+							couldClear = couldClear.concat( unmarked );
+						}
+					}
+				}
+
+				var qqq = [];
+				var ooo = [];
+
+				for ( let i = 0 ; i < couldMark.length ; i++ ) {
+					let neighborCell = couldMark[ i ];
+					let klass = neighborCell.getAttribute( 'class' ) || '';
+					if ( automatic ) {
+						clucked( neighborCell, identified, true ); // fubar
+						// don't understand why i need to do this...
+						neighborCell.marked = true;
+						neighborCell.setAttribute( 'class', 'marked' );
+						qqq.push( neighborCell.row + '.' + neighborCell.column );
+					} else {
+						neighborCell.setAttribute( 'class', klass + ' helpMark' );
+					}
+				}
+
+				for ( let i = 0 ; i < couldClear.length ; i++ ) {
+					let neighborCell = couldClear[ i ];
+					let klass = neighborCell.getAttribute( 'class' ) || '';
+					if ( automatic ) {
+						clucked( neighborCell, identified, false ); // fubar
+						ooo.push( neighborCell.row + '.' + neighborCell.column );
+					} else {
+						neighborCell.setAttribute( 'class', klass + ' helpClear' );
+					}
+				}
+
+				if ( !automatic ) {
+					break;
+				}
+
+				if ( 0 == couldMark.length + couldClear.length ) {
+					console.log( 'could not help... at ' +xxx );
+					break;
+				} else {
+					console.log( 'helped ' + ( couldMark.length + couldClear.length ) + ' at ' + xxx + ': mark:' + qqq + ' and clear:' + ooo );
+				}
+
+				couldClear = [];
+				couldMark = [];
+}
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const winningOrLosing = function( identified ) {
+				identified.board.onclick = function() { 
+					create( identified ) 
+				};
+			};
+
+			const nuts = function( identified ) {
+				let rows = identified.rows.value;
+				let columns = identified.columns.value;
+						
+				let f = 0.1;
+
+				for ( let row = 0 ; row < rows ; row++ ) {
+					let rowElement = identified.board.childNodes[ row ];
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = rowElement.childNodes[ column ];
+						if ( !cellElement.position ) {
+							let ay = -f * ( row    - rows    / 2 );
+							let ax = -f * ( column - columns / 2 );
+
+							cellElement.position = {x:0,y:0,dx:0,dy:0,ax:ax,ay:ay};
+							cellElement.style.position = 'relative';
+						}
+
+						cellElement.position.x += cellElement.position.dx;
+						cellElement.position.y += cellElement.position.dy;
+
+						cellElement.position.dx += cellElement.position.ax;
+						cellElement.position.dy += cellElement.position.ay;
+
+						cellElement.style.left = Math.floor( cellElement.position.x ) + 'px';
+						cellElement.style.top  = Math.floor( cellElement.position.y  ) + 'px';
+					}
+				}
+			}
+
 			const uWin = function( identified ) {
-				alert( 'u win' );
-				identified.board.onclick = false;
+				winningOrLosing( identified );
+				nuts( identified );
+				identified.lol = setInterval( function() { nuts( identified ) }, 1000 / 13 );
 			};
 
 			const uLose = function( identified ) {
-				alert( 'u fckd up!' );
-				identified.board.onclick = function() { create( identified ) };
+				winningOrLosing( identified );
 			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const identifier = function( node, identified ) {
+				if ( !node ) node = document.body;
+				if ( !identified ) identified = {};
+				
+				if ( node && node.hasAttribute && node.hasAttribute( 'id' ) ) {
+					let id = node.getAttribute( 'id' );
+					identified[ id ] = node;
+				}
+
+				if ( node && node.childElementCount ) {
+					for ( var i = 0 ; i < node.childElementCount ; i++ ) {
+						identifier( node.children[ i ], identified )	
+					}
+				}
+				return identified;
+			};
+		
 
 			window.onload = function() { load() }
 		</script>
 	</HEAD>
 	<BODY>
+		<bevel>
+			<board></board>
+		</bevel>
+		<info>
+			<label>mined:</label> <counter id="minedCount"  >00</counter>
+			<label>marked:</label><counter id="markedCount">00</counter>
+		</info>
+		<info>hold shift and click to mark/unmark</info>
 		<controls>
-			<control><label>rows:</label>    <input id="rows"    value="22"   size="5"></input></control>
-			<control><label>columns:</label> <input id="columns" value="22"   size="5"></input></control>
-			<control><label>percent:</label> <input id="percent" value="0.13" size="5"></input></control>
+			<control><label>rows:</label>    <input id="rows"    value="16"   size="5"></input></control>
+			<control><label>columns:</label> <input id="columns" value="16"   size="5"></input></control>
+			<control><label>percent:</label> <input id="percent" value="0.16" size="5"></input></control>
 			<control><button id="create">create</button></control>
+			<control><button id="help">help</button></control>
+			<control><button id="auto">auto</button></control>
 		</controls>
-		<board></board>
 	</BODY>
 </HTML>
