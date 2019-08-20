@@ -2,6 +2,21 @@
 	<HEAD>
 		<TITLE>mine-sweeper</TITLE>
 
+		<!-- 
+		
+			I made this for my sweetie! cuz I <3 him and he's a minesweeper lunatic!
+
+			TODO list:
+				
+				* cleanup help function
+				* implement probablistic assistance
+				* enhance automatic mode
+				* double click and long-press marking
+				* levels of marking: unmarked, possible, probable
+				* get jiggety with it
+			
+		-->
+
 		<style>
 			body {
 				font-family: Comic Sans MS, sans;
@@ -103,6 +118,10 @@
 			.helpMark {
 				background: #FAA;
 			}
+
+			.hidden {
+				display: none;
+			}
 		</style>
 
 		<script type="text/javascript">
@@ -122,6 +141,16 @@
 				// windows[ name ] doesn't work... it finds the element not the function
 				identified.help.onclick = function() { help( identified ) };
 				identified.auto.onclick = function() { auto( identified ) };
+
+				if ( -1 != document.location.toString().indexOf( 'debug' ) ) {
+					let hidden = document.getElementsByClassName( 'hidden' );
+					for ( let i = 0 ; i < hidden.length ; i++ ) {
+						hidden[ i ].style.display = 'block';
+					}
+
+
+
+				}
 			};
 
 			const create = function( identified ) {
@@ -169,6 +198,8 @@
 						cellElement.innerHTML = CLEAR_TEXT;
 						cellElement.row = row; 
 						cellElement.column = column;
+						// for debugging ... probly should remove it...
+						cellElement.setAttribute( 'id', [ row, column ].join( '.' ) ); 
 						rowElement.appendChild( cellElement );
 					}
 					identified.board.appendChild( rowElement );
@@ -306,7 +337,7 @@
 						for ( let j = cellElement.column - 1 ; j < cellElement.column + 2 ; j++ ) {
 							if( j < 0 || j >= columns ) continue;
 							let neighborCell = identified.board.childNodes[ i ].childNodes[ j ];
-							clucked( neighborCell, identified );
+							clucked( neighborCell, identified, shifted );
 						}
 					}
 				}
@@ -342,7 +373,18 @@
 
 			const help = function( identified, automatic ) {
 				console.log( 'let me help' );
-for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
+				if ( automatic ) {
+					identified.auto.setAttribute( 'disabled', 'hi' );
+				}
+				identified.help.setAttribute( 'disabled', 'ho' );
+
+				let beenThereDoneThat = {};
+let max = 22233;
+for ( let xxx = 0 ; xxx < max ; xxx++ ) {
+	if ( automatic ) { 
+		console.log( '-----------------------------------------------------------------------------' );
+		console.log( 'help iteration ' + xxx + ' of ' + max );
+	}
 
 				let rows = identified.rows.value;
 				let columns = identified.columns.value;
@@ -370,7 +412,12 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 					let rowElement = identified.board.childNodes[ row ];
 					for ( let column = 0 ; column < columns ; column++ ) {
 						let cellElement = rowElement.childNodes[ column ];
+						let debugCell = ( cellElement.id == identified.cell.value );
+
 						if ( !cellElement.clucked || !cellElement.neighborCount ) {
+							if ( debugCell ) {
+								console.log( 'skip analysis of ' + cellElement.id );
+							}
 							continue;
 						}
 
@@ -382,12 +429,14 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 							if( i < 0 || i >= rows ) {
 								continue;
 							}
+
 							let neighborRow = identified.board.childNodes[ i ];
 							for( let j = column - 1 ; j < column + 2 ; j++ ) {
 								if( j < 0 || j >= columns ) {
 									continue;
 								}
 								let neighborCell = neighborRow.childNodes[ j ];
+								let info = neighborCell.row + '.' + neighborCell.column;
 
 								if ( !neighborCell.clucked ) {
 									idk++;
@@ -400,40 +449,60 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 										unmarked.push( neighborCell );
 									}
 								}
-
-
 							}
 						}
 
 						// undermarked
 						if ( idk == cellElement.neighborCount ) {
 							couldMark = couldMark.concat( unmarked );
+							if( debugCell ) {
+								console.log( 'x: undermarked:' + unmarked );
+							}
 						}
 
 						// overmarked
 						if ( marked.length > cellElement.neighborCount ) {
 							couldMark = couldMark.concat( marked );
+							console.log( 'oopsie: ' + marked );
+							if( debugCell ) {
+								console.log( 'x: overmarked:' + marked )
+							}
 						}
 
 						// markers say this is ok (is it, idk?)
 						if ( marked.length == cellElement.neighborCount ) {
 							couldClear = couldClear.concat( unmarked );
+							if( debugCell ) {
+								console.log( 'x: need to clear neighbors:' + unmarked );
+							}
 						}
 					}
 				}
 
-				var qqq = [];
-				var ooo = [];
+				console.log( 'possibilities: couldMark:' + couldMark.length + ' couldClear:' + couldClear.length );
+
+				let didMark = [];
+				let didClear = [];
+				let alreadySeen = {};
 
 				for ( let i = 0 ; i < couldMark.length ; i++ ) {
 					let neighborCell = couldMark[ i ];
+					if ( neighborCell.id in alreadySeen ) {
+						continue;
+					}
+					alreadySeen[ neighborCell.id ] = true;
+
 					let klass = neighborCell.getAttribute( 'class' ) || '';
 					if ( automatic ) {
 						clucked( neighborCell, identified, true ); // fubar
-						// don't understand why i need to do this...
-						neighborCell.marked = true;
-						neighborCell.setAttribute( 'class', 'marked' );
-						qqq.push( neighborCell.row + '.' + neighborCell.column );
+						console.log( 'marked:' + neighborCell.id );
+						didMark.push( neighborCell.id );
+
+						// FIXME: it seems like this should not be needed...
+						if ( false ) {
+							neighborCell.marked = true;
+							neighborCell.setAttribute( 'class', 'marked' );
+						}
 					} else {
 						neighborCell.setAttribute( 'class', klass + ' helpMark' );
 					}
@@ -441,10 +510,16 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 
 				for ( let i = 0 ; i < couldClear.length ; i++ ) {
 					let neighborCell = couldClear[ i ];
+					if ( neighborCell.id in alreadySeen ) {
+						continue;
+					}
+					alreadySeen[ neighborCell.id ] = true;
+
 					let klass = neighborCell.getAttribute( 'class' ) || '';
 					if ( automatic ) {
 						clucked( neighborCell, identified, false ); // fubar
-						ooo.push( neighborCell.row + '.' + neighborCell.column );
+						console.log( 'cleared:' + neighborCell.id );
+						didClear.push( neighborCell.id );
 					} else {
 						neighborCell.setAttribute( 'class', klass + ' helpClear' );
 					}
@@ -454,16 +529,29 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 					break;
 				}
 
-				if ( 0 == couldMark.length + couldClear.length ) {
-					console.log( 'could not help... at ' +xxx );
+				let allHelp = couldMark.length + couldClear.length;
+
+				if ( 0 == allHelp ) {
+					console.log( 'could not help... at ' + xxx );
 					break;
 				} else {
-					console.log( 'helped ' + ( couldMark.length + couldClear.length ) + ' at ' + xxx + ': mark:' + qqq + ' and clear:' + ooo );
+					let summary = 'allHelp:' + allHelp + ' mark:' + didMark + ' and clear:' + didClear;
+					console.log( summary + ' at ' + xxx );
+					if ( summary in beenThereDoneThat ) {
+						console.log( 'but... been there... done that... wat the fun?' );
+						break;
+					} else {
+						beenThereDoneThat[ summary ] = 33;
+					}
 				}
 
 				couldClear = [];
 				couldMark = [];
 }
+				if ( automatic ) {
+					identified.auto.removeAttribute( 'disabled' );
+				}
+				identified.help.removeAttribute( 'disabled' );
 			};
 
 			/////////////////////////////////////////////////////////////////////////////
@@ -551,8 +639,11 @@ for ( let xxx = 0 ; xxx < 22233 ; xxx++ ) {
 			<control><label>columns:</label> <input id="columns" value="16"   size="5"></input></control>
 			<control><label>percent:</label> <input id="percent" value="0.16" size="5"></input></control>
 			<control><button id="create">create</button></control>
+		</controls>
+		<controls class="hidden">
 			<control><button id="help">help</button></control>
 			<control><button id="auto">auto</button></control>
+			<control><label>debug cell id:</label> <input id="cell" size="5"></input></control>
 		</controls>
 	</BODY>
 </HTML>
