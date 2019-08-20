@@ -705,6 +705,8 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 			const uWin = function( identified ) {
 				winningOrLosing( identified );
 				nuts( identified );
+					
+				clearInterval( identified.lol ); // just in case...
 				identified.lol = setInterval( function() { nuts( identified ) }, 1000 / 13 );
 			};
 
