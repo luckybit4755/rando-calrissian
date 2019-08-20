@@ -14,7 +14,10 @@
 				* double click and long-press marking
 				* levels of marking: unmarked, possible, probable
 				* get jiggety with it
-			
+
+
+			https://github.com/luckybit4755/rando-calrissian/blob/master/html/demo/mine-sweeper.html
+
 		-->
 
 		<style>
@@ -171,7 +174,6 @@
 				identified.board.onclick = function( e ) {
 					if ( 'CELL' != e.target.nodeName ) return;
 					clucked( e.target, identified, e.shiftKey );
-					//help( identified ); //snit
 				}
 
 				winCheck( identified );
