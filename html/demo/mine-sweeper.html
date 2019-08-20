@@ -130,6 +130,9 @@
 		<script type="text/javascript">
 			const POSSIBLE_MINE_TEXT   = '* &#x2617; &#x2612; &#x2605; &#x2629; &#x2613;';
 			const POSSIBLE_MARKED_TEXT = '? &#x2600; &#x2602; &#x2611; &#x2668;';
+				
+			const TIMEOUT_LONG_PRESS = 500;
+			const TIMEOUT_DOUBLE_CLICK = 500; // 250 seems too long
 
 			let MINE_TEXT = '*';
 			let CLEAR_TEXT = '&nbsp;';
@@ -150,9 +153,6 @@
 					for ( let i = 0 ; i < hidden.length ; i++ ) {
 						hidden[ i ].style.display = 'block';
 					}
-
-
-
 				}
 			};
 
@@ -171,12 +171,202 @@
 				mineTheBoard( identified, debug );
 				countTheNeighbors( identified, debug );
 
-				identified.board.onclick = function( e ) {
-					if ( 'CELL' != e.target.nodeName ) return;
-					clucked( e.target, identified, e.shiftKey );
-				}
+				fancyClick( identified, debug ); 
 
 				winCheck( identified );
+			};
+
+			let CLICK_QUEUE = [];
+			let CLICK_INTERVAL = false;
+
+			const addClick = function( target ) {
+				let now = new Date().getTime();
+				CLICK_QUEUE.push( {target:target,when:now} );
+			};
+
+			const removeClick = function( target ) {
+				let removed = 0;
+				let tmp = [];
+				for( let i = 0 ; i < CLICK_QUEUE.length ; i++ ) {
+					let click = CLICK_QUEUE[ i ];
+					if ( click.target.id == target.id ) {
+						removed++;
+						console.log( 'remove click for ' + target.id );
+					} else {
+						tmp.push( click );
+					}
+				}
+				if ( removed ) {
+					CLICK_QUEUE = tmp;
+					console.log( 'removed ' + removed + ' clicks' );
+				};
+				return removed;
+			};
+
+			const handleClicks = function( identified, force ) {
+				let now = new Date().getTime();
+				let tmp = [];
+				let processed = 0;
+
+				for( let i = 0 ; i < CLICK_QUEUE.length ; i++ ) {
+					let click = CLICK_QUEUE[ i ];
+					let diff = now - click.when;
+					if ( diff > TIMEOUT_DOUBLE_CLICK || force ) {
+						console.log( 'process click for ' + click.target.id + ', force:' + force );
+						processed++;
+
+						diff = click.when - click.target.down;
+						if ( diff > TIMEOUT_LONG_PRESS ) { 
+							console.log( 'long press' );
+							clucked( click.target, identified, true );
+						} else {
+							console.log( 'normal mouse click' );
+							clucked( click.target, identified, false );
+						}
+
+					} else {
+						tmp.push( click );
+					}
+				}
+
+				if ( processed ) {
+					CLICK_QUEUE = tmp;
+				}
+			};
+
+
+			// ok. implementing single click, double click and long press is gross
+			// sorry... I'm sure someone has done this better :-P
+			const fancyClick = function( identified, debug ) {
+				if ( false ) {
+					identified.board.onclick = function( e ) {
+						if ( 'CELL' != e.target.nodeName ) return;
+						clucked( e.target, identified, e.shiftKey );
+					}
+					return;
+				}
+
+				CLICK_QUEUE = [];
+				clearInterval( CLICK_INTERVAL );
+				CLICK_INTERVAL = setInterval( function() { handleClicks( identified ) }, 100 );
+
+				identified.board.ondblclick = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					if ( removeClick( e.target ) ) {
+						console.log( 'double clicked' );
+						clucked( e.target, identified, true );
+					} else {
+						console.log( 'too slow!' );
+					}
+				};
+
+				identified.board.onclick = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					if ( e.shiftKey ) {
+						// simple case
+						console.log( 'shift click is easy' );
+						return clucked( e.target, identified, e.shiftKey );
+					}
+					console.log( 'my j!' );
+					addClick( e.target );
+				};
+
+				identified.board.onmouseout = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					handleClicks( identified, true );
+				}
+
+				identified.board.onmousedown = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					e.target.down = new Date().getTime();
+				};
+
+				return;
+
+				let target = false;
+				let first = false;
+				let down = false;
+				let interval = false;
+				let count = 0;
+
+				let resetClick = function() {
+					target = first = down = count = interval = 0;
+				};
+
+				identified.board.onmousedown = function( e ) {
+					if ( 'CELL' != e.target.nodeName ) return;
+					target = e.target;
+					down = new Date().getTime();
+				};
+
+				identified.board.onblur = identified.board.onmouseout = function( e ) {
+					if ( e.target.id != target.id ) return;
+					if ( interval ) { 
+						clearInterval( interval );
+						interval = false;
+					} 
+					
+					if ( 1 == count ) {
+						console.log( 'cannot double click at this point...' );
+						clucked( e.target, identified, false );
+					}
+
+					return resetClick();
+				}
+
+				identified.board.onmouseup = function( e ) {
+					if ( 'CELL' != e.target.nodeName || e.target.id != target.id ) {
+						return resetClick();
+					}
+
+					if ( e.shiftKey ) {
+						// ignore all the long press, double press mess and get on with it...
+						clucked( e.target, identified, e.shiftKey );
+						return resetClick();
+					}
+
+					let now = new Date().getTime();
+
+					let diff = now - down;
+					if ( diff > TIMEOUT_LONG_PRESS && !count ) {
+						console.log( 'long press is nice' );
+						clucked( e.target, identified, true );
+						return resetClick();
+					}
+
+					count++;
+					console.log( JSON.stringify( {target:target.id, diff:diff, count:count+1} ) );
+
+					switch ( count ) {
+						case 1: 
+							console.log( 'might be a double click or a single click' );
+							first = now;
+							if ( interval ) { 
+								console.log( 'this is suprising...' );
+								clearInterval( interval );
+							} 
+							interval = setInterval(
+								function() {
+									if ( interval ) {
+										clearInterval( interval );
+										interval = false;
+										console.log( 'single click is go!' );
+										clucked( e.target, identified, false );
+									}
+									return resetClick();
+								}
+								, TIMEOUT_DOUBLE_CLICK
+							);
+							break;
+						default:
+							console.log( 'this must be a double click...' );
+							clearInterval( interval );
+							interval = false;
+							console.log( 'double click is go!' );
+							clucked( e.target, identified, true );
+							return resetClick();
+					}
+				};
 			};
 
 			const validateInputs = function( identified ) {
@@ -421,6 +611,10 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 								console.log( 'skip analysis of ' + cellElement.id );
 							}
 							continue;
+						} else {
+							if ( debugCell ) {
+								console.log( 'begin analysis of ' + cellElement.id );
+							}
 						}
 
 						let unmarked = [];
@@ -452,6 +646,10 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 									}
 								}
 							}
+						}
+
+						if ( debugCell ) {
+							console.log( 'x:' + JSON.stringify( {neighborCount:cellElement.neighborCount, idk:idk, marked:marked.length, unmarked:unmarked.length } ) );
 						}
 
 						// undermarked
@@ -635,7 +833,9 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 			<label>mined:</label> <counter id="minedCount"  >00</counter>
 			<label>marked:</label><counter id="markedCount">00</counter>
 		</info>
-		<info>hold shift and click to mark/unmark</info>
+		<info>
+			to mark/unmark: shift click, long press or double click
+		</info>
 		<controls>
 			<control><label>rows:</label>    <input id="rows"    value="16"   size="5"></input></control>
 			<control><label>columns:</label> <input id="columns" value="16"   size="5"></input></control>
