@@ -267,7 +267,6 @@
 						console.log( 'shift click is easy' );
 						return clucked( e.target, identified, e.shiftKey );
 					}
-					console.log( 'my j!' );
 					addClick( e.target );
 				};
 
@@ -279,93 +278,6 @@
 				identified.board.onmousedown = function( e ) {
 					if ( 'CELL' != e.target.nodeName ) return;
 					e.target.down = new Date().getTime();
-				};
-
-				return;
-
-				let target = false;
-				let first = false;
-				let down = false;
-				let interval = false;
-				let count = 0;
-
-				let resetClick = function() {
-					target = first = down = count = interval = 0;
-				};
-
-				identified.board.onmousedown = function( e ) {
-					if ( 'CELL' != e.target.nodeName ) return;
-					target = e.target;
-					down = new Date().getTime();
-				};
-
-				identified.board.onblur = identified.board.onmouseout = function( e ) {
-					if ( e.target.id != target.id ) return;
-					if ( interval ) { 
-						clearInterval( interval );
-						interval = false;
-					} 
-					
-					if ( 1 == count ) {
-						console.log( 'cannot double click at this point...' );
-						clucked( e.target, identified, false );
-					}
-
-					return resetClick();
-				}
-
-				identified.board.onmouseup = function( e ) {
-					if ( 'CELL' != e.target.nodeName || e.target.id != target.id ) {
-						return resetClick();
-					}
-
-					if ( e.shiftKey ) {
-						// ignore all the long press, double press mess and get on with it...
-						clucked( e.target, identified, e.shiftKey );
-						return resetClick();
-					}
-
-					let now = new Date().getTime();
-
-					let diff = now - down;
-					if ( diff > TIMEOUT_LONG_PRESS && !count ) {
-						console.log( 'long press is nice' );
-						clucked( e.target, identified, true );
-						return resetClick();
-					}
-
-					count++;
-					console.log( JSON.stringify( {target:target.id, diff:diff, count:count+1} ) );
-
-					switch ( count ) {
-						case 1: 
-							console.log( 'might be a double click or a single click' );
-							first = now;
-							if ( interval ) { 
-								console.log( 'this is suprising...' );
-								clearInterval( interval );
-							} 
-							interval = setInterval(
-								function() {
-									if ( interval ) {
-										clearInterval( interval );
-										interval = false;
-										console.log( 'single click is go!' );
-										clucked( e.target, identified, false );
-									}
-									return resetClick();
-								}
-								, TIMEOUT_DOUBLE_CLICK
-							);
-							break;
-						default:
-							console.log( 'this must be a double click...' );
-							clearInterval( interval );
-							interval = false;
-							console.log( 'double click is go!' );
-							clucked( e.target, identified, true );
-							return resetClick();
-					}
 				};
 			};
 
@@ -842,10 +754,10 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 			<control><label>percent:</label> <input id="percent" value="0.16" size="5"></input></control>
 			<control><button id="create">create</button></control>
 		</controls>
-		<controls class="hidden">
+		<controls>
 			<control><button id="help">help</button></control>
 			<control><button id="auto">auto</button></control>
-			<control><label>debug cell id:</label> <input id="cell" size="5"></input></control>
+			<control class="hidden"><label>debug cell id:</label> <input id="cell" size="5"></input></control>
 		</controls>
 	</BODY>
 </HTML>
