@@ -145,6 +145,7 @@
 				// windows[ name ] doesn't work... it finds the element not the function
 				identified.help.onclick = function() { help( identified ) };
 				identified.auto.onclick = function() { auto( identified ) };
+				identified.rando.onclick = function() { rando( identified ) };
 
 				if ( -1 != document.location.toString().indexOf( 'debug' ) ) {
 					let hidden = document.getElementsByClassName( 'hidden' );
@@ -279,16 +280,57 @@
 				};
 			};
 
+			// weak sauce...
+			const validaters = {
+				  isInt    : function( v ) { return !isNaN( v ); }
+				, isFloat  : function( v ) { return validaters.isInt( v ); } 
+				, isString : function( v ) { return true; }
+			}
+
 			const validateInputs = function( identified ) {
-				identified.columns.value = parseInt(   identified.columns.value );
-				identified.rows.value    = parseInt(   identified.rows.value    );
-				identified.percent.value = parseFloat( identified.percent.value );
-				return !isNaN( identified.columns.value + identified.rows.value + identified.percent.value );
+				let invalid = [];
+				identified._v = {};
+
+				for ( let key in identified ) {
+					let value = identified[ key ];
+					if ( 'INPUT' === value.nodeName ) {
+						let type = value.getAttribute( 'type' ) || 'string';
+						let typeName = type[ 0 ].toUpperCase() + type.substr( 1 ).toLowerCase();
+
+						let parser = 'parse' + typeName;
+						let validater = 'is' + typeName;
+
+						let actualValue = value.value;
+						try {
+							actualValue = window[ parser ]( value.value );
+						} catch( e ) {
+							// nasty...
+						}
+
+						let valid = validaters[ validater ]( actualValue );
+						if ( !valid ) {
+							invalid.push( key );
+						}
+
+						//console.log( toString( {key:key,type:type,typeName:typeName,value:value.value,actualValue:actualValue,parser:parser,validater:validater,valid:valid} ) );
+
+						identified._v[ key ] = actualValue;
+					}
+				}
+				//console.log( toString( identified._v ) );
+
+				if ( 0 != invalid.length ) {
+					console.log( 'validation failed for ' + invalid.join( ', ' ) );
+					return false;
+				}
+
+
+				return !isNaN( identified._v.columns + identified._v.rows + identified._v.percent );
 			};
 
 			const createElements = function( identified ) {
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
 				identified.board = identified.board || document.getElementsByTagName( 'board' )[ 0 ];
 				identified.board.innerHTML = '';
@@ -309,10 +351,10 @@
 			};
 
 			const mineTheBoard = function( identified, debug ) {
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
-				let percent = identified.percent.value;
+				let percent = identified._v.percent;
 				let mined = Math.floor( rows * columns * percent );
 
 				let count = 0;
@@ -343,8 +385,8 @@
 			};
 				
 			const countTheNeighbors = function( identified, debug ) {
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
 				for ( let row = 0 ; row < rows ; row++ ) {
 					let rowElement = identified.board.childNodes[ row ];
@@ -379,8 +421,8 @@
 			};
 
 			const clucked = function( cellElement, identified, shifted ) {
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
 				let isClucked = /clucked/.test( cellElement.getAttribute( 'class' ) );
 
@@ -473,39 +515,26 @@
 				help( identified, true );
 			};
 
-			const help = function( identified, automatic ) {
-				console.log( 'let me help' );
-				if ( automatic ) {
-					identified.auto.setAttribute( 'disabled', 'hi' );
-				}
-				identified.help.setAttribute( 'disabled', 'ho' );
+			const helpClear = function( identified ) {
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
-				let beenThereDoneThat = {};
-let max = 22233;
-for ( let xxx = 0 ; xxx < max ; xxx++ ) {
-	if ( automatic ) { 
-		console.log( '-----------------------------------------------------------------------------' );
-		console.log( 'help iteration ' + xxx + ' of ' + max );
-	}
-
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
-
-				// bulk unhelp...
 				for ( let row = 0 ; row < rows ; row++ ) {
-					if ( automatic ) { 
-						break;
-					}
 					let rowElement = identified.board.childNodes[ row ];
 					for ( let column = 0 ; column < columns ; column++ ) {
 						let cellElement = rowElement.childNodes[ column ];
 						let klass = cellElement.getAttribute( 'class' );
 						if ( klass ) {
-							klass = klass.replace( /\s+help[A-Za-z]*/, '' );
+							klass = klass.replace( /\s*help[A-Za-z]*/, '' );
 							cellElement.setAttribute( 'class', klass );
 						}
 					}
 				}
+			};
+			
+			const helpIteration = function( identified, automatic, iteration ) {
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 
 				let couldMark = [];
 				let couldClear = [];
@@ -559,7 +588,7 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 						}
 
 						if ( debugCell ) {
-							console.log( 'x:' + JSON.stringify( {neighborCount:cellElement.neighborCount, idk:idk, marked:marked.length, unmarked:unmarked.length } ) );
+							console.log( 'x:' + toString( {neighborCount:cellElement.neighborCount, idk:idk, marked:marked.length, unmarked:unmarked.length } ) );
 						}
 
 						// undermarked
@@ -607,12 +636,6 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 						clucked( neighborCell, identified, true ); // fubar
 						console.log( 'marked:' + neighborCell.id );
 						didMark.push( neighborCell.id );
-
-						// FIXME: it seems like this should not be needed...
-						if ( false ) {
-							neighborCell.marked = true;
-							neighborCell.setAttribute( 'class', 'marked' );
-						}
 					} else {
 						neighborCell.setAttribute( 'class', klass + ' helpMark' );
 					}
@@ -636,34 +659,111 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 				}
 
 				if ( !automatic ) {
-					break;
+					return true;
 				}
 
 				let allHelp = couldMark.length + couldClear.length;
 
 				if ( 0 == allHelp ) {
-					console.log( 'could not help... at ' + xxx );
-					break;
+					console.log( 'could not help... at ' + iteration );
+					return true;
 				} else {
 					let summary = 'allHelp:' + allHelp + ' mark:' + didMark + ' and clear:' + didClear;
-					console.log( summary + ' at ' + xxx );
-					if ( summary in beenThereDoneThat ) {
-						console.log( 'but... been there... done that... wat the fun?' );
+					console.log( summary + ' at ' + iteration );
+				}
+			};
+
+			const help = function( identified, automatic ) {
+				console.log( 'let me help' );
+				if ( automatic ) {
+					identified.auto.setAttribute( 'disabled', 'hi' );
+				}
+				identified.help.setAttribute( 'disabled', 'ho' );
+
+				helpClear( identified );
+
+				let max = 22233;
+				for ( let iteration = 0 ; iteration < max ; iteration++ ) {
+					if ( helpIteration( identified, automatic, iteration ) ) {
 						break;
-					} else {
-						beenThereDoneThat[ summary ] = 33;
 					}
 				}
 
-				couldClear = [];
-				couldMark = [];
-}
 				if ( automatic ) {
 					identified.auto.removeAttribute( 'disabled' );
 				}
 				identified.help.removeAttribute( 'disabled' );
 			};
 
+			const rando = function( identified ) {
+				let rows    = identified._v.rows;
+				let columns = identified._v.columns;
+				let percent = identified._v.percent;
+
+				let remainingMines = identified.board.mined - identified.board.marked;
+				let remainingUnknown = identified.board.free - identified.board.cleared;
+				percent = remainingMines / remainingUnknown;
+				console.log( percent + ' vs ' + identified._v.percent );
+/*
+*/
+
+				let pix = [];
+
+				for ( let row = 0 ; row < rows ; row++ ) {
+					let rowElement = identified.board.childNodes[ row ];
+					for ( let column = 0 ; column < columns ; column++ ) {
+						let cellElement = rowElement.childNodes[ column ];
+						let debugCell = ( cellElement.id == identified.cell.value );
+						if ( cellElement.clucked || cellElement.marked ) continue;
+
+						let neighborCount = 0;
+						let dangerValue = 0;
+
+						for ( let i = row - 1 ; i < row + 2 ; i++ ) {
+							if( i < 0 || i >= rows ) {
+								continue;
+							}
+
+							let neighborRow = identified.board.childNodes[ i ];
+							for( let j = column - 1 ; j < column + 2 ; j++ ) {
+								if( j < 0 || j >= columns ) {
+									continue;
+								}
+								let neighborCell = neighborRow.childNodes[ j ];
+								let info = neighborCell.row + '.' + neighborCell.column;
+
+								neighborCount++;
+
+								if ( neighborCell.clucked ) {
+									dangerValue += parseInt( neighborCell.neighborCount ) / 8;
+								} else {
+									dangerValue += percent;
+								}
+							}
+						}
+
+						// this is all wrong....
+						let score = dangerValue/neighborCount;
+
+						pix.push( {cell:cellElement, dv:dangerValue, nc:neighborCount, score:score } );
+					}
+				}
+
+				pix.sort( function( a, b ) { return a.score - b.score } );
+				for ( let i = 0 ; i < 33 && i < pix.length ; i++ ) {
+					break;
+					console.log( toString( pix[ i ] ) );
+				}
+
+				let pick = 0; // the score is all jacked up...
+				pick = Math.floor( Math.random() * pix.length );
+				if ( 0 != pix.length ) {
+					let goodLuck = pix[ pick ];
+					console.log( 'randomly pick ' + goodLuck.cell.id + ' score:' + goodLuck.score );
+					clucked( goodLuck.cell, identified, false ); 
+				}
+			};
+	
 			/////////////////////////////////////////////////////////////////////////////
 
 			const winningOrLosing = function( identified ) {
@@ -673,8 +773,8 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 			};
 
 			const nuts = function( identified ) {
-				let rows = identified.rows.value;
-				let columns = identified.columns.value;
+				let rows = identified._v.rows;
+				let columns = identified._v.columns;
 						
 				let f = 0.1;
 
@@ -716,6 +816,10 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 
 			/////////////////////////////////////////////////////////////////////////////
 
+			const toString = function( v ) {
+				return JSON.stringify( v );
+			}
+
 			const identifier = function( node, identified ) {
 				if ( !node ) node = document.body;
 				if ( !identified ) identified = {};
@@ -749,14 +853,15 @@ for ( let xxx = 0 ; xxx < max ; xxx++ ) {
 			to mark/unmark: shift click, long press or double click
 		</info>
 		<controls>
-			<control><label>rows:</label>    <input id="rows"    value="16"   size="5"></input></control>
-			<control><label>columns:</label> <input id="columns" value="16"   size="5"></input></control>
-			<control><label>percent:</label> <input id="percent" value="0.16" size="5"></input></control>
-			<control><button id="create">create</button></control>
+			<control><label>rows:</label>    <input id="rows"    value="16"   size="5" type="int"</input></control>
+			<control><label>columns:</label> <input id="columns" value="16"   size="5" type="int"</input></control>
+			<control><label>percent:</label> <input id="percent" value="0.16" size="5" type="float"</input></control>
 		</controls>
 		<controls>
-			<control><button id="help">help</button></control>
+			<control><button id="create">create</button></control>
+			<control><button id="rando">rando</button></control>
 			<control><button id="auto">auto</button></control>
+			<control><button id="help">help</button></control>
 			<control class="hidden"><label>debug cell id:</label> <input id="cell" size="5"></input></control>
 		</controls>
 	</BODY>
