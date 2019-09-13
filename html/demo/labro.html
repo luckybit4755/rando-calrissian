@@ -1,0 +1,206 @@
+<HTML>
+	<HEAD>
+		<TITLE>labro</TITLE>
+		<!-- 
+			https://en.wikipedia.org/wiki/Maze_generation_algorithm
+		-->
+
+		<style>
+			body {
+				font-family: Sans-serif;
+			}
+			board {
+				display: block;
+			}
+			row {
+				display: block;
+			}
+			cell {
+				display: inline-block;
+				width:1em;
+				height:1em;
+				border: 1px solid #EEE;
+			}
+			.up    { border-top: 1px solid black; }
+			.down  { border-bottom: 1px solid black; }
+			.left  { border-left: 1px solid black; }
+			.right { border-right: 1px solid black; }
+		</style>
+
+		<script type="text/javascript">
+			const Labro = function() {
+			};
+			Labro.prototype = {
+				setup: function() {
+					this.board = document.createElement( 'board' );
+					document.body.appendChild( this.board );
+					this.cols = 72;
+					this.rows = 33;
+
+					this.mazed = {};
+					this.unmazed = {};
+
+					for ( let i = 0 ; i < this.rows ; i++ ) {
+						let row = document.createElement( 'row' );
+						this.board.appendChild( row );
+						for ( let j = 0 ; j < this.cols ; j++ ) {
+							let cell = document.createElement( 'cell' );
+							cell.row = i;
+							cell.col = j;
+							cell.id = [ i , j ].join( ':' );
+							cell.closed = {up:1,down:1,left:1,right:1};
+							this.setCellClass( cell );
+							row.appendChild( cell );
+							this.unmazed[ cell.id ] = cell;
+						}
+					}
+				}
+
+				, run: function() {
+					this.setup();
+					this.addToMaze( this.cellAt( 0, 0 ) );
+
+					/* https://en.wikipedia.org/wiki/Maze_generation_algorithm#Wilson's_algorithm */
+					for ( let i = 0 ; i < 3344 ; i++ ) {
+						console.log( 'ok:' + i );
+						if ( this.walko() ) break;
+					}
+				}
+
+				/* return true if done */
+				, walko:function() {
+					let keys = Object.keys( this.unmazed );
+					if ( 0 == keys.length ) return true;
+
+					let key = keys[ Math.floor( Math.random() * keys.length ) ];
+					console.log( key );
+
+					let path = {};
+					let current = this.unmazed[ key ];
+					path[ current.id ] = current;
+
+					let max = 3344;
+
+					for ( let n = 0 ; n < max ; n++ ) {
+						let i = current.row;
+						let j = current.col;
+
+						let m;
+						for ( m = 0 ; m < max ; m++ ) {
+							i = this.random( current.row, 0, this.rows );
+							j = this.random( current.col, 0, this.cols );
+
+							/* have to try to move */
+							if ( i == current.row && j == current.col ) continue;
+
+							/* do not move diagonally */
+							if ( i != current.row && j != current.col ) continue;
+
+							break;
+						}
+						if ( m >= max ) break; /* dead end */
+
+						let key = [ i, j ].join( ':' );
+						
+						if ( key in path ) { 
+							/* not sure this is really "erasing the loop" */
+							continue;
+						}
+
+						if ( key in this.mazed ) {
+							path[ key ] = this.mazed[ key ];
+							path[ key ].from = current;
+							break;
+						}
+
+						let next = ( path[ key ] = this.unmazed[ key ] );
+
+						if ( !next ) { 
+							console.log( 'wtf is ' + key );
+							return;	
+
+						}
+
+						next.from = current;
+
+						current = next;
+					}
+
+					for ( let key in path ) {
+						let cell = path[ key ];
+						if ( !cell.from ) continue;
+
+						let direction = 'up';
+						let from = 'down';
+
+
+						/* most be left or right */
+						if ( cell.from.row == cell.row ) {
+							if ( cell.from.col < cell.col ) {
+								direction = 'left';
+								from = 'right';
+							} else {
+								direction = 'right';
+								from = 'left';
+							}
+						} else {
+							/* most be up or down */
+							if ( cell.from.row < cell.row ) {
+							} else {
+								direction = 'down';
+								from = 'up';
+							}
+						}
+
+						delete( cell.closed[ direction ] );
+						delete( cell.from.closed[ from ] );
+
+						console.log( direction + ' so ' + Object.keys( cell.closed ) );
+					}
+
+					for ( let key in path ) {
+						let cell = path[ key ];
+						this.setCellClass( cell );
+						console.log( cell.getAttribute( 'class' ) );
+
+
+						delete this.unmazed[ key ];
+						this.mazed[ key ] = cell;
+					}
+
+				}
+
+				, random: function( value, min, max ) {
+					let rmin = value - 1;
+					let rmax = value + 2;
+
+					if ( rmin <  min ) rmin = min;
+					if ( rmax >= max ) rmax = max - 1;
+
+					let diff = rmax - rmin;
+
+					return Math.floor( Math.random() * diff + rmin );
+				}
+
+				, cellAt: function( i, j ) {
+					return this.board.children[ i ].children[ j ];
+				}
+
+				, setCellClass: function( cell ) {
+					cell.setAttribute( 'class', Object.keys( cell.closed ).join( ' ' ) );	
+				}
+
+				, addToMaze: function( cell ) {
+					this.mazed[ cell.id ] = cell;
+					delete this.unmazed[ cell.id ];
+				}
+			};
+
+			window.onload = function() {
+				new Labro().run();
+			};
+		</script>
+	</HEAD>
+	<BODY>
+	</BODY>
+</HTML>
