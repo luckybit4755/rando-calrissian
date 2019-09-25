@@ -650,41 +650,39 @@ const Dummy_1 = function(Wert, Pr)				// Function Dummy_1 (Wert, Pr: String):Str
 		Insert (Zeichen,Pr,1);					// 	Insert (Zeichen,Pr,1);
 	}						 					// 	End; {If-(Platz..)-Begin}
 	Dummy_1 = Pr;					 			// Dummy_1:=Pr;
-}							 					// End; {Function Dummy_1}
+};							 					// End; {Function Dummy_1}
 
 // {------------------     Hilfsprozedur (Rechts Oben)     -------------------}
 
-// Procedure Dummy_Reob (Stelle, Num: ShortInt);
-
-// Begin
-// If (Num<6) then
-// 	Begin
-// 	Zeile:=Stelle-Num+5;
-// 	Spalte:=Stelle;
-// 	End
-// Else
-// 	Begin
-// 	Zeile:=Stelle;
-// 	Spalte:=Stelle+Num-5;
-// 	End;
-// End; {Procedure Dummy_Reob}
+const Dummy_Reob = function(Stelle, Num)		// Procedure Dummy_Reob (Stelle, Num: ShortInt);
+{												// Begin
+	if (Num<6) 									// If (Num<6) then
+	{											// 	Begin
+		Zeile  = Stelle - Num + 5;				// 	Zeile:=Stelle-Num+5;
+		Spalte = Stelle;						// 	Spalte:=Stelle;
+												// 	End
+	} else {									// Else
+												// 	Begin
+		Zeile  = Stelle;						// 	Zeile:=Stelle;
+		Spalte = Stelle + Num - 5;				// 	Spalte:=Stelle+Num-5;
+	}											// 	End;
+}						 						// End; {Procedure Dummy_Reob}
 
 // {------------------     Hilfsprozedur (Links Oben)     --------------------}
 
-// Procedure Dummy_Liob (Stelle, Num: ShortInt);
-
-// Begin
-// If (Num<6) then
-// 	Begin
-// 	Zeile:=Stelle-Num+5;
-// 	Spalte:=9-Stelle;
-// 	End
-// Else
-// 	Begin
-// 	Zeile:=Stelle;
-// 	Spalte:=14-Stelle-Num;
-// 	End;
-// End; {Procedure Dummy_Liob}
+const Dummy_Liob = function(Stelle, Num)		// Procedure Dummy_Liob (Stelle, Num: ShortInt);
+{												// Begin
+	if (Num<6) 									// If (Num<6) then
+	{											// 	Begin
+		Zeile  = Stelle - Num + 5;				// 	Zeile:=Stelle-Num+5;
+		Spalte = 9 - Stelle;					// 	Spalte:=9-Stelle;
+												// 	End
+	} else {									// Else
+												// 	Begin
+		Zeile  = Stelle;						// 	Zeile:=Stelle;
+		Spalte = 14 - Stelle - Num;				// 	Spalte:=14-Stelle-Num;
+	} 											// 	End;
+}						 						// End; {Procedure Dummy_Liob}
 
 // {--------------------------------------------------------------------------}
 
