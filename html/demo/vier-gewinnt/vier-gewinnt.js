@@ -357,11 +357,10 @@ const Kontrolle = function()
 		Zeile++;                          // 	Inc (Zeile);
 	} while (Platz[Spalte][Zeile]!='O');  // Until (Platz[Spalte,Zeile]='O');
 	if (Zeile>8) {                        // If (Zeile>8) then
-		Kontrolle = false                  // 	Kontrolle:=false
+		return false                  // 	Kontrolle:=false
 	} else {                              // else
-		Kontrolle = true;                  // 	Kontrolle:=true;
+		return true;                  // 	Kontrolle:=true;
 	}
-	return Kontrolle;
 } // End; {Function Kontrolle}
 
 // {--------------------------------------------------------------------------}
@@ -384,7 +383,7 @@ const Wahl = function( callback )
 	Readln(
 		function( Bst ) {
 			Spalte = parseInt( Bst );
-			let ok = ((Spalte>0) && (Spalte<9) && (Code===0) && (Kontrolle)) || (Bst==='a') || (Bst=='A');
+			let ok = ((Spalte>0) && (Spalte<9) && (Code===0) && (Kontrolle())) || (Bst==='a') || (Bst=='A');
 			if ( !ok ) return true;
 			OutTextXY (X(330),TextHeight('Ip'),Bst);  // OutTextXY (X(330),TextHeight('Ip'),Bst);
 			if ( Bst==='a' || Bst==='A' )             // If (Bst='a') or (Bst='A') then
@@ -393,6 +392,7 @@ const Wahl = function( callback )
 				Gewinner = GEWINNER_STATES.Niemand;   // 	Gewinner:=Niemand;
 				Exit();                               // 	Exit;
 			}                 						  // 	End;  {If-(Bst..)-Begin}
+			if ( callback ) callback();
 		}
 	)
 } // End;      {Procedure Wahl}
@@ -402,8 +402,6 @@ const Wahl = function( callback )
 // {--------------------------------------------------------------------------}
 
 const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (Wert:Char; Col:String);
-	let i;															 // Var I: ShortInt;
-																	 // 
 																	 // Begin
 	SetViewPort (0,0,X(639),Y(353),true);							 // SetViewPort (0,0,X(639),Y(353),true);
 	//For I:=0 to 3 do												 // For I:=0 to 3 do
@@ -429,9 +427,10 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 			SetFillStyle (Solidfill,LightGray);						// SetFillStyle (Solidfill,LightGray);
 		}															// End;
 		FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));	// FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));
+		console.log( 'called from Zeichnen' );
 
 
-		if ( ++i >2 ) {
+		if ( ++I >2 ) {
 			clearInterval( interval );
 			callback();
 		}
@@ -454,7 +453,8 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 // {--------------------------------------------------------------------------}
 
 const Markierung = function(Col,callback) {							 			// Procedure Markierung(Col:String);
-	let I;														 				// Var I: Integer;
+	let I = 0;														 				// Var I: Integer;
+
 	// 
 	// Begin
 	SetViewPort (0,0,X(639),Y(353),true);								 		// SetViewPort (0,0,X(639),Y(353),true);
@@ -476,6 +476,9 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 			SetColor (LightGray);												// 		SetColor (LightGray);
 			SetFillStyle (Solidfill,LightGray);								 	// 		SetFillStyle (Solidfill,LightGray);
 		}																 		// 		End;
+	
+		console.log( 'Richtung:' + Richtung );
+		
 		switch( Richtung ) {													// 	Case Richtung of
 			case 1: 															// 	1: Begin
 				FillEllipse (X(130+GewSSt*42),Y(358-GewZSt*42),X(18),Y(18)); 	// 	   FillEllipse (X(130+GewSSt*42),Y(358-GewZSt*42),X(18),Y(18));
@@ -502,7 +505,7 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 				FillEllipse (X(256+GewSSt*42),Y(358-GewZSt*42),X(18),Y(18));	// 	   FillEllipse (X(256+GewSSt*42),Y(358-GewZSt*42),X(18),Y(18));
 				break;															// 	   End;
 		}  														 				// 	End;  {Case}
-		if ( ++i >= 7 ) { 														// For I:=0 to 7 do
+		if ( ++I >= 7 ) { 														// For I:=0 to 7 do
 			clearInterval( interval ); 											// 	End;  {For-I-Begin}
 			callback();
 		}
@@ -515,7 +518,7 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 // {--------------------------------------------------------------------------}
 
 
-const AktString = function( wert ) 		// Procedure AktString (Wert: Char);
+const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 { 										// Begin
 	let Num, Stelle; 			   		// Var    Num, Stelle:  ShortInt;
 	Waag[ Zeile ][ Spalte ] = Wert;		// Waag[Zeile,Spalte]:=Wert;
@@ -598,7 +601,7 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 	// {------------------------------     Schrg nach links oben suchen     -----}
 
 	Num = -(Spalte+Zeile)+14;				// Num:=-(Spalte+Zeile)+14;
-	If ( Num>0 && Num<10 ) 					// If (Num>0) and (Num<10) then
+	if ( Num>0 && Num<10 ) 					// If (Num>0) and (Num<10) then
 	{										// 	Begin 
 			Stelle = Pos(Wert,Liob[Num]);	// 	Stelle:=Pos (Wert,Liob[Num]); 
 			if (Stelle!=0) {				// 	If (Stelle<>0) then Begin																			 // 		Begin
@@ -619,12 +622,12 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 
 	if (Wert=='SSSS' && Spielende) 			// If (Wert='SSSS') and (Spielende) then
 	{										// 	Begin
-		Gewinner = Spieler;					// 	Gewinner:=Spieler;
+		Gewinner = GEWINNER_STATES.Spieler;					// 	Gewinner:=Spieler;
 		Farbe    = Farbe_Sp;				// 	Farbe:=Farbe_Sp;
 	}										// 	End;
 	if (Wert=='CCCC' && Spielende) 			// If (Wert='CCCC') and (Spielende) then
 	{										// 	Begin
-		Gewinner = Computer;				// 	Gewinner:=Computer;
+		Gewinner = GEWINNER_STATES.Computer;				// 	Gewinner:=Computer;
 		Farbe    = Farbe_Co;				// 	Farbe:=Farbe_Co;
 	}										// 	End;
 } // End; {Procedure Gewinnsuche}
@@ -810,7 +813,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 		Stelle = Pos( Wert, Senk[ Spalte ] );				// 	Stelle:=Pos (Wert,Senk[Spalte]);
 		if ( Stelle != 0 ) 									// 	If (Stelle<>0) then
 		{													// 		Begin
-			if ( Kontrolle ) {								// 		If Kontrolle then
+			if ( Kontrolle() ) {								// 		If Kontrolle then
 				Pri = Dummy_1( Wert, Pri );					// 			Pri:=Dummy_1 (Wert,Pri);
 			}
 		}													// 		End;
@@ -826,7 +829,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 const Warnung = function() 		 	// Function Warnung: Boolean;
 {							 		// Begin
 	Warnung = false;				// Warnung:=false;
-	if ( Kontrolle ) {				// If Kontrolle then
+	if ( Kontrolle() ) {			// If Kontrolle then
 		if (Zeile<8) 				// If (Zeile<8) then
 		{ 							// 	Begin
 			Zeile++;				// 	Inc (Zeile);
@@ -835,7 +838,7 @@ const Warnung = function() 		 	// Function Warnung: Boolean;
 			if ( Spielende )		// 	If Spielende then
 			{						// 		Begin
 				Spielende = false;	// 		Spielende:=false;
-				Gewinner = Niemand;	// 		Gewinner:=Niemand;
+				Gewinner = GEWINNER_STATES.Niemand;	// 		Gewinner:=Niemand;
 				Warnung = true;		// 		Warnung:=true;
 			}		 				// 		End; {If-Spielende-Begin}
 			AktString('O');			// 	AktString('O');
@@ -848,7 +851,7 @@ const Warnung = function() 		 	// Function Warnung: Boolean;
 // {------------------     Zugauswertung                    ------------------}
 // {--------------------------------------------------------------------------}
 
-const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
+const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolean;
 {														// Begin
 	let I, J;											// Var I,J: Integer;
 	Zugauswertung = false;								// Zugauswertung:=false;
@@ -857,11 +860,15 @@ const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
 		Spalte = parseInt( Prior_1[I] );				// 	Val (Prior_1[I],Spalte,Code);
 		for ( J = Prior_2.Length - 1 ; J > 1 ; J-- ) 	// 	For J:=(Length (Prior_2)-1) downto 1 do
 			if (Prior_2[J]==Prior_1[I] && !Warnung) {	// 		If (Prior_2[J]=Prior_1[I]) and not (Warnung) then
-				if ( Kontrolle ) 						// 			If Kontrolle then
+				if ( Kontrolle() ) 						// 			If Kontrolle then
 				{										// 				Begin
-					Zeichnen( 'C', Farbe_Co );			// 				Zeichnen ('C',Farbe_Co);
-					AktString( 'C' );					// 				AktString('C');
-					Zugauswertung = true;				// 				Zugauswertung:=true;
+					Zeichnen( 'C', Farbe_Co 			// 				Zeichnen ('C',Farbe_Co);
+						, function() {
+							AktString( 'C' );			// 				AktString('C');
+							Zugauswertung = true;		// 				Zugauswertung:=true;
+							callback( Zugauswertung );	// 				Exit;
+						}
+					);
 					return Zugauswertung;				// 				Exit;
 				}							 			// 				End;  {If-Kontrolle-Begin}
 			} 											//
@@ -873,37 +880,49 @@ const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
 // {------------------     Spielerzug     ------------------------------------}
 // {--------------------------------------------------------------------------}
 
-const Spieler_Zug = function( callback ) 	// Procedure Spieler_Zug;
-{											// Begin
-	if ( Spielende ) { 						// If Spielende then
-		return;								// 	Exit;
-	} 										//
-	Wahl();  						 		// Wahl;                                {Spieler setzt}
-	if ( !Spielende ) {						// If Not Spielende then
-	{										// 	Begin
-		Zeichnen('S',Farbe_Sp);  			// 	Zeichnen('S',Farbe_Sp);          {Spielstein zeichnen + Zug speichern}
-		AktString('S');          		 	// 	AktString('S');                  {Aktualisieren der Spielfeld-Strings}
-		Gewinnsuche('SSSS');     		 	// 	Gewinnsuche('SSSS');             {Kontrolle auf Spielergewinn}
-											// 	End
-	} else {								// Else
-		return;								// 	Exit;
-	}
-	if ( Gewinner==Spieler )				// If Gewinner=Spieler then
-	{										// 	Begin
-		Spielende:=true;					// 	Spielende:=true;
-		Markierung(Farbe_Sp);				// 	Markierung(Farbe_Sp);
-	}										// 	End;
-	setInterval( 
-		function() { callback() }
-		, 500 								// Delay(500);
-	)
+const Spieler_Zug = function( callback ) 			// Procedure Spieler_Zug;
+{										 			// Begin
+	if ( Spielende ) { 					 			// If Spielende then
+		return;							 			// 	Exit;
+	} 									 			//
+
+	Wahl( 								 			// Wahl;                                {Spieler setzt}
+		function() {
+			if ( Spielende ) {
+				return;
+			}
+
+			Zeichnen('S',Farbe_Sp  	 			// 	Zeichnen('S',Farbe_Sp);          {Spielstein zeichnen + Zug speichern}
+				, function() {
+					AktString('S');         	// 	AktString('S');                  {Aktualisieren der Spielfeld-Strings}
+					Gewinnsuche('SSSS');     	// 	Gewinnsuche('SSSS');             {Kontrolle auf Spielergewinn}
+
+					if ( Gewinner==GEWINNER_STATES.Spieler )				// If Gewinner=Spieler then
+					{										// 	Begin
+						Spielende = true;					// 	Spielende:=true;
+						console.log( 'call Markierung from Spieler_Zug' );
+						Markierung(Farbe_Sp,callback);		// 	Markierung(Farbe_Sp);
+					}										// 	End;
+
+					// Delay(500);
+					setInterval( 
+						function() { 
+							callback() 
+						}
+						, 500
+					)
+				}
+			);
+
+		}
+	);
 };											// End; {Procedure Spieler_Zug}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Computerzug     -----------------------------------}
 // {--------------------------------------------------------------------------}
 
-const Computer_Zug = function()  									// Procedure Computer_Zug;
+const Computer_Zug = function( callback )  									// Procedure Computer_Zug;
 {																	// Begin
 	if ( Spielende ) {												// If Spielende then
 		return;														// 	Exit;
@@ -918,14 +937,18 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 																								 // 
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) 					// For Spalte:=1 to 8 do
 	{																// 	Begin
-		if ( Kontrolle ) 											// 	If Kontrolle then                      {8 Zge setzen}
+		if ( Kontrolle() ) 											// 	If Kontrolle then                      {8 Zge setzen}
 		{															// 		Begin
 			AktString('C');											// 		AktString('C');
 			Gewinnsuche('CCCC');									// 		Gewinnsuche('CCCC');
 			if ( Spielende )  										// 		If Spielende then                  {evtl. Gewinn}
 			{														// 			Begin
-				Zeichnen('C',Farbe_Co);								// 			Zeichnen('C',Farbe_Co);
-				Markierung(Farbe_Co);								// 			Markierung(Farbe_Co);
+				Zeichnen('C',Farbe_Co  								// 			Zeichnen('C',Farbe_Co);
+					, function() {
+						console.log( 'call Markierung from Computer_Zug' );
+						Markierung(Farbe_Co,callback);				// 			Markierung(Farbe_Co);
+					}
+				);
 				return;                          					// 			Exit;                          {Verlassen von Computer-Zug}
 																	// 			End  {If-Spielende-Begin}
 			} else {												// 		Else
@@ -938,7 +961,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) 					// For Spalte:=1 to 8 do
 	{																// 	Begin
-		if ( Kontrolle )                      						// 	If Kontrolle then                      {8 Zge setzen}
+		if ( Kontrolle() )                      						// 	If Kontrolle then                      {8 Zge setzen}
 		{															// 		Begin
 			AktString('S');											// 		AktString('S');
 			Gewinnsuche('SSSS');									// 		Gewinnsuche('SSSS');
@@ -946,8 +969,8 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 			{														// 			Begin
 				AktString('C');										// 			AktString('C');
 				Spielende = false;									// 			Spielende:=false;
-				Gewinner = Niemand;									// 			Gewinner:=Niemand;
-				Zeichnen( 'C', Farbe_Co );							// 			Zeichnen('C',Farbe_Co);
+				Gewinner = GEWINNER_STATES.Niemand;					// 			Gewinner:=Niemand;
+				Zeichnen( 'C', Farbe_Co, callback );				// 			Zeichnen('C',Farbe_Co);
 				return;                          					// 			Exit;                          {Verlassen von Computer-Zug}
 																	// 			End  {If-Spielende-Begin}
 			} else {												// 		Else
@@ -966,7 +989,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 	Prior_2 = Prior( Suchstring[6],Prior_2,4,true);					// Prior_2:=Prior (Suchstring[6],Prior_2,4,true);
 	Prior_2 = Prior( Suchstring[17],Prior_2,2,true);				// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
 	Prior_2 = Prior( Suchstring[17],Prior_2,4,true);				// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
-	if (Zugauswertung) {											// If (Zugauswertung) then
+	if (Zugauswertung( callback )) {											// If (Zugauswertung) then
 		return;														// 	Exit;
 	}
 
@@ -977,7 +1000,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 	for ( K = 7 ; K <= 12 ; K++ ) { 								// For K:=7 to 12 do
 		Prior_2 = Prior( Suchstring[K],Prior_2,0,false );			// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
 	}
-	if (Zugauswertung) {											// If (Zugauswertung) then
+	if (Zugauswertung( callback ) ) {											// If (Zugauswertung) then
 		return;														// 	Exit;
 	}
 
@@ -987,12 +1010,12 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 	for ( K = 13 ; K <= 16 ; K++ ) {								// For K:=13 to 16 do
 		Prior_2 = Prior( Suchstring[K], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
 	}
-	if (Zugauswertung) {											// If (Zugauswertung) then
+	if (Zugauswertung( callback ) ) {											// If (Zugauswertung) then
 		return;														// 	Exit;
 	}
 
 	Prior_2 = '12345678 ';											// Prior_2:='12345678 ';
-	if ( Zugauswertung ) {											// If Zugauswertung then
+	if ( Zugauswertung( callback ) ) {											// If Zugauswertung then
 		return;														// 	Exit;
 	}
 
@@ -1002,7 +1025,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 	Prior_2 = Prior( Suchstring[ 17 ], Prior_2, 2, true );			// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
 	Prior_2 = Prior( Suchstring[ 17 ], Prior_2, 4, true );			// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
 
-	if ( Zugauswertung ) {											// If Zugauswertung then
+	if ( Zugauswertung( callback ) ) {											// If Zugauswertung then
 		return;														// 	Exit;
 	}
 
@@ -1014,7 +1037,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
 	}
 	
-	if ( Zugauswertung ) {											// If Zugauswertung then
+	if ( Zugauswertung( callback ) ) {											// If Zugauswertung then
 		return;														// 	Exit;
 	}
 
@@ -1026,44 +1049,60 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
 	}
 
-	if ( Zugauswertung ) {											// If Zugauswertung then
+	if ( Zugauswertung( callback ) ) {											// If Zugauswertung then
 		return;														// 	Exit;
 	}
 
 	Spalte = Last_2;												// Spalte:=Last_2;
 	if (!Warnung) {													// If not (Warnung) then
-		if (Kontrolle) 												// 	If (Kontrolle) then
+		if (Kontrolle()) 												// 	If (Kontrolle) then
 		{															// 		Begin
-			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
-			AktString( 'C' );										// 		AktString ('C');
+			Zeichnen( 'C', Farbe_Co   								// 		Zeichnen ('C',Farbe_Co);
+				, function() {
+					AktString( 'C' );								// 		AktString ('C');
+					callback();
+				}
+			);
 			return;													// 		Exit;
 		}															// 		End;
 	}
 																	
 	Spalte = Last_1;												// Spalte:=Last_1;
 	if ( !Warnung) {												// If not (Warnung) then
-		if (Kontrolle) 												// 	If (Kontrolle) then
+		if (Kontrolle()) 												// 	If (Kontrolle) then
 		{															// 		Begin
-			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
-			AktString( 'C' );										// 		AktString ('C');
+			Zeichnen( 'C', Farbe_Co   								// 		Zeichnen ('C',Farbe_Co);
+				, function() {
+					AktString( 'C' );								// 		AktString ('C');
+					callback();
+				}
+			);
 			return;													// 		Exit;
 		}															// 		End;
 	}
 
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) {					// For Spalte:=1 to 8 do
-		If (!Warnung && Kontrolle) 									// 	If not (Warnung) and (Kontrolle) then
+		If (!Warnung && Kontrolle()) 									// 	If not (Warnung) and (Kontrolle) then
 		{															// 		Begin
-			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
-			AktString( 'C' );										// 		AktString ('C');
+			Zeichnen( 'C', Farbe_Co   								// 		Zeichnen ('C',Farbe_Co);
+				, function() {
+					AktString( 'C' );								// 		AktString ('C');
+					callback();
+				}
+			);
 			return;													// 		Exit;
 		}															// 		End;
 	}
 
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) {					// For Spalte:=1 to 8 do
-		if (Kontrolle) 												// 	If (Kontrolle) then
+		if (Kontrolle()) 												// 	If (Kontrolle) then
 		{															// 		Begin
-			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
-			AktString( 'C' );										// 		AktString ('C');
+			Zeichnen( 'C', Farbe_Co   								// 		Zeichnen ('C',Farbe_Co);
+				, function() {
+					AktString( 'C' );										// 		AktString ('C');
+					callback();
+				}
+			);
 			return;													// 		Exit;
 		}															// 		End;
 	}
@@ -1073,6 +1112,7 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 // {------------------     Daten speichern     -------------------------------}
 // {--------------------------------------------------------------------------}
 
+const Godat = function() { 
 // Procedure Godat;
 // Var I   :Byte;
 
@@ -1099,79 +1139,97 @@ const Computer_Zug = function()  									// Procedure Computer_Zug;
 // Writeln(Datja,'ja');
 // Close(Datja);
 // End;  {Procedure Godat}
+	console.log( 'iou: Godat' );
+};
 
 // {--------------------------------------------------------------------------}
 // {------------------     Schluámeldung     ---------------------------------}
 // {--------------------------------------------------------------------------}
 
-// Procedure Schluss;
-// Begin
-
-// SetViewPort (0,Y(340)+TextHeight('I'),X(639),Y(479),true);
-// ClearViewPort;
-// Case Gewinner of
-// 	Computer:      OutTextXY (10,Y(50),'tsch ,  ich  habe  gewonnen .');
-// 	Spieler:       OutTextXY (10,Y(50),'Herzlichen  Glckwunsch ,  Sie  sind  besser ,  als  ich  dachte !');
-// 	Niemand:       Begin
-// 				   SetColor(Blue);
-// 				   OutTextXY (10,Y(50),'Spiel  durch  "Abbruch"  beendet');
-// 				   End;
-// 	Unentschieden: Begin
-// 				   SetColor (Blue);
-// 				   OutTextXY (10,Y(50),'Das  Spiel  ist  unentschieden')
-// 				   End;
-// 	End;  {Case}
-// End;      {Procedure Schluss}
+const Schluss = function() 																								 // Procedure Schluss;
+{																											 // Begin
+	SetViewPort (0,Y(340)+TextHeight('I'),X(639),Y(479),true);														 // SetViewPort (0,Y(340)+TextHeight('I'),X(639),Y(479),true);
+	ClearViewPort();																									 // ClearViewPort;
+	switch( Gewinner ) {																								 // Case Gewinner of
+		case GEWINNER_STATES.Computer:      
+			OutTextXY (10,Y(50),'tsch ,  ich  habe  gewonnen .');											 // 	Computer:      OutTextXY (10,Y(50),'tsch ,  ich  habe  gewonnen .');
+			break;
+		case GEWINNER_STATES.Spieler:       
+			OutTextXY (10,Y(50),'Herzlichen  Glckwunsch ,  Sie  sind  besser ,  als  ich  dachte !');		 // 	Spieler:       OutTextXY (10,Y(50),'Herzlichen  Glckwunsch ,  Sie  sind  besser ,  als  ich  dachte !');
+			break;
+		case GEWINNER_STATES.Niemand:
+			SetColor(Blue);																							 // 				   SetColor(Blue);
+			OutTextXY (10,Y(50),'Spiel  durch  "Abbruch"  beendet');													 // 				   OutTextXY (10,Y(50),'Spiel  durch  "Abbruch"  beendet');
+			break;
+		case GEWINNER_STATES.Unentschieden: // 	Unentschieden: Begin
+			SetColor (Blue);																							 // 				   SetColor (Blue);
+			OutTextXY (10,Y(50),'Das  Spiel  ist  unentschieden')													 // 				   OutTextXY (10,Y(50),'Das  Spiel  ist  unentschieden')
+			break;																										 // 				   End;
+	}																									 // 	End;  {Case}
+};																				 // End;      {Procedure Schluss}
 
 // {--------------------------------------------------------------------------}
 // {------------------     HAUPTPROGRAMM     ---------------------------------}
 // {--------------------------------------------------------------------------}
 
-// BEGIN                                  {Hauptprogramm}
-// Grafik;                                {Grafik initialisieren}
-// Titel;                                 {Titelbild}
-// Neustart:                              {Neuanfang}
-// Init;                                  {Einstellungen initialisieren}
-// Spielregeln;                           {Erklrung der Spielregeln}
-// Anfang;                                {Einstellung der Anfangsbedingungen}
-// Grafik;
-// Spielfeld;                             {Zeichnen des Spielfeldes}
-// Textzeile(1);                          {Befehlszeile drucken}
-// Godat;                                 {Zug auf Festplatte speichern}
-// If Beginner then                       {TRUE: Spieler beginnt}
-// 	Spieler_Zug                        {Wahl, Farbe, Zeichnen}
-// Else
-// 	Spalte:=4;                         {    erster     }
-// Godat;
-// Farbe:=Farbe_Co;                       {  Computerzug  }
-// If Kontrolle then
-// 	Begin                              {      ist      }
-// 	Zeichnen('C',Farbe_Co);            {   definiert   }
-// 	AktString('C');
-// 	End;
-// Godat;
 
-// Repeat
 
-// 	Spieler_Zug;
-// 	Godat;
-// 	Computer_Zug;
-// 	Godat;
+// valerie: async methods: 
+// 
+// ok:  Titel
+// ok:  Spielregeln
+// ok:  Anfang
+// ok:  Wahl
+// ok:  Zeichnen
+// ok:  Markierung
+// ok:  Spieler_Zug
+// ok:  Zugauswertung
+// idk:  Computer_Zug
 
-// Until Spielende;                       {max. 64 Zge}
+const PlayGame = function() {
+	Init();                                  		// Init;                                  {Einstellungen initialisieren}
+	Spielregeln(
+		function() {
+			Anfang( 
+				function() {
+					Grafik();								   		// Grafik;
+					Spielfeld();                             		// Spielfeld;                             {Zeichnen des Spielfeldes}
+					Textzeile(1);                          		// Textzeile(1);                          {Befehlszeile drucken}
 
-// Schluss;
+					let player = false;
 
-// Textzeile (3);
-// Repeat
-// 	Readln(Abfrage);
-// Until (Abfrage='e') or (Abfrage='E') or (Abfrage='');
-// If (Abfrage='') then
-// 	Goto Neustart
-// Else
-// 	Begin
-// 	RestoreCrtMode;
-// 	Exit;
-// 	End;
+					let next = function() {
+						if ( Spielende ) {
+							console.log( 'game over' );
+							Schluss();
+							return;
+						}
 
-// END.                                   {Hauptprogramm}
+						player != player;
+
+						if ( player ) {
+							console.log( 'player' );
+							Spieler_Zug( function() { next() } );
+						} else {
+							console.log( 'computer' );
+							Computer_Zug( function() { next() } );
+						}
+					}
+
+					next();
+
+					return 'idk what is going on with a lot of the rest of this, so just do the bit above for now';
+
+					Godat();                                 		// Godat;                                 {Zug auf Festplatte speichern}
+				}
+			)
+		}
+	);
+
+};
+
+const Hauptprogramm = function() 
+{                                  		// BEGIN                                  {Hauptprogramm}
+	Grafik();                                		// Grafik;                                {Grafik initialisieren}
+	Titel( function() { PlayGame() } );                                 		// Titel;                                 {Titelbild}
+};						 // END.                                   {Hauptprogramm}

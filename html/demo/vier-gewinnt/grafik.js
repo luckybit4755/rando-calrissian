@@ -6,6 +6,9 @@ const White = 'white';
 const Blue = 'blue';
 const Black = 'black';
 const EmptyFill = 'idk';
+const LightGray = 'LightGray';
+const SolidFill = 'Solidfill';
+const Solidfill = 'Solidfill';
 
 const Graph = {
 	  bkColor   : White
@@ -19,12 +22,12 @@ const InitGraph = function() {
 		canvas.setAttribute( 'width', GetMaxX );
 		canvas.setAttribute( 'height', GetMaxY );
 		canvas.style.border = '1px solid black';
-		canvas.style.display = 'block';
 
 		Graph.canvas = canvas;
 		Graph.context = canvas.getContext( '2d' );
 		document.body.appendChild( Graph.canvas );
-	}
+	} 
+	Graph.canvas.style.display = 'block';
 	
 	// this doesn't really belong here, but whatever...
 	if ( !Graph.crt ) {
@@ -87,6 +90,28 @@ const Bar3D = function( x1, y1, x2, y2, depth, top ) {
 		Graph.context.lineTo( x2, y2 );
 	}
 
+	Graph.context.stroke();
+};
+
+const Rectangle = function( x1, y1, x2, y2 ) {
+	Graph.context.fillStyle = Graph.bkColor;
+	Graph.context.strokeStyle = Graph.color;
+
+	let width = x2 - x1;
+	let height = y2 - y1;
+		
+	Graph.context.beginPath();	
+	Graph.context.rect( x1, y1, width, height );
+	Graph.context.stroke();
+};
+
+const Line = function( x1, y1, x2, y2 ) {
+	Graph.context.fillStyle = Graph.bkColor;
+	Graph.context.strokeStyle = Graph.color;
+
+	Graph.context.beginPath();	
+	Graph.context.moveTo( x1, y1 );
+	Graph.context.lineTo( x2, y2 );
 	Graph.context.stroke();
 };
 
@@ -162,6 +187,23 @@ const SetTextStyle = function(font,direction,fontSize) {
 
 const SetViewPort = function(a,b,X,Y,idk) {
 };
+
+const FillEllipse = function( x, y, XRadius, YRadius ) {
+	Graph.context.fillStyle = Graph.bkColor;
+	Graph.context.strokeStyle = Graph.color;
+
+	Graph.context.fillStyle = 'red';
+	Graph.context.strokeStyle = 'yellow';
+
+	console.log( 'FillEllipse:' + JSON.stringify( {x:x,y:y,XRadius:XRadius,YRadius:YRadius} ) );
+	Graph.context.beginPath();
+
+	Graph.context.arc( x, y, XRadius, 0, 2 * Math.PI);  // this is not really right, but ok
+
+	Graph.context.stroke();
+	Graph.context.fill();
+};
+
 
 console.log( 'loaded grafik' );
 
