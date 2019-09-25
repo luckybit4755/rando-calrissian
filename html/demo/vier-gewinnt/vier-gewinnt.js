@@ -516,110 +516,119 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 // {--------------------------------------------------------------------------}
 
 
-const AktString = function( wert )  // Procedure AktString (Wert: Char);
-// Var    Num, Stelle:  ShortInt;
-
-{ // Begin
-	Waag[ Zeile ][ Spalte ] = Wert; // Waag[Zeile,Spalte]:=Wert;
-	Senk[ Spalte ][ Zeile ] = Wert; // Senk[Spalte,Zeile]:=Wert;
-	let Num = Spalte - Zeile + 5	// Num:=Spalte-Zeile+5;                          {--------------}
-	if( Num > 0 && Num < 10 ) // If (Num>0) and (Num<10) then
-	{ // 	Begin
-		if ( Num < 6 ) {  // 	If (Num<6) then
-			Stelle = Zeile + Num - 5; // 		Stelle:=Zeile+Num-5                   {---  REOB  ---}
-		} else { // 	Else
-			Stelle = Zeile; // 		Stelle:=Zeile;
-			Reob[ Num ][ Stelle ] = Wert; // 	Reob[Num,Stelle]:=Wert;
+const AktString = function( wert ) 		// Procedure AktString (Wert: Char);
+{ 										// Begin
+	let Num, Stelle; 			   		// Var    Num, Stelle:  ShortInt;
+	Waag[ Zeile ][ Spalte ] = Wert;		// Waag[Zeile,Spalte]:=Wert;
+	Senk[ Spalte ][ Zeile ] = Wert;		// Senk[Spalte,Zeile]:=Wert;
+	let Num = Spalte - Zeile + 5   		// Num:=Spalte-Zeile+5;                   {--------------}
+	if( Num > 0 && Num < 10 ) 	   		// If (Num>0) and (Num<10) then
+	{ 							   		// 	Begin
+		if ( Num < 6 ) {  				// 	If (Num<6) then
+			Stelle = Zeile + Num - 5; 	// 		Stelle:=Zeile+Num-5               {---  REOB  ---}
+		} else { 						// 	Else
+			Stelle = Zeile; 			// 		Stelle:=Zeile;
 		}
-	} // 	End; {If-Begin}                           {--------------}
-
-	Num = -(Spalte+Zeile)+14	// Num:=-(Spalte+Zeile)+14;                      {--------------}
-	if( Num > 0 && Num < 10 ) // If (Num>0) and (Num<10) then
-	{ // 	Begin
-		if( Num < 6 ) { // 	If (Num<6) then
-			Stelle = Zeile + Num - 5; // 		Stelle:=Zeile+Num-5                   {---  LIOB  ---}
-		} else { // 	Else
-			Stelle = Zeile; // 		Stelle:=Zeile;
+		Reob[ Num ][ Stelle ] = Wert; 	// 	Reob[Num,Stelle]:=Wert;
+	} 									// 	End; {If-Begin}                       {--------------}
+	Num = -(Spalte+Zeile)+14			// Num:=-(Spalte+Zeile)+14;               {--------------}
+	if( Num > 0 && Num < 10 ) 			// If (Num>0) and (Num<10) then
+	{ 									// 	Begin
+		if( Num < 6 ) { 				// 	If (Num<6) then
+			Stelle = Zeile + Num - 5; 	// 		Stelle:=Zeile+Num-5               {---  LIOB  ---}
+		} else { 						// 	Else
+			Stelle = Zeile; 			// 		Stelle:=Zeile;
 		}
-		Liob[ Num ][ Stelle ] = Wert; // 	Liob[Num,Stelle]:=Wert;
-	}// 	End; {If-Begin}                           {--------------}
-} // End; {Procedure AktString}
+		Liob[ Num ][ Stelle ] = Wert; 	// 	Liob[Num,Stelle]:=Wert;
+	} 									// 	End; {If-Begin}                       {--------------}
+}; // End; {Procedure AktString}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Gewinnsuche     -----------------------------------}
 // {--------------------------------------------------------------------------}
 
-// Procedure Gewinnsuche(Wert:String);
-// Var    Num, Stelle:  ShortInt;
+const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
+{ 											// Begin
+	let Num, Stelle;  						// Var    Num, Stelle:  ShortInt;
 
-// Begin
-// {----------------------------------     Waagrecht suchen     --------------}
-// Stelle:=Pos (Wert,Waag[Zeile]);
-// If (Stelle<>0) then
-// 	Begin
-// 	GewZSt:=Zeile;
-// 	GewSSt:=Stelle;
-// 	Richtung:=4;
-// 	Spielende:=true;
-// 	End; {If-Begin}
-// {----------------------------------     Senkrecht suchen     --------------}
-// Stelle:=Pos (Wert,Senk[Spalte]);
-// If (Stelle<>0) then
-// 	Begin
-// 	GewZSt:=Stelle;
-// 	GewSSt:=Spalte;
-// 	Richtung:=2;
-// 	Spielende:=true;
-// 	End; {If-Begin}
-// {------------------------------     Schrg nach rechts oben suchen     ----}
-// Num:=Spalte-Zeile+5;
-// If (Num>0) and (Num<10) then
-// 	Begin
-// 	Stelle:=Pos (Wert,Reob[Num]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If (Num<6) then
-// 			GewZSt:=Stelle-Num+5
-// 		Else
-// 			GewZSt:=Stelle;
-// 		If (Num<6) then
-// 			GewSSt:=Stelle
-// 		Else
-// 			GewSSt:=Stelle+Num-5;
-// 		Richtung:=3;
-// 		Spielende:=true;
-// 		End; {If-Begin}
-// 	End;     {If-Begin}
-// {------------------------------     Schrg nach links oben suchen     -----}
-// Num:=-(Spalte+Zeile)+14;
-// If (Num>0) and (Num<10) then
-// 	Begin
-// 	Stelle:=Pos (Wert,Liob[Num]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If (Num<6) then
-// 			GewZSt:=Stelle-Num+5
-// 		Else
-// 			GewZSt:=Stelle;
-// 		If (Num<6) then
-// 			GewSSt:=9-Stelle
-// 		Else
-// 			GewSSt:=14-Stelle-Num;
-// 		Richtung:=1;
-// 		Spielende:=true;
-// 		End; {If-Begin}
-// 	End;     {If-Begin}
-// If (Wert='SSSS') and (Spielende) then
-// 	Begin
-// 	Gewinner:=Spieler;
-// 	Farbe:=Farbe_Sp;
-// 	End;
-// If (Wert='CCCC') and (Spielende) then
-// 	Begin
-// 	Gewinner:=Computer;
-// 	Farbe:=Farbe_Co;
-// 	End;
-// End; {Procedure Gewinnsuche}
+	// {----------------------------------     Waagrecht suchen     --------------}
+
+	Stelle = Pos (Wert,Waag[Zeile]);		// Stelle:=Pos (Wert,Waag[Zeile]);
+	if (Stelle!=0) 							// If (Stelle<>0) then
+	{ 										// 	Begin
+		GewZSt = Zeile;						//      GewZSt:=Zeile;
+		GewSSt = Stelle;					//      GewSSt:=Stelle;
+		Richtung = 4;						//      Richtung:=4;
+		Spielende = true;					//      Spielende:=true;
+	}										// 	End; {If-Begin}
+
+	// {----------------------------------     Senkrecht suchen     --------------}
+
+	Stelle = Pos (Wert,Senk[Spalte]); 		// Stelle:=Pos (Wert,Senk[Spalte]);
+	if (Stelle!=0) 							// If (Stelle<>0) then
+	{ 										// 	Begin
+		GewZSt = Stelle;					//      GewZSt:=Stelle;
+		GewSSt = Spalte;					//      GewSSt:=Spalte;
+		Richtung = 2;						//      Richtung:=2;
+		Spielende = true;					//      Spielende:=true;
+	}										// 	End; {If-Begin}
+
+	// {------------------------------     Schrg nach rechts oben suchen     ----}
+
+	Num = Spalte-Zeile+5;					// Num:=Spalte-Zeile+5;
+	if (Num>0 && Num<10) 					// If (Num>0) and (Num<10) then
+	{										// 	Begin
+		Stelle  = Pos (Wert,Reob[Num]);		// 	Stelle:=Pos (Wert,Reob[Num]);
+		if (Stelle<>0) then					// 	If (Stelle<>0) then
+		{ 									// 		Begin
+			if (Num<6) {					// 		If (Num<6) then
+				GewZSt = Stelle-Num+5		// 			GewZSt:=Stelle-Num+5
+			} else {						// 		Else
+				GewZSt = Stelle;			// 			GewZSt:=Stelle;
+			}
+			if (Num<6) {					// 		If (Num<6) then
+				GewSSt = Stelle				// 			GewSSt:=Stelle
+			} else {						// 		Else
+				GewSSt = Stelle+Num-5;		// 			GewSSt:=Stelle+Num-5;
+			}
+			Richtung = 3;					// 		Richtung:=3;
+			Spielende = true;				// 		Spielende:=true;
+		}									// 		End; {If-Begin}
+	}										// 	End;     {If-Begin}
+
+	// {------------------------------     Schrg nach links oben suchen     -----}
+
+	Num = -(Spalte+Zeile)+14;				// Num:=-(Spalte+Zeile)+14;
+	If ( Num>0 && Num<10 ) 					// If (Num>0) and (Num<10) then
+	{										// 	Begin 
+			Stelle:=Pos (Wert,Liob[Num]);	// 	Stelle:=Pos (Wert,Liob[Num]); 
+			If (Stelle<>0) {				// 	If (Stelle<>0) then Begin																			 // 		Begin
+				if (Num<6) {				// 		If (Num<6) then
+					GewZSt = Stelle-Num+5	// 			GewZSt:=Stelle-Num+5
+				} else {					// 		Else
+					GewZSt = Stelle;		// 			GewZSt:=Stelle;
+				} 							//
+				if (Num<6) {				// 		If (Num<6) then
+					GewSSt = 9-Stelle		// 			GewSSt:=9-Stelle
+				} else {					// 		Else
+					GewSSt = 14-Stelle-Num;	// 			GewSSt:=14-Stelle-Num;
+				} 							//
+				Richtung = 1;				// 		Richtung:=1;
+				Spielende = true;			// 		Spielende:=true;
+			}								// 		End; {If-Begin}
+	}										// 	End;     {If-Begin}
+
+	if (Wert=='SSSS' && Spielende) 			// If (Wert='SSSS') and (Spielende) then
+	{										// 	Begin
+		Gewinner = Spieler;					// 	Gewinner:=Spieler;
+		Farbe    = Farbe_Sp;				// 	Farbe:=Farbe_Sp;
+	}										// 	End;
+	if (Wert=='CCCC' && Spielende) 			// If (Wert='CCCC') and (Spielende) then
+	{										// 	Begin
+		Gewinner = Computer;				// 	Gewinner:=Computer;
+		Farbe    = Farbe_Co;				// 	Farbe:=Farbe_Co;
+	}										// 	End;
+} // End; {Procedure Gewinnsuche}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Stringsuche mit Priorittsprfung     -------------}
