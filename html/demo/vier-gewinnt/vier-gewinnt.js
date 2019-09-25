@@ -815,7 +815,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 			}
 		}													// 		End;
 	}														// 	End;     {For-Spalte-Begin}
-	Prior = Pri;												// Prior:=Pri;
+	Prior = Pri;											// Prior:=Pri;
 };											 				// End;                      {Function Prior}
 
 
@@ -823,25 +823,25 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 // {------------------     Warnung vor gefhrlichen Zgen     ----------------}
 // {--------------------------------------------------------------------------}
 
-// Function Warnung: Boolean;
-
-// Begin
-// Warnung:=false;
-// If Kontrolle then
-// If (Zeile<8) then
-// 	Begin
-// 	Inc (Zeile);
-// 	AktString('S');
-// 	Gewinnsuche('SSSS');
-// 	If Spielende then
-// 		Begin
-// 		Spielende:=false;
-// 		Gewinner:=Niemand;
-// 		Warnung:=true;
-// 		End; {If-Spielende-Begin}
-// 	AktString('O');
-// 	End; {If-(Zeile..)-Begin}
-// End;     {Function Warnung}
+const Warnung = function() 		 	// Function Warnung: Boolean;
+{							 		// Begin
+	Warnung = false;				// Warnung:=false;
+	if ( Kontrolle ) {				// If Kontrolle then
+		if (Zeile<8) 				// If (Zeile<8) then
+		{ 							// 	Begin
+			Zeile++;				// 	Inc (Zeile);
+			AktString('S');			// 	AktString('S');
+			Gewinnsuche('SSSS');	// 	Gewinnsuche('SSSS');
+			if ( Spielende )		// 	If Spielende then
+			{						// 		Begin
+				Spielende = false;	// 		Spielende:=false;
+				Gewinner = Niemand;	// 		Gewinner:=Niemand;
+				Warnung = true;		// 		Warnung:=true;
+			}		 				// 		End; {If-Spielende-Begin}
+			AktString('O');			// 	AktString('O');
+		}		 					// 	End; {If-(Zeile..)-Begin}
+	} 								// 
+};		 							// End;     {Function Warnung}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Zugauswertung                    ------------------}
