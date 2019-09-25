@@ -682,124 +682,141 @@ const Dummy_Liob = function(Stelle, Num)		// Procedure Dummy_Liob (Stelle, Num: 
 		Zeile  = Stelle;						// 	Zeile:=Stelle;
 		Spalte = 14 - Stelle - Num;				// 	Spalte:=14-Stelle-Num;
 	} 											// 	End;
-}						 						// End; {Procedure Dummy_Liob}
+};						 						// End; {Procedure Dummy_Liob}
 
 // {--------------------------------------------------------------------------}
 
-// Function Prior (Wert, Pri: String; Zahl: Byte; Setzen: Boolean): String;
-// Var    Num, Stelle:  ShortInt;
-// 	   I, J:         Integer;
-// 	   Stop:         Boolean;
+// valerie: this one is a monster...
+const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri: String; Zahl: Byte; Setzen: Boolean): String;
+{															// Begin
+ 	let Num, Stelle;										// Var    Num, Stelle:  ShortInt;
+	let I, J;												// 	   I, J:         Integer;
+	let Stop;												// 	   Stop:         Boolean;
+															// 
+	Stop = false;											// Stop:=false;
+															// 
+	// {--------------------     Schrg nach rechts oben suchen/Prioritt     ----}
+	for ( Num = 0 ; Num < 9 ; Num++ )  						// For Num:=1 to 9 do (valerie: indexing could be buggy)
+	{														// 	Begin
+		Stelle = Pos (Wert,Reob[Num]);						// 	Stelle:=Pos (Wert,Reob[Num]);
+		if (Stelle != 0) 									// 	If (Stelle<>0) then
+		{													// 		Begin
+			if (Setzen) {									// 		If (Setzen) then
+				for ( J = 0 ; J < Wert.length ; J++ ) 		// 			For J:=0 to (Length (Wert)-1) do
+				{											// 				Begin
+					Dummy_Reob (Stelle+J, Num);				// 				Dummy_Reob (Stelle+J, Num);
+					if ( Platz[Spalte][Zeile]=='O' 			// 				If (Platz[Spalte,Zeile]='O')
+						&& Platz[Spalte][Zeile-1]=='O') { 	// 				and (Platz[Spalte,Zeile-1]='O') then
+						Stop = true;					 	// 					Stop:=true;
+					}                                   	//
+				}											// 				End;  {For-J-Begin}
+			} 												//
+			if (!Stop) {									// 		If not (Stop) then
+				if (Zahl!=0) {								// 			If (Zahl<>0) then
+					 										// 				Begin
+					Dummy_Reob (Stelle+Zahl-1, Num);		// 				Dummy_Reob (Stelle+Zahl-1, Num);
+					Pri = Dummy_1 (Wert, Pri);				// 				Pri:=Dummy_1 (Wert, Pri);
+															// 				End
+				} else {									// 			Else
+															// 				Begin
+					for ( I=0 ; I < Wert.length - 1; I++ )	// 				For I:=0 to ((Length(Wert))-1) do
+						if ( Wert[ I + 1] == 'O' ) 			// 					If (Wert[I+1]='O') then
+						{									// 						Begin
+							Dummy_Reob( Stelle + I, Num );	// 						Dummy_Reob (Stelle+I, Num);
+							Pri = Dummy_1( Wert, Pri );		// 						Pri:=Dummy_1 (Wert, Pri);
+						}									// 						End  {If-(Wert..)-Begin}
+				}											// 				End;     {Else-Begin}
+			} 												//
+		}											 		// 		End;             {If-(Stelle..)-Begin}
+	}												 		// 	End;                 {For-Num-Begin}
+																					 // 
+	// {--------------------     Schrg nach links oben suchen/Prioritt     -----}
 
-// Begin
-// Stop:=false;
+	Stop = false;											// Stop:=false;
+	for ( Num = 0 ; Num < 9 ; Num++ ) 						// For Num:=1 to 9 do
+	{														// 	Begin
+		Stelle =Pos (Wert,Liob[Num]);						// 	Stelle:=Pos (Wert,Liob[Num]);
+		if (Stelle!=0) 										// 	If (Stelle<>0) then
+		{ 													// 		Begin
+			if (Setzen) {								 	// 		If (Setzen) then
+				for ( J = 0 ; J < Wert.length ; J++ ) 		// 			For J:=0 to (Length (Wert)-1) do
+				{											// 				Begin
+					Dummy_Liob (Stelle+J, Num);				// 				Dummy_Liob (Stelle+J, Num);
+					if (Platz[Spalte][Zeile]=='O'			// 				If (Platz[Spalte,Zeile]='O')
+						&& Platz[Spalte][Zeile-1]=='O') {	// 				and (Platz[Spalte,Zeile-1]='O') then
+						Stop = true;						// 					Stop:=true;
+					} 										//
+				}											// 				End;  {For-J-Begin}
+			}  												//
 
-// {--------------------     Schrg nach rechts oben suchen/Prioritt     ----}
-// For Num:=1 to 9 do
-// 	Begin
-// 	Stelle:=Pos (Wert,Reob[Num]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If (Setzen) then
-// 			For J:=0 to (Length (Wert)-1) do
-// 				Begin
-// 				Dummy_Reob (Stelle+J, Num);
-// 				If (Platz[Spalte,Zeile]='O')
-// 				and (Platz[Spalte,Zeile-1]='O') then
-// 					Stop:=true;
-// 				End;  {For-J-Begin}
-// 		If not (Stop) then
-// 			If (Zahl<>0) then
-// 				Begin
-// 				Dummy_Reob (Stelle+Zahl-1, Num);
-// 				Pri:=Dummy_1 (Wert, Pri);
-// 				End
-// 			Else
-// 				Begin
-// 				For I:=0 to ((Length(Wert))-1) do
-// 					If (Wert[I+1]='O') then
-// 						Begin
-// 						Dummy_Reob (Stelle+I, Num);
-// 						Pri:=Dummy_1 (Wert, Pri);
-// 						End  {If-(Wert..)-Begin}
-// 				End;     {Else-Begin}
-// 		End;             {If-(Stelle..)-Begin}
-// 	End;                 {For-Num-Begin}
+			if (!Stop) {									// 		If not (Stop) then
+				if (Zahl!=0) 								// 			If (Zahl<>0) then
+				{											// 				Begin
+					Dummy_Liob (Stelle+Zahl-1, Num);		// 				Dummy_Liob (Stelle+Zahl-1, Num);
+					Pri = Dummy_1 (Wert, Pri);				// 				Pri:=Dummy_1 (Wert, Pri);
+				} else {									// 				End
+															// 			Else
+															// 				Begin
+					for ( I=0 ; I < Wert.length-1 ; I++) {	// 				For I:=0 to ((Length(Wert))-1) do
+						if (Wert[I+1]=='O') 				// 					If (Wert[I+1]='O') then
+						{									// 						Begin
+							Dummy_Liob( Stelle + I, Num ); 	// 						Dummy_Liob (Stelle+I, Num);
+							Pri = Dummy_1( Wert, Pri );		// 						Pri:=Dummy_1 (Wert, Pri);
+						}									// 						End;  {If-(Wert..)-Begin}
+					} 										//
+				}											// 				End;          {Else-Begin}
+			} 												//
+		}													// 		End;                  {If-(Stelle..)-Begin}
+	}														// 	End;                      {For-Num-Begin}
 
-// {--------------------     Schrg nach links oben suchen/Prioritt     -----}
-// Stop:=false;
-// For Num:=1 to 9 do
-// 	Begin
-// 	Stelle:=Pos (Wert,Liob[Num]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If (Setzen) then
-// 			For J:=0 to (Length (Wert)-1) do
-// 				Begin
-// 				Dummy_Liob (Stelle+J, Num);
-// 				If (Platz[Spalte,Zeile]='O')
-// 				and (Platz[Spalte,Zeile-1]='O') then
-// 					Stop:=true;
-// 				End;  {For-J-Begin}
-// 		If not (Stop) then
-// 			If (Zahl<>0) then
-// 				Begin
-// 				Dummy_Liob (Stelle+Zahl-1, Num);
-// 				Pri:=Dummy_1 (Wert, Pri);
-// 				End
-// 			Else
-// 				Begin
-// 				For I:=0 to ((Length(Wert))-1) do
-// 					If (Wert[I+1]='O') then
-// 						Begin
-// 						Dummy_Liob (Stelle+I, Num);
-// 						Pri:=Dummy_1 (Wert, Pri);
-// 						End;  {If-(Wert..)-Begin}
-// 				End;          {Else-Begin}
-// 		End;                  {If-(Stelle..)-Begin}
-// 	End;                      {For-Num-Begin}
-
-// {----------------------------------     Waagrecht suchen/Prioritt     ----}
-// Stop:=false;
-// For Zeile:=1 to 8 do
-// 	Begin
-// 	Stelle:=Pos (Wert,Waag[Zeile]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If (Setzen) then
-// 			For J:=0 to (Length (Wert)-1) do
-// 				If (Platz[Stelle+J,Zeile]='O')
-// 				and (Platz[Stelle+J,Zeile-1]='O') then
-// 					Stop:=true;
-// 		If not (Stop) then
-// 			If (Zahl<>0) then
-// 				Begin
-// 				Spalte:=Stelle+Zahl-1;
-// 				Pri:=Dummy_1 (Wert,Pri);
-// 				End
-// 			Else
-// 				For I:=0 to ((Length(Wert))-1) do
-// 					If Wert[I]='O' then
-// 						Begin
-// 						Spalte:=Stelle+I-1;
-// 						Pri:=Dummy_1 (Wert,Pri);
-// 						End;
-// 		End; {If-(Stelle..)-Begin}
-// 	End;     {For-Zeile-Begin}
-
-// {----------------------------------     Senkrecht suchen/Prioritt     ----}
-// Stop:=false;
-// For Spalte:=1 to 8 do
-// 	Begin
-// 	Stelle:=Pos (Wert,Senk[Spalte]);
-// 	If (Stelle<>0) then
-// 		Begin
-// 		If Kontrolle then
-// 			Pri:=Dummy_1 (Wert,Pri);
-// 		End;
-// 	End;     {For-Spalte-Begin}
-// Prior:=Pri;
-// End;                      {Function Prior}
+	// {----------------------------------     Waagrecht suchen/Prioritt     ----}
+	Stop = false;											// Stop:=false;
+	for ( Zeile = 1 ; Zeile < 9 ; Zeile++ )  				// For Zeile:=1 to 8 do
+	{														// 	Begin
+		Stelle = Pos(Wert,Waag[Zeile]);						// 	Stelle:=Pos (Wert,Waag[Zeile]);
+		if ( Stelle!=0 ) 									// 	If (Stelle<>0) then
+		{ 													// 		Begin
+			if (Setzen) {									// 		If (Setzen) then
+				for( J=0 ; J < Wert.length - 1 ; J++ ) {	// 			For J:=0 to (Length (Wert)-1) do
+					if (Platz[Stelle+J,Zeile]=='O' 			// 				If (Platz[Stelle+J,Zeile]='O')
+						&& Platz[Stelle+J,Zeile-1]=='O') {	// 				and (Platz[Stelle+J,Zeile-1]='O') then
+						Stop = true;						// 					Stop:=true;
+					}
+				}
+			}
+			if (!Stop) {									// 		If not (Stop) then
+				if (Zahl!=0) 								// 			If (Zahl<>0) then
+				{											// 				Begin
+					Spalte = Stelle + Zahl - 1;				// 				Spalte:=Stelle+Zahl-1;
+					Pri = Dummy_1( Wert, Pri );				// 				Pri:=Dummy_1 (Wert,Pri);
+															// 				End
+				} else {									// 			Else 
+					for ( I=0 ; I < Wert.length-1 ; I++ ) {	// 				For I:=0 to ((Length(Wert))-1) do
+						if ( Wert[I]=='O' ) 				// 					If Wert[I]='O' then
+						{ 									// 						Begin
+							Spalte = Stelle + I - 1;		// 						Spalte:=Stelle+I-1;
+							Pri = Dummy_1( Wert, Pri );		// 						Pri:=Dummy_1 (Wert,Pri);
+						}									// 						End;
+					}
+				}
+			}
+		}													// 		End; {If-(Stelle..)-Begin}
+	}														// 	End;     {For-Zeile-Begin}
+																					 // 
+	// {----------------------------------     Senkrecht suchen/Prioritt     ----}
+	Stop = false;											// Stop:=false;
+	for ( Spalte = 1 ; Spalte < 8 ; Spalte++ ) 				// For Spalte:=1 to 8 do
+	{														// 	Begin
+		Stelle = Pos( Wert, Senk[ Spalte ] );				// 	Stelle:=Pos (Wert,Senk[Spalte]);
+		if ( Stelle != 0 ) 									// 	If (Stelle<>0) then
+		{													// 		Begin
+			if ( Kontrolle ) {								// 		If Kontrolle then
+				Pri = Dummy_1( Wert, Pri );					// 			Pri:=Dummy_1 (Wert,Pri);
+			}
+		}													// 		End;
+	}														// 	End;     {For-Spalte-Begin}
+	Prior = Pri;												// Prior:=Pri;
+};											 				// End;                      {Function Prior}
 
 
 // {--------------------------------------------------------------------------}
