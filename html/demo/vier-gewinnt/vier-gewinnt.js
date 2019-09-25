@@ -841,31 +841,33 @@ const Warnung = function() 		 	// Function Warnung: Boolean;
 			AktString('O');			// 	AktString('O');
 		}		 					// 	End; {If-(Zeile..)-Begin}
 	} 								// 
+	return Warnung; 				// (valerie: think this is right)
 };		 							// End;     {Function Warnung}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Zugauswertung                    ------------------}
 // {--------------------------------------------------------------------------}
 
-// Function Zugauswertung: Boolean;
-// Var I,J: Integer;
-
-// Begin
-// Zugauswertung:=false;
-// For I:=1 to (Length (Prior_1)-1) do
-// 	Begin
-// 	Val (Prior_1[I],Spalte,Code);
-// 	For J:=(Length (Prior_2)-1) downto 1 do
-// 		If (Prior_2[J]=Prior_1[I]) and not (Warnung) then
-// 			If Kontrolle then
-// 				Begin
-// 				Zeichnen ('C',Farbe_Co);
-// 				AktString('C');
-// 				Zugauswertung:=true;
-// 				Exit;
-// 				End;  {If-Kontrolle-Begin}
-// 	End;              {For-I-Begin}
-// End;                  {Function Zugauswertung}
+const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
+{														// Begin
+	let I, J;											// Var I,J: Integer;
+	Zugauswertung = false;								// Zugauswertung:=false;
+	for ( I = 1 ; I < Prior_1.length - 1 ; I++ )		// For I:=1 to (Length (Prior_1)-1) do
+	{ 													// 	Begin
+		Spalte = parseInt( Prior_1[I] );				// 	Val (Prior_1[I],Spalte,Code);
+		for ( J = Prior_2.Length - 1 ; J > 1 ; J-- ) 	// 	For J:=(Length (Prior_2)-1) downto 1 do
+			if (Prior_2[J]==Prior_1[I] && !Warnung) {	// 		If (Prior_2[J]=Prior_1[I]) and not (Warnung) then
+				if ( Kontrolle ) 						// 			If Kontrolle then
+				{										// 				Begin
+					Zeichnen( 'C', Farbe_Co );			// 				Zeichnen ('C',Farbe_Co);
+					AktString( 'C' );					// 				AktString('C');
+					Zugauswertung = true;				// 				Zugauswertung:=true;
+					return Zugauswertung;				// 				Exit;
+				}							 			// 				End;  {If-Kontrolle-Begin}
+			} 											//
+	}						 							// 	End;              {For-I-Begin}
+	return Zugauswertung; 								// (valerie: think this is right)
+}			 											// End;                  {Function Zugauswertung}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Spielerzug     ------------------------------------}
