@@ -2,6 +2,11 @@ const toString = function( v ) {
 	return JSON.stringify( v );
 };
 
+// http://irietools.com/iriepascal/progref211.html
+const Pos = function( needle, haystack, offset ) {
+	return 1 + haystack.indexOf( needle );
+};
+
 const Odd = function( v ) {
 	return v % 2;
 };
