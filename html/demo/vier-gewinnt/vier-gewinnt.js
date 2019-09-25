@@ -303,9 +303,8 @@ const Anfang = function( callback )
 // {------------------     Spielfeld zeichnen     ----------------------------}
 // {--------------------------------------------------------------------------}
 
-// Procedure Spielfeld;
-const Spielfeld = function() 
-{ 	// Begin
+const Spielfeld = function() 										  // Procedure Spielfeld;
+{ 																	  // Begin
 	SetViewPort (0,0,X(639),Y(336)+3*TextHeight('I'),true);           // SetViewPort (0,0,X(639),Y(336)+3*TextHeight('I'),true);
 	ClearViewPort();                                                  // ClearViewPort;
 	SetTextStyle (TriplexFont,0,1);                                   // SetTextStyle (TriplexFont,0,1);
@@ -314,15 +313,15 @@ const Spielfeld = function()
 	SetColor (Blue);                                                  // SetColor (Blue);
 	for( Spalte = 1 ; Spalte <= 8; Spalte++ )                         // For Spalte := 1 to 8 do
 	{                                                                 // 	Begin
-		Zeichen = Spalte; 	                                         // 	Str(Spalte,Zeichen);
+		Zeichen = Spalte + ''; 	                                      // 	Str(Spalte,Zeichen);
 		OutTextXY (X(130+Spalte*42),Y(336)+TextHeight('I'),Zeichen);  // 	OutTextXY (X(130+Spalte*42),Y(336)+TextHeight('I'),Zeichen);
 		for ( Zeile = 1 ; Zeile <= 8 ; Zeile++ ) {                    // 	For Zeile := 1 to 8 do
 			Rectangle (X(110+Spalte*42),Y(Zeile*42-40),               // 		Rectangle (X(110+Spalte*42),Y(Zeile*42-40),
 			X(150+Spalte*42),Y(Zeile*42));                            // 		X(150+Spalte*42),Y(Zeile*42));
-		}
+		}                                                             //
 	}							                                      // 	End; {For-Spalte-Begin}
 	Line (0,Y(336)+TextHeight('I')+3,X(639),Y(336)+TextHeight('I')+3);// Line (0,Y(336)+TextHeight('I')+3,X(639),Y(336)+TextHeight('I')+3);
-} // End; {Procedure Spielfeld}
+} 																	  // End; {Procedure Spielfeld}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Textzeile      ------------------------------------}
@@ -521,7 +520,7 @@ const AktString = function( wert ) 		// Procedure AktString (Wert: Char);
 	let Num, Stelle; 			   		// Var    Num, Stelle:  ShortInt;
 	Waag[ Zeile ][ Spalte ] = Wert;		// Waag[Zeile,Spalte]:=Wert;
 	Senk[ Spalte ][ Zeile ] = Wert;		// Senk[Spalte,Zeile]:=Wert;
-	let Num = Spalte - Zeile + 5   		// Num:=Spalte-Zeile+5;                   {--------------}
+	Num = Spalte - Zeile + 5   		    // Num:=Spalte-Zeile+5;                   {--------------}
 	if( Num > 0 && Num < 10 ) 	   		// If (Num>0) and (Num<10) then
 	{ 							   		// 	Begin
 		if ( Num < 6 ) {  				// 	If (Num<6) then
@@ -579,7 +578,7 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 	if (Num>0 && Num<10) 					// If (Num>0) and (Num<10) then
 	{										// 	Begin
 		Stelle  = Pos (Wert,Reob[Num]);		// 	Stelle:=Pos (Wert,Reob[Num]);
-		if (Stelle<>0) then					// 	If (Stelle<>0) then
+		if (Stelle!=0) then					// 	If (Stelle<>0) then
 		{ 									// 		Begin
 			if (Num<6) {					// 		If (Num<6) then
 				GewZSt = Stelle-Num+5		// 			GewZSt:=Stelle-Num+5
@@ -601,8 +600,8 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 	Num = -(Spalte+Zeile)+14;				// Num:=-(Spalte+Zeile)+14;
 	If ( Num>0 && Num<10 ) 					// If (Num>0) and (Num<10) then
 	{										// 	Begin 
-			Stelle:=Pos (Wert,Liob[Num]);	// 	Stelle:=Pos (Wert,Liob[Num]); 
-			If (Stelle<>0) {				// 	If (Stelle<>0) then Begin																			 // 		Begin
+			Stelle = Pos(Wert,Liob[Num]);	// 	Stelle:=Pos (Wert,Liob[Num]); 
+			if (Stelle!=0) {				// 	If (Stelle<>0) then Begin																			 // 		Begin
 				if (Num<6) {				// 		If (Num<6) then
 					GewZSt = Stelle-Num+5	// 			GewZSt:=Stelle-Num+5
 				} else {					// 		Else
@@ -636,20 +635,22 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 
 // {------------------     Hilfsfunktion     ---------------------------------}
 
-// Function Dummy_1 (Wert, Pr: String):String;
-// Var J: Integer;
-
-// Begin
-// If (Platz[Spalte,Zeile-1]<>'O') then
-// 	Begin
-// 	Str (Spalte:1,Zeichen);
-// 	For J:=1 to Length (Pr) do
-// 		If (Pr[J]=Zeichen) then
-// 			Zeichen:='';
-// 	Insert (Zeichen,Pr,1);
-// 	End; {If-(Platz..)-Begin}
-// Dummy_1:=Pr;
-// End; {Function Dummy_1}
+const Dummy_1 = function(Wert, Pr)				// Function Dummy_1 (Wert, Pr: String):String;
+{												// Begin
+												// 
+	let j;										// Var J: Integer;
+	if (Platz[Spalte][Zeile-1] != 'O') 			// If (Platz[Spalte,Zeile-1]<>'O') then
+	{											// 	Begin
+		Zeichen = Spalte + ''; 					// 	Str (Spalte:1,Zeichen);// valerie: what is this :1?
+		for ( j = 0 ; j < pr.lenght ; j++ ) { 	// 	For J:=1 to Length (Pr) do
+			if (Pr[J]=Zeichen) {				// 		If (Pr[J]=Zeichen) then
+				Zeichen = '';					// 			Zeichen:='';
+			} 									// 
+		} 										//
+		Insert (Zeichen,Pr,1);					// 	Insert (Zeichen,Pr,1);
+	}						 					// 	End; {If-(Platz..)-Begin}
+	Dummy_1 = Pr;					 			// Dummy_1:=Pr;
+}							 					// End; {Function Dummy_1}
 
 // {------------------     Hilfsprozedur (Rechts Oben)     -------------------}
 

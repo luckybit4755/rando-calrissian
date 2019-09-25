@@ -2,8 +2,15 @@ const toString = function( v ) {
 	return JSON.stringify( v );
 };
 
+// https://www.freepascal.org/docs-html/rtl/system/insert.html
+const Insert = function( text, target, position ) { 
+	position--; // pascal strings are indexed from 1 for some reason
+	return target.substring( 0, position ) + text + target.substring( position );
+};
+
 // http://irietools.com/iriepascal/progref211.html
 const Pos = function( needle, haystack, offset ) {
+	// pascal strings are indexed from 1 for some reason
 	return 1 + haystack.indexOf( needle );
 };
 
