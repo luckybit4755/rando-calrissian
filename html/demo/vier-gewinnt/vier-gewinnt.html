@@ -1,0 +1,28 @@
+<HTML>
+	<HEAD>
+		<TITLE>4_gew_v2</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+		</style>
+
+		<script type="text/javascript" src="pascala.js"></script>
+		<script type="text/javascript" src="grafik.js"></script>
+		<script type="text/javascript" src="crt.js"></script>
+		<script type="text/javascript" src="vier-gewinnt.js"></script>
+
+		<script type="text/javascript">
+
+			window.onload = function() {
+				Init();
+				Grafik();
+
+				Titel( function() { Spielregeln( function() { Anfang( function() {console.log( 'ok' ) } ) } ) } );
+			}
+		</script>
+	</HEAD>
+	<BODY>
+	</BODY>
+</HTML>
