@@ -873,173 +873,201 @@ const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
 // {------------------     Spielerzug     ------------------------------------}
 // {--------------------------------------------------------------------------}
 
-// Procedure Spieler_Zug;
-
-// Begin
-// If Spielende then
-// 	Exit;
-// Wahl;                                {Spieler setzt}
-// If Not Spielende then
-// 	Begin
-// 	Zeichnen('S',Farbe_Sp);          {Spielstein zeichnen + Zug speichern}
-// 	AktString('S');                  {Aktualisieren der Spielfeld-Strings}
-// 	Gewinnsuche('SSSS');             {Kontrolle auf Spielergewinn}
-// 	End
-// Else
-// 	Exit;
-// If Gewinner=Spieler then
-// 	Begin
-// 	Spielende:=true;
-// 	Markierung(Farbe_Sp);
-// 	End;
-// Delay(500);
-// End; {Procedure Spieler_Zug}
+const Spieler_Zug = function( callback ) 	// Procedure Spieler_Zug;
+{											// Begin
+	if ( Spielende ) { 						// If Spielende then
+		return;								// 	Exit;
+	} 										//
+	Wahl();  						 		// Wahl;                                {Spieler setzt}
+	if ( !Spielende ) {						// If Not Spielende then
+	{										// 	Begin
+		Zeichnen('S',Farbe_Sp);  			// 	Zeichnen('S',Farbe_Sp);          {Spielstein zeichnen + Zug speichern}
+		AktString('S');          		 	// 	AktString('S');                  {Aktualisieren der Spielfeld-Strings}
+		Gewinnsuche('SSSS');     		 	// 	Gewinnsuche('SSSS');             {Kontrolle auf Spielergewinn}
+											// 	End
+	} else {								// Else
+		return;								// 	Exit;
+	}
+	if ( Gewinner==Spieler )				// If Gewinner=Spieler then
+	{										// 	Begin
+		Spielende:=true;					// 	Spielende:=true;
+		Markierung(Farbe_Sp);				// 	Markierung(Farbe_Sp);
+	}										// 	End;
+	setInterval( 
+		function() { callback() }
+		, 500 								// Delay(500);
+	)
+};											// End; {Procedure Spieler_Zug}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Computerzug     -----------------------------------}
 // {--------------------------------------------------------------------------}
 
-// Procedure Computer_Zug;
+const Computer_Zug = function()  									// Procedure Computer_Zug;
+{																	// Begin
+	if ( Spielende ) {												// If Spielende then
+		return;														// 	Exit;
+	}
+	SetViewPort (0,Y(390),X(639),Y(450),true);						// SetViewPort (0,Y(390),X(639),Y(450),true);
+	ClearViewPort;													// ClearViewPort;
+	SetColor (Blue);												// SetColor (Blue);
+	let text = 'Bitte etwas Geduld, ich muá nachdenken  ! ! !';
+	OutTextXY (X(10),TextHeight('Ip'), text);		 				// OutTextXY (X(10),TextHeight('Ip'),'Bitte etwas Geduld, ich muá nachdenken  ! ! !');
 
-// Begin
-// If Spielende then
-// 	Exit;
-// SetViewPort (0,Y(390),X(639),Y(450),true);
-// ClearViewPort;
-// SetColor (Blue);
-// OutTextXY (X(10),TextHeight('Ip'),'Bitte etwas Geduld, ich muá nachdenken  ! ! !');
+	// {------------------     Auf Gewinn prfen     -----------------------------}
+																								 // 
+	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) 					// For Spalte:=1 to 8 do
+	{																// 	Begin
+		if ( Kontrolle ) 											// 	If Kontrolle then                      {8 Zge setzen}
+		{															// 		Begin
+			AktString('C');											// 		AktString('C');
+			Gewinnsuche('CCCC');									// 		Gewinnsuche('CCCC');
+			if ( Spielende )  										// 		If Spielende then                  {evtl. Gewinn}
+			{														// 			Begin
+				Zeichnen('C',Farbe_Co);								// 			Zeichnen('C',Farbe_Co);
+				Markierung(Farbe_Co);								// 			Markierung(Farbe_Co);
+				return;                          					// 			Exit;                          {Verlassen von Computer-Zug}
+																	// 			End  {If-Spielende-Begin}
+			} else {												// 		Else
+				AktString('O');                						// 			AktString('O');                {Zug wieder lschen}
+			} 														//
+		}															// 		End;  {If-Kontrolle-Begin}
+	}															 	// 	End;      {For-Spalte-Begin}
+																								 // 
+	// {------------------     Direkt-Gewinn-Verhinderung Gegner     -------------}
 
-// {------------------     Auf Gewinn prfen     -----------------------------}
+	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) 					// For Spalte:=1 to 8 do
+	{																// 	Begin
+		if ( Kontrolle )                      						// 	If Kontrolle then                      {8 Zge setzen}
+		{															// 		Begin
+			AktString('S');											// 		AktString('S');
+			Gewinnsuche('SSSS');									// 		Gewinnsuche('SSSS');
+			if ( Spielende )                   						// 		If Spielende then                  {evtl. 'Feind'-gewinn}
+			{														// 			Begin
+				AktString('C');										// 			AktString('C');
+				Spielende = false;									// 			Spielende:=false;
+				Gewinner = Niemand;									// 			Gewinner:=Niemand;
+				Zeichnen( 'C', Farbe_Co );							// 			Zeichnen('C',Farbe_Co);
+				return;                          					// 			Exit;                          {Verlassen von Computer-Zug}
+																	// 			End  {If-Spielende-Begin}
+			} else {												// 		Else
+				AktString('O');                						// 			AktString('O');                {Zug wieder lschen}
+			} 														// 
+		}															// 		End;  {If-Kontrolle-Begin}
+	}																// 	End;      {For-Spalte-Begin}
+																								 // 
+	// {------------------     Suchen des besten Zuges     -----------------------}
 
-// For Spalte:=1 to 8 do
-// 	Begin
-// 	If Kontrolle then                      {8 Zge setzen}
-// 		Begin
-// 		AktString('C');
-// 		Gewinnsuche('CCCC');
-// 		If Spielende then                  {evtl. Gewinn}
-// 			Begin
-// 			Zeichnen('C',Farbe_Co);
-// 			Markierung(Farbe_Co);
-// 			Exit;                          {Verlassen von Computer-Zug}
-// 			End  {If-Spielende-Begin}
-// 		Else
-// 			AktString('O');                {Zug wieder lschen}
-// 		End;  {If-Kontrolle-Begin}
-// 	End;      {For-Spalte-Begin}
+	Prior_1 = Prior( Suchstring[3],' ',0,true);						// Prior_1:=Prior (Suchstring[3],' ',0,true);
+	Prior_1 = Prior( Suchstring[4],Prior_1,0,true);					// Prior_1:=Prior (Suchstring[4],Prior_1,0,true);
+	Prior_1 = Prior( Suchstring[18],Prior_1,0,true);				// Prior_1:=Prior (Suchstring[18],Prior_1,0,true);
+	Prior_1 = Prior( Suchstring[19],Prior_1,0,true);				// Prior_1:=Prior (Suchstring[19],Prior_1,0,true);
+	Prior_2 = Prior( Suchstring[5],' ',2,true);						// Prior_2:=Prior (Suchstring[5],' ',2,true);
+	Prior_2 = Prior( Suchstring[6],Prior_2,4,true);					// Prior_2:=Prior (Suchstring[6],Prior_2,4,true);
+	Prior_2 = Prior( Suchstring[17],Prior_2,2,true);				// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
+	Prior_2 = Prior( Suchstring[17],Prior_2,4,true);				// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
+	if (Zugauswertung) {											// If (Zugauswertung) then
+		return;														// 	Exit;
+	}
 
-// {------------------     Direkt-Gewinn-Verhinderung Gegner     -------------}
+	Prior_2 = ' ';													// Prior_2:=' ';
+	for ( K = 7 ; K <= 12 ; K++ ) {									// For K:=7 to 12 do
+		Prior_2 = Prior( Suchstring[K],Prior_2,0,true );			// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
+	} 
+	for ( K = 7 ; K <= 12 ; K++ ) { 								// For K:=7 to 12 do
+		Prior_2 = Prior( Suchstring[K],Prior_2,0,false );			// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
+	}
+	if (Zugauswertung) {											// If (Zugauswertung) then
+		return;														// 	Exit;
+	}
 
-// For Spalte:=1 to 8 do
-// 	Begin
-// 	If Kontrolle then                      {8 Zge setzen}
-// 		Begin
-// 		AktString('S');
-// 		Gewinnsuche('SSSS');
-// 		If Spielende then                  {evtl. 'Feind'-gewinn}
-// 			Begin
-// 			AktString('C');
-// 			Spielende:=false;
-// 			Gewinner:=Niemand;
-// 			Zeichnen('C',Farbe_Co);
-// 			Exit;                          {Verlassen von Computer-Zug}
-// 			End  {If-Spielende-Begin}
-// 		Else
-// 			AktString('O');                {Zug wieder lschen}
-// 		End;  {If-Kontrolle-Begin}
-// 	End;      {For-Spalte-Begin}
+	for ( K = 13 ; K <= 16 ; K++ ) {								// For K:=13 to 16 do
+		Prior_2 = Prior( Suchstring[K], Prior_2, 0, true );			// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
+	}
+	for ( K = 13 ; K <= 16 ; K++ ) {								// For K:=13 to 16 do
+		Prior_2 = Prior( Suchstring[K], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
+	}
+	if (Zugauswertung) {											// If (Zugauswertung) then
+		return;														// 	Exit;
+	}
 
-// {------------------     Suchen des besten Zuges     -----------------------}
+	Prior_2 = '12345678 ';											// Prior_2:='12345678 ';
+	if ( Zugauswertung ) {											// If Zugauswertung then
+		return;														// 	Exit;
+	}
 
-// Prior_1:=Prior (Suchstring[3],' ',0,true);
-// Prior_1:=Prior (Suchstring[4],Prior_1,0,true);
-// Prior_1:=Prior (Suchstring[18],Prior_1,0,true);
-// Prior_1:=Prior (Suchstring[19],Prior_1,0,true);
-// Prior_2:=Prior (Suchstring[5],' ',2,true);
-// Prior_2:=Prior (Suchstring[6],Prior_2,4,true);
-// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
-// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
-// If (Zugauswertung) then
-// 	Exit;
+	Prior_1 = '12345678 ';											// Prior_1:='12345678 ';
+	Prior_2 = Prior( Suchstring[  5 ], ' '    , 2, true );			// Prior_2:=Prior (Suchstring[5],' ',2,true);
+	Prior_2 = Prior( Suchstring[  6 ], Prior_2, 4, true );			// Prior_2:=Prior (Suchstring[6],Prior_2,4,true);
+	Prior_2 = Prior( Suchstring[ 17 ], Prior_2, 2, true );			// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
+	Prior_2 = Prior( Suchstring[ 17 ], Prior_2, 4, true );			// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
 
-// Prior_2:=' ';
-// For K:=7 to 12 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
-// For K:=7 to 12 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
-// If (Zugauswertung) then
-// 	Exit;
+	if ( Zugauswertung ) {											// If Zugauswertung then
+		return;														// 	Exit;
+	}
 
-// For K:=13 to 16 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
-// For K:=13 to 16 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
-// If (Zugauswertung) then
-// 	Exit;
+	Prior_2 = ' ';													// Prior_2:=' ';
+	for ( K = 7 ; K <= 12 ; K++ ) {									// For K:=7 to 12 do
+		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, true );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
+	}
+	for ( K = 7 ; K <= 12 ; K++ ) {									// For K:=7 to 12 do
+		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
+	}
+	
+	if ( Zugauswertung ) {											// If Zugauswertung then
+		return;														// 	Exit;
+	}
 
-// Prior_2:='12345678 ';
-// If Zugauswertung then
-// 	Exit;
+	Prior_2 = ' ';													// Prior_2:=' ';
+	for ( K = 13 ; K <= 16 ; K++ ) { 								// For K:=13 to 16 do
+		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, true );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
+	}
+	for ( K = 13 ; K <= 16 ; K++ ) { 								// For K:=13 to 16 do
+		Prior_2 = Prior( Suchstring[ K ], Prior_2, 0, false );		// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
+	}
 
-// Prior_1:='12345678 ';
-// Prior_2:=Prior (Suchstring[5],' ',2,true);
-// Prior_2:=Prior (Suchstring[6],Prior_2,4,true);
-// Prior_2:=Prior (Suchstring[17],Prior_2,2,true);
-// Prior_2:=Prior (Suchstring[17],Prior_2,4,true);
+	if ( Zugauswertung ) {											// If Zugauswertung then
+		return;														// 	Exit;
+	}
 
-// If Zugauswertung then
-// 	Exit;
+	Spalte = Last_2;												// Spalte:=Last_2;
+	if (!Warnung) {													// If not (Warnung) then
+		if (Kontrolle) 												// 	If (Kontrolle) then
+		{															// 		Begin
+			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
+			AktString( 'C' );										// 		AktString ('C');
+			return;													// 		Exit;
+		}															// 		End;
+	}
+																	
+	Spalte = Last_1;												// Spalte:=Last_1;
+	if ( !Warnung) {												// If not (Warnung) then
+		if (Kontrolle) 												// 	If (Kontrolle) then
+		{															// 		Begin
+			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
+			AktString( 'C' );										// 		AktString ('C');
+			return;													// 		Exit;
+		}															// 		End;
+	}
 
-// Prior_2:=' ';
-// For K:=7 to 12 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
-// For K:=7 to 12 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
-// If Zugauswertung then
-// 	Exit;
+	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) {					// For Spalte:=1 to 8 do
+		If (!Warnung && Kontrolle) 									// 	If not (Warnung) and (Kontrolle) then
+		{															// 		Begin
+			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
+			AktString( 'C' );										// 		AktString ('C');
+			return;													// 		Exit;
+		}															// 		End;
+	}
 
-// Prior_2:=' ';
-// For K:=13 to 16 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,true);
-// For K:=13 to 16 do
-// 	Prior_2:=Prior (Suchstring[K],Prior_2,0,false);
-// If Zugauswertung then
-// 	Exit;
-
-// Spalte:=Last_2;
-// If not (Warnung) then
-// 	If (Kontrolle) then
-// 		Begin
-// 		Zeichnen ('C',Farbe_Co);
-// 		AktString ('C');
-// 		Exit;
-// 		End;
-
-// Spalte:=Last_1;
-// If not (Warnung) then
-// 	If (Kontrolle) then
-// 		Begin
-// 		Zeichnen ('C',Farbe_Co);
-// 		AktString ('C');
-// 		Exit;
-// 		End;
-
-// For Spalte:=1 to 8 do
-// 	If not (Warnung) and (Kontrolle) then
-// 		Begin
-// 		Zeichnen ('C',Farbe_Co);
-// 		AktString ('C');
-// 		Exit;
-// 		End;
-
-// For Spalte:=1 to 8 do
-// 	If (Kontrolle) then
-// 		Begin
-// 		Zeichnen ('C',Farbe_Co);
-// 		AktString ('C');
-// 		Exit;
-// 		End;
-// End; {Procedure Computer_Zug}
+	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) {					// For Spalte:=1 to 8 do
+		if (Kontrolle) 												// 	If (Kontrolle) then
+		{															// 		Begin
+			Zeichnen( 'C', Farbe_Co );								// 		Zeichnen ('C',Farbe_Co);
+			AktString( 'C' );										// 		AktString ('C');
+			return;													// 		Exit;
+		}															// 		End;
+	}
+};														 			// End; {Procedure Computer_Zug}
 
 // {--------------------------------------------------------------------------}
 // {------------------     Daten speichern     -------------------------------}
