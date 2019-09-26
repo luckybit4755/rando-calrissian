@@ -33,11 +33,11 @@ let Zahl, Nr, GewSSt, GewZSt, Richtung, Last_1, Last_2;
 // 												 :String[10];
 let Abfrage, Farbe, Farbe_Sp, Farbe_Co, Prior_1, Prior_2;
 
-// 		Zeichen                                  {Hilfsgráe}
+// 		Zeichen                                  {Hilfsgráe}  <-- valerie: Hilfsgröße??? 
 // 												 :String[1];
 let Zeichen;
 
-// 		Bst                                      {Hilfsgráe}
+// 		Bst                                      {Hilfsgráe}  <-- valerie: Hilfsgröße??? 
 // 												 :Char;
 let Bst;
 
@@ -47,10 +47,10 @@ let Bst;
 let Beginner, Spielende = true;
 
 // 		Waag,  Senk,  Liob,  Reob                :Array [0..9] of String[8];
-let Waag = makeArray( makeString( 8 ), 0, 9 );
-let Senk = makeArray( makeString( 8 ), 0, 9 );
-let Liob = makeArray( makeString( 8 ), 0, 9 );
-let Reob = makeArray( makeString( 8 ), 0, 9 );
+let Waag = []; // valerie: not needed:  makeArray( makeString( 8 ), 0, 9 );
+let Senk = []; // valerie: not needed:  makeArray( makeString( 8 ), 0, 9 );
+let Liob = []; // valerie: not needed:  makeArray( makeString( 8 ), 0, 9 );
+let Reob = []; // valerie: not needed:  makeArray( makeString( 8 ), 0, 9 );
 
 // 		Suchstring                               :Array [1..19] of String[5];
 let Suchstring = makeString( makeString( 5 ), 1, 19 );
@@ -78,6 +78,7 @@ let datja = '';
 
 // Procedure Init;
 const Init = function() {
+	console.log( toString( {fn:'Init'} ) );
 	// Begin
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) // For Spalte:=1 to 8 do
 	{ 	// 	Begin
@@ -89,7 +90,7 @@ const Init = function() {
 	for ( I = 1 ; I <= 64 ; I++ ) {  // For I:=1 to 64 do
 		Zug[ I ] = 0; // 	Zug[I]:=0;
 	}
-	for( I = 1 ; I <= 8 ; I++ ) // For I:=1 to 8 do
+	for ( I = 1 ; I <= 8 ; I++ ) // For I:=1 to 8 do
 	{ 	// 	Begin
 		Waag[I] ='OOOOOOOO'; // 	Waag[I]:='OOOOOOOO';
 		Senk[I] ='OOOOOOOO'; // 	Senk[I]:='OOOOOOOO';
@@ -98,11 +99,14 @@ const Init = function() {
 	{	// 	Begin
 		Reob[I] = '';            	// 	Reob[I]:='';
 		Liob[I] = '';            	// 	Liob[I]:='';
-		for( J = 1 ; J <= (8-abs(5-I)) ; J++ ) // 	For J:=1 to (8-abs(5-I)) do
+		let q = 8-abs(5-I);
+		for ( J = 1 ; J <= (8-abs(5-I)) ; J++ ) // 	For J:=1 to (8-abs(5-I)) do
 		{               	// 		Begin
 			Reob[I] = Reob[I]+'O';	// 		Reob[I]:=Reob[I]+'O';
 			Liob[I] = Liob[I]+'O';	// 		Liob[I]:=Liob[I]+'O';
 		}  	// 		End; {For-J-Begin}
+		console.log( 'q:' + I + ' -> ' + q + '>> ' + Reob[I] );
+			
 	} // 	End;     {For-I-Begin}
 	Suchstring[1] = 'CCCC';  	// Suchstring[1]:='CCCC';
 	Suchstring[2] = 'SSSS';  	// Suchstring[2]:='SSSS';
@@ -141,6 +145,7 @@ const Init = function() {
 // Procedure Grafik;
 const Grafik = function() 
 { // Begin
+	console.log( toString( {fn:'Grafik'} ) );
 	// GraphDriver:=Detect;
 	InitGraph(); // InitGraph (GraphDriver,GraphMode,'./bgi'); 
 } // End; {Procedure Grafik}
@@ -168,6 +173,7 @@ const Y = function( Y_Koord )
 // Procedure Titel;
 const Titel = function( callback )
 { // Begin
+	console.log( toString( {fn:'Titel'} ) );
 	SetViewPort (0,0,X(639),Y(479),true);                                            // SetViewPort (0,0,X(639),Y(479),true);
 	ClearViewPort();                                                                 // ClearViewPort;
 	SetTextStyle (TriplexFont,0,10);                                                 // SetTextStyle (TriplexFont,0,10);
@@ -201,6 +207,7 @@ const Titel = function( callback )
 // Procedure Spielregeln;
 const Spielregeln = function( callback ) 
 { 	// Begin
+	console.log( toString( {fn:'Spielregeln'} ) );
 	RestoreCrtMode();                                                                   			// RestoreCrtMode;
 	Writeln();                                                                          			// Writeln;
 	TextColor(LightGreen);                                                            			// TextColor(LightGreen);
@@ -240,7 +247,8 @@ const Spielregeln = function( callback )
 
 // Procedure Anfang;
 const Anfang = function( callback ) 
-	{ // Begin
+{ // Begin
+	console.log( toString( {fn:'Anfang'} ) );
 
 	// {------------------     Wahl der Spielfarbe     --------------------------}
 	// Repeat
@@ -305,13 +313,14 @@ const Anfang = function( callback )
 
 const Spielfeld = function() 										  // Procedure Spielfeld;
 { 																	  // Begin
+	console.log( toString( {fn:'Spielfeld'} ) );
 	SetViewPort (0,0,X(639),Y(336)+3*TextHeight('I'),true);           // SetViewPort (0,0,X(639),Y(336)+3*TextHeight('I'),true);
 	ClearViewPort();                                                  // ClearViewPort;
 	SetTextStyle (TriplexFont,0,1);                                   // SetTextStyle (TriplexFont,0,1);
 	SetTextJustify (1,0);                                             // SetTextJustify (1,0);
 	SetBkColor (LightGray);                                           // SetBkColor (LightGray);
 	SetColor (Blue);                                                  // SetColor (Blue);
-	for( Spalte = 1 ; Spalte <= 8; Spalte++ )                         // For Spalte := 1 to 8 do
+	for ( Spalte = 1 ; Spalte <= 8; Spalte++ )                         // For Spalte := 1 to 8 do
 	{                                                                 // 	Begin
 		Zeichen = Spalte + ''; 	                                      // 	Str(Spalte,Zeichen);
 		OutTextXY (X(130+Spalte*42),Y(336)+TextHeight('I'),Zeichen);  // 	OutTextXY (X(130+Spalte*42),Y(336)+TextHeight('I'),Zeichen);
@@ -325,11 +334,16 @@ const Spielfeld = function() 										  // Procedure Spielfeld;
 
 // {--------------------------------------------------------------------------}
 // {------------------     Textzeile      ------------------------------------}
+// {------------------     line of text   ------------------------------------}
 // {--------------------------------------------------------------------------}
 
 // Procedure Textzeile(Zahl:Byte);
 const Textzeile = function( Zahl ) 
 { 	// Begin
+	console.log( toString( {fn:'Textzeile'} ) );
+
+	//SetTextStyle snit
+
 	SetViewPort (0,Y(479)-TextHeight('Ip')-5,X(639),Y(479),true);                   // SetViewPort (0,Y(479)-TextHeight('Ip')-5,X(639),Y(479),true);
 	ClearViewPort();                                                                // ClearViewPort;
 	Line (0,0,X(639),0);                                                            // Line (0,0,X(639),0);
@@ -337,11 +351,14 @@ const Textzeile = function( Zahl )
 	SetColor (Blue);                                                                // SetColor (Blue);
 	switch( Zahl ) {                                                                // Case Zahl of
 		case 1: OutTextXY (X(10),TextHeight('Ip')+2,                                    // 	1: OutTextXY (X(10),TextHeight('Ip')+2,
-		   '1 . . 8 :  Spalten  whlen ,      A : Abbrechen');               		// 	   '1 . . 8 :  Spalten  whlen ,      A : Abbrechen');
+		   '1 . . 8 :  Spalten  wählen ,      A : Abbrechen');               		// 	   '1 . . 8 :  Spalten  wählen ,      A : Abbrechen');
+			break;
 		case 2: OutTextXY (X(10),TextHeight('Ip')+2,                                    // 	2: OutTextXY (X(10),TextHeight('Ip')+2,
 		   'S :  Spiel  speichern ,        L :  Spiel  laden,        E: Programmende'); // 	   'S :  Spiel  speichern ,        L :  Spiel  laden,        E: Programmende');
+			break;
 		case 3: OutTextXY (X(10),TextHeight('Ip')+2,                                    // 	3: OutTextXY (X(10),TextHeight('Ip')+2,
 		   '<RETURN> :  Weiterspielen ,     "E" + <RETURN> :  Spielende');          	// 	   '<RETURN> :  Weiterspielen ,     "E" + <RETURN> :  Spielende');
+			break;
 	}                                                                     				// End; {Case}
 }; // End; {Procedure Textzeile}
 
@@ -352,13 +369,16 @@ const Textzeile = function( Zahl )
 // Function Kontrolle: Boolean;
 const Kontrolle = function() 
 { // Begin
+	console.log( toString( {fn:'Kontrolle',Spalte:Spalte} ) );
 	Zeile = 0;                            // Zeile:=0;
 	do {                                  // Repeat
 		Zeile++;                          // 	Inc (Zeile);
 	} while (Platz[Spalte][Zeile]!='O');  // Until (Platz[Spalte,Zeile]='O');
 	if (Zeile>8) {                        // If (Zeile>8) then
+		console.log( toString( {en:'Kontrolle',r:false,Zeile:Zeile} ) );
 		return false                  // 	Kontrolle:=false
 	} else {                              // else
+		console.log( toString( {en:'Kontrolle',r:true,Zeile:Zeile} ) );
 		return true;                  // 	Kontrolle:=true;
 	}
 } // End; {Function Kontrolle}
@@ -371,10 +391,11 @@ const Kontrolle = function()
 // Var I: Integer;
 const Wahl = function( callback )
 { // Begin
+	console.log( toString( {fn:'Wahl'} ) );
 	SetViewPort (0,Y(390),X(639),Y(450),true);                                     // SetViewPort (0,Y(390),X(639),Y(450),true);
 	ClearViewPort();                                                                 // ClearViewPort;
 	SetColor (Blue);                                                               // SetColor (Blue);
-	OutTextXY (X(10),TextHeight('Ip'),'Welche Spalte mchten Sie setzen?');     // OutTextXY (X(10),TextHeight('Ip'),'Welche Spalte mchten Sie setzen?');
+	OutTextXY (X(10),TextHeight('Ip'),'Welche Spalte möchten Sie setzen?');     // OutTextXY (X(10),TextHeight('Ip'),'Welche Spalte möchten Sie setzen?');
 	// Repeat
 	// 	Bst:=ReadKey;
 	// 	Val (Bst,Spalte,Code);
@@ -383,11 +404,13 @@ const Wahl = function( callback )
 	Readln(
 		function( Bst ) {
 			Spalte = parseInt( Bst );
-			let ok = ((Spalte>0) && (Spalte<9) && (Code===0) && (Kontrolle())) || (Bst==='a') || (Bst=='A');
+			//let ok = ((Spalte>0) && (Spalte<9) && (Code===0) && (Kontrolle())) || (Bst==='a') || (Bst=='A');
+			let ok = ((Spalte>0) && (Spalte<9) && (Kontrolle())) || (Bst==='a') || (Bst=='A');
 			if ( !ok ) return true;
 			OutTextXY (X(330),TextHeight('Ip'),Bst);  // OutTextXY (X(330),TextHeight('Ip'),Bst);
 			if ( Bst==='a' || Bst==='A' )             // If (Bst='a') or (Bst='A') then
 			{                                    	  // 	Begin
+				console.log( 'Spielende.1' );
 				Spielende = true;                     // 	Spielende:=true;
 				Gewinner = GEWINNER_STATES.Niemand;   // 	Gewinner:=Niemand;
 				Exit();                               // 	Exit;
@@ -399,9 +422,11 @@ const Wahl = function( callback )
 
 // {--------------------------------------------------------------------------}
 // {------------------     Zeichnen, Speichern     ---------------------------}
+// {------------------     To draw,  to save       ---------------------------}
 // {--------------------------------------------------------------------------}
 
 const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (Wert:Char; Col:String);
+	console.log( toString( {fn:'Zeichnen',Wert:Wert,Col:Col,callback:callback?true:false} ) );
 																	 // Begin
 	SetViewPort (0,0,X(639),Y(353),true);							 // SetViewPort (0,0,X(639),Y(353),true);
 	//For I:=0 to 3 do												 // For I:=0 to 3 do
@@ -424,11 +449,9 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 		} else {													// Else
 																	// Begin
 			SetColor (LightGray);									// SetColor (LightGray);
-			SetFillStyle (Solidfill,LightGray);						// SetFillStyle (Solidfill,LightGray);
+			SetFillStyle (SolidFill,LightGray);						// SetFillStyle (Solidfill,LightGray);
 		}															// End;
 		FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));	// FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));
-		console.log( 'called from Zeichnen' );
-
 
 		if ( ++I >2 ) {
 			clearInterval( interval );
@@ -444,6 +467,7 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 	Last_1 = Spalte;												// Last_1:=Spalte;
 
 	if ( Nr == 64 ) {												// If Nr=64 then
+		console.log( 'Spielende.2' );
 		Spielende = true;												// Spielende:=true;
 	}
 };	 																// End; {Procedure Zeichnen}
@@ -453,6 +477,7 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 // {--------------------------------------------------------------------------}
 
 const Markierung = function(Col,callback) {							 			// Procedure Markierung(Col:String);
+	console.log( toString( {fn:'Markierung',Col:Col,callback:callback?true:false} ) );
 	let I = 0;														 				// Var I: Integer;
 
 	// 
@@ -520,6 +545,7 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 
 const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 { 										// Begin
+	console.log( toString( {fn:'AktString',Wert:Wert} ) );
 	let Num, Stelle; 			   		// Var    Num, Stelle:  ShortInt;
 	Waag[ Zeile ][ Spalte ] = Wert;		// Waag[Zeile,Spalte]:=Wert;
 	Senk[ Spalte ][ Zeile ] = Wert;		// Senk[Spalte,Zeile]:=Wert;
@@ -551,6 +577,8 @@ const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 
 const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 { 											// Begin
+
+	console.log( toString( {fn:'Gewinnsuche',Wert:Wert} ) );
 	let Num, Stelle;  						// Var    Num, Stelle:  ShortInt;
 
 	// {----------------------------------     Waagrecht suchen     --------------}
@@ -561,6 +589,7 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 		GewZSt = Zeile;						//      GewZSt:=Zeile;
 		GewSSt = Stelle;					//      GewSSt:=Stelle;
 		Richtung = 4;						//      Richtung:=4;
+		console.log( 'Gewinnsuche:Spielende.3' );
 		Spielende = true;					//      Spielende:=true;
 	}										// 	End; {If-Begin}
 
@@ -572,16 +601,19 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 		GewZSt = Stelle;					//      GewZSt:=Stelle;
 		GewSSt = Spalte;					//      GewSSt:=Spalte;
 		Richtung = 2;						//      Richtung:=2;
+		console.log( 'Gewinnsuche:Spielende.4' );
 		Spielende = true;					//      Spielende:=true;
 	}										// 	End; {If-Begin}
 
-	// {------------------------------     Schrg nach rechts oben suchen     ----}
+	// {------------------------------     Schräg nach rechts oben suchen     ----}
+	// {------------------------------     Search diagonally to the top right ----}
+
 
 	Num = Spalte-Zeile+5;					// Num:=Spalte-Zeile+5;
 	if (Num>0 && Num<10) 					// If (Num>0) and (Num<10) then
 	{										// 	Begin
-		Stelle  = Pos (Wert,Reob[Num]);		// 	Stelle:=Pos (Wert,Reob[Num]);
-		if (Stelle!=0) then					// 	If (Stelle<>0) then
+		Stelle = Pos( Wert,Reob[ Num ] );	// 	Stelle:=Pos (Wert,Reob[Num]);
+		if ( Stelle !=0 ) then				// 	If (Stelle<>0) then
 		{ 									// 		Begin
 			if (Num<6) {					// 		If (Num<6) then
 				GewZSt = Stelle-Num+5		// 			GewZSt:=Stelle-Num+5
@@ -594,11 +626,12 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 				GewSSt = Stelle+Num-5;		// 			GewSSt:=Stelle+Num-5;
 			}
 			Richtung = 3;					// 		Richtung:=3;
+			console.log( 'Gewinnsuche:Spielende.5:' + toString( {Stelle:Stelle,Wert:Wert,ReobN:Reob[Num],Num:Num,Spalte:Spalte,Zeile:Zeile} ) );
 			Spielende = true;				// 		Spielende:=true;
 		}									// 		End; {If-Begin}
 	}										// 	End;     {If-Begin}
 
-	// {------------------------------     Schrg nach links oben suchen     -----}
+	// {------------------------------     Schräg nach links oben suchen     -----}
 
 	Num = -(Spalte+Zeile)+14;				// Num:=-(Spalte+Zeile)+14;
 	if ( Num>0 && Num<10 ) 					// If (Num>0) and (Num<10) then
@@ -616,6 +649,7 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 					GewSSt = 14-Stelle-Num;	// 			GewSSt:=14-Stelle-Num;
 				} 							//
 				Richtung = 1;				// 		Richtung:=1;
+				console.log( 'Gewinnsuche:Spielende.6' );
 				Spielende = true;			// 		Spielende:=true;
 			}								// 		End; {If-Begin}
 	}										// 	End;     {If-Begin}
@@ -640,12 +674,13 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 
 const Dummy_1 = function(Wert, Pr)				// Function Dummy_1 (Wert, Pr: String):String;
 {												// Begin
+	console.log( toString( {fn:'Dummy_1',Wert:Wert,Pr:Pr} ) );
 												// 
 	let j;										// Var J: Integer;
 	if (Platz[Spalte][Zeile-1] != 'O') 			// If (Platz[Spalte,Zeile-1]<>'O') then
 	{											// 	Begin
 		Zeichen = Spalte + ''; 					// 	Str (Spalte:1,Zeichen);// valerie: what is this :1?
-		for ( j = 0 ; j < pr.lenght ; j++ ) { 	// 	For J:=1 to Length (Pr) do
+		for ( j = 1 ; j <= Pr.length ; j++ ) { 	// 	For J:=1 to Length (Pr) do
 			if (Pr[J]=Zeichen) {				// 		If (Pr[J]=Zeichen) then
 				Zeichen = '';					// 			Zeichen:='';
 			} 									// 
@@ -659,6 +694,7 @@ const Dummy_1 = function(Wert, Pr)				// Function Dummy_1 (Wert, Pr: String):Str
 
 const Dummy_Reob = function(Stelle, Num)		// Procedure Dummy_Reob (Stelle, Num: ShortInt);
 {												// Begin
+	console.log( toString( {fn:'Dummy_Reob',Stelle:Stelle,Num:Num} ) );
 	if (Num<6) 									// If (Num<6) then
 	{											// 	Begin
 		Zeile  = Stelle - Num + 5;				// 	Zeile:=Stelle-Num+5;
@@ -675,6 +711,7 @@ const Dummy_Reob = function(Stelle, Num)		// Procedure Dummy_Reob (Stelle, Num: 
 
 const Dummy_Liob = function(Stelle, Num)		// Procedure Dummy_Liob (Stelle, Num: ShortInt);
 {												// Begin
+	console.log( toString( {fn:'Dummy_Liob',Stelle:Stelle,Num:Num} ) );
 	if (Num<6) 									// If (Num<6) then
 	{											// 	Begin
 		Zeile  = Stelle - Num + 5;				// 	Zeile:=Stelle-Num+5;
@@ -692,14 +729,15 @@ const Dummy_Liob = function(Stelle, Num)		// Procedure Dummy_Liob (Stelle, Num: 
 // valerie: this one is a monster...
 const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri: String; Zahl: Byte; Setzen: Boolean): String;
 {															// Begin
+	console.log( toString( {fn:'Prior',Wert:Wert,Pri:Pri,Zahl:Zahl,Setzen:Setzen} ) );
  	let Num, Stelle;										// Var    Num, Stelle:  ShortInt;
 	let I, J;												// 	   I, J:         Integer;
 	let Stop;												// 	   Stop:         Boolean;
 															// 
 	Stop = false;											// Stop:=false;
 															// 
-	// {--------------------     Schrg nach rechts oben suchen/Prioritt     ----}
-	for ( Num = 0 ; Num < 9 ; Num++ )  						// For Num:=1 to 9 do (valerie: indexing could be buggy)
+	// {--------------------     Schräg nach rechts oben suchen/Prioritt     ----}
+	for ( Num = 1 ; Num <= 9 ; Num++ )  					// For Num:=1 to 9 do (valerie: indexing could be buggy)
 	{														// 	Begin
 		Stelle = Pos (Wert,Reob[Num]);						// 	Stelle:=Pos (Wert,Reob[Num]);
 		if (Stelle != 0) 									// 	If (Stelle<>0) then
@@ -722,7 +760,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 															// 				End
 				} else {									// 			Else
 															// 				Begin
-					for ( I=0 ; I < Wert.length - 1; I++ )	// 				For I:=0 to ((Length(Wert))-1) do
+					for ( I=0 ; I < Wert.length ; I++ )		// 				For I:=0 to ((Length(Wert))-1) do
 						if ( Wert[ I + 1] == 'O' ) 			// 					If (Wert[I+1]='O') then
 						{									// 						Begin
 							Dummy_Reob( Stelle + I, Num );	// 						Dummy_Reob (Stelle+I, Num);
@@ -733,10 +771,10 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 		}											 		// 		End;             {If-(Stelle..)-Begin}
 	}												 		// 	End;                 {For-Num-Begin}
 																					 // 
-	// {--------------------     Schrg nach links oben suchen/Prioritt     -----}
+	// {--------------------     Schräg nach links oben suchen/Prioritt     -----}
 
 	Stop = false;											// Stop:=false;
-	for ( Num = 0 ; Num < 9 ; Num++ ) 						// For Num:=1 to 9 do
+	for ( Num = 1 ; Num <= 9 ; Num++ ) 						// For Num:=1 to 9 do
 	{														// 	Begin
 		Stelle =Pos (Wert,Liob[Num]);						// 	Stelle:=Pos (Wert,Liob[Num]);
 		if (Stelle!=0) 										// 	If (Stelle<>0) then
@@ -760,7 +798,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 				} else {									// 				End
 															// 			Else
 															// 				Begin
-					for ( I=0 ; I < Wert.length-1 ; I++) {	// 				For I:=0 to ((Length(Wert))-1) do
+					for ( I=0 ; I < Wert.length ; I++) {	// 				For I:=0 to ((Length(Wert))-1) do
 						if (Wert[I+1]=='O') 				// 					If (Wert[I+1]='O') then
 						{									// 						Begin
 							Dummy_Liob( Stelle + I, Num ); 	// 						Dummy_Liob (Stelle+I, Num);
@@ -774,13 +812,13 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 
 	// {----------------------------------     Waagrecht suchen/Prioritt     ----}
 	Stop = false;											// Stop:=false;
-	for ( Zeile = 1 ; Zeile < 9 ; Zeile++ )  				// For Zeile:=1 to 8 do
+	for ( Zeile = 1 ; Zeile <= 8 ; Zeile++ )  				// For Zeile:=1 to 8 do
 	{														// 	Begin
 		Stelle = Pos(Wert,Waag[Zeile]);						// 	Stelle:=Pos (Wert,Waag[Zeile]);
 		if ( Stelle!=0 ) 									// 	If (Stelle<>0) then
 		{ 													// 		Begin
 			if (Setzen) {									// 		If (Setzen) then
-				for( J=0 ; J < Wert.length - 1 ; J++ ) {	// 			For J:=0 to (Length (Wert)-1) do
+				for ( J = 0 ; J < Wert.length ; J++ ) {		// 			For J:=0 to (Length (Wert)-1) do
 					if (Platz[Stelle+J,Zeile]=='O' 			// 				If (Platz[Stelle+J,Zeile]='O')
 						&& Platz[Stelle+J,Zeile-1]=='O') {	// 				and (Platz[Stelle+J,Zeile-1]='O') then
 						Stop = true;						// 					Stop:=true;
@@ -794,7 +832,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 					Pri = Dummy_1( Wert, Pri );				// 				Pri:=Dummy_1 (Wert,Pri);
 															// 				End
 				} else {									// 			Else 
-					for ( I=0 ; I < Wert.length-1 ; I++ ) {	// 				For I:=0 to ((Length(Wert))-1) do
+					for ( I = 0 ; I < Wert.length ; I++ ) {	// 				For I:=0 to ((Length(Wert))-1) do
 						if ( Wert[I]=='O' ) 				// 					If Wert[I]='O' then
 						{ 									// 						Begin
 							Spalte = Stelle + I - 1;		// 						Spalte:=Stelle+I-1;
@@ -807,8 +845,9 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 	}														// 	End;     {For-Zeile-Begin}
 																					 // 
 	// {----------------------------------     Senkrecht suchen/Prioritt     ----}
+
 	Stop = false;											// Stop:=false;
-	for ( Spalte = 1 ; Spalte < 8 ; Spalte++ ) 				// For Spalte:=1 to 8 do
+	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) 			// For Spalte:=1 to 8 do
 	{														// 	Begin
 		Stelle = Pos( Wert, Senk[ Spalte ] );				// 	Stelle:=Pos (Wert,Senk[Spalte]);
 		if ( Stelle != 0 ) 									// 	If (Stelle<>0) then
@@ -828,6 +867,7 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 
 const Warnung = function() 		 	// Function Warnung: Boolean;
 {							 		// Begin
+	console.log( toString( {fn:'Warnung'} ) );
 	Warnung = false;				// Warnung:=false;
 	if ( Kontrolle() ) {			// If Kontrolle then
 		if (Zeile<8) 				// If (Zeile<8) then
@@ -853,12 +893,13 @@ const Warnung = function() 		 	// Function Warnung: Boolean;
 
 const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolean;
 {														// Begin
+	console.log( toString( {fn:'Zugauswertung',callback:callback?true:false} ) );
 	let I, J;											// Var I,J: Integer;
 	Zugauswertung = false;								// Zugauswertung:=false;
-	for ( I = 1 ; I < Prior_1.length - 1 ; I++ )		// For I:=1 to (Length (Prior_1)-1) do
+	for ( I = 1 ; I < Prior_1.length ; I++ )			// For I:=1 to (Length (Prior_1)-1) do
 	{ 													// 	Begin
 		Spalte = parseInt( Prior_1[I] );				// 	Val (Prior_1[I],Spalte,Code);
-		for ( J = Prior_2.Length - 1 ; J > 1 ; J-- ) 	// 	For J:=(Length (Prior_2)-1) downto 1 do
+		for ( J = Prior_2.Length - 1 ; J >= 1 ; J-- ) 	// 	For J:=(Length (Prior_2)-1) downto 1 do
 			if (Prior_2[J]==Prior_1[I] && !Warnung) {	// 		If (Prior_2[J]=Prior_1[I]) and not (Warnung) then
 				if ( Kontrolle() ) 						// 			If Kontrolle then
 				{										// 				Begin
@@ -882,6 +923,7 @@ const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolea
 
 const Spieler_Zug = function( callback ) 			// Procedure Spieler_Zug;
 {										 			// Begin
+	console.log( toString( {fn:'Spieler_Zug',callback:callback?true:false} ) );
 	if ( Spielende ) { 					 			// If Spielende then
 		return;							 			// 	Exit;
 	} 									 			//
@@ -899,6 +941,7 @@ const Spieler_Zug = function( callback ) 			// Procedure Spieler_Zug;
 
 					if ( Gewinner==GEWINNER_STATES.Spieler )				// If Gewinner=Spieler then
 					{										// 	Begin
+						console.log( 'Spielende.6' );
 						Spielende = true;					// 	Spielende:=true;
 						console.log( 'call Markierung from Spieler_Zug' );
 						Markierung(Farbe_Sp,callback);		// 	Markierung(Farbe_Sp);
@@ -924,9 +967,12 @@ const Spieler_Zug = function( callback ) 			// Procedure Spieler_Zug;
 
 const Computer_Zug = function( callback )  									// Procedure Computer_Zug;
 {																	// Begin
+	console.log( toString( {fn:'Computer_Zug',callback:callback?true:false} ) );
+
 	if ( Spielende ) {												// If Spielende then
 		return;														// 	Exit;
 	}
+
 	SetViewPort (0,Y(390),X(639),Y(450),true);						// SetViewPort (0,Y(390),X(639),Y(450),true);
 	ClearViewPort;													// ClearViewPort;
 	SetColor (Blue);												// SetColor (Blue);
@@ -1113,6 +1159,7 @@ const Computer_Zug = function( callback )  									// Procedure Computer_Zug;
 // {--------------------------------------------------------------------------}
 
 const Godat = function() { 
+	console.log( toString( {fn:'Godat'} ) );
 // Procedure Godat;
 // Var I   :Byte;
 
@@ -1148,6 +1195,7 @@ const Godat = function() {
 
 const Schluss = function() 																								 // Procedure Schluss;
 {																											 // Begin
+	console.log( toString( {fn:'Schluss'} ) );
 	SetViewPort (0,Y(340)+TextHeight('I'),X(639),Y(479),true);														 // SetViewPort (0,Y(340)+TextHeight('I'),X(639),Y(479),true);
 	ClearViewPort();																									 // ClearViewPort;
 	switch( Gewinner ) {																								 // Case Gewinner of
@@ -1194,24 +1242,27 @@ const PlayGame = function() {
 				function() {
 					Grafik();								   		// Grafik;
 					Spielfeld();                             		// Spielfeld;                             {Zeichnen des Spielfeldes}
-					Textzeile(1);                          		// Textzeile(1);                          {Befehlszeile drucken}
+					Textzeile(1);                          			// Textzeile(1);                          {Befehlszeile drucken}
 
-					let player = false;
+					let player = true;
+
+					console.log( 'Spielende:' + Spielende );
 
 					let next = function() {
 						if ( Spielende ) {
-							console.log( 'game over' );
+							console.log( 'GAME OVER:' + Spielende );
 							Schluss();
 							return;
 						}
 
 						player != player;
+						console.log( 'player is ' + player );
 
 						if ( player ) {
-							console.log( 'player' );
+							console.log( 'TURN: player' );
 							Spieler_Zug( function() { next() } );
 						} else {
-							console.log( 'computer' );
+							console.log( 'TURN: computer' );
 							Computer_Zug( function() { next() } );
 						}
 					}
