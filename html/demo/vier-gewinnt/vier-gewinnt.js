@@ -87,18 +87,23 @@ const Init = function() {
 			Platz[ Spalte ][ Zeile ] = 'O';// 		Platz[Spalte,Zeile]:='O';
 		}
 	} 	// 	End;
+
 	for ( I = 1 ; I <= 64 ; I++ ) {  // For I:=1 to 64 do
 		Zug[ I ] = 0; // 	Zug[I]:=0;
 	}
+
+	Waag[ 0 ] = Senk[ 0 ] = '_'; // valerie: trying to avoid some weirdness
 	for ( I = 1 ; I <= 8 ; I++ ) // For I:=1 to 8 do
 	{ 	// 	Begin
 		Waag[I] ='OOOOOOOO'; // 	Waag[I]:='OOOOOOOO';
 		Senk[I] ='OOOOOOOO'; // 	Senk[I]:='OOOOOOOO';
 	} 	// 	End;
+
+	Reob[0]=Liob[I] = '_'; // valerie: trying to avoid some weirdness
 	for ( I = 1 ; I <= 9 ; I++ )    // For I:=1 to 9 do
 	{	// 	Begin
-		Reob[I] = 'x';            	// 	Reob[I]:='';
-		Liob[I] = 'x';            	// 	Liob[I]:='';
+		Reob[I] = '';            	// 	Reob[I]:='';
+		Liob[I] = '';            	// 	Liob[I]:='';
 		let q = 8-abs(5-I);
 		for ( J = 1 ; J <= (8-abs(5-I)) ; J++ ) // 	For J:=1 to (8-abs(5-I)) do
 		{               	// 		Begin
@@ -429,34 +434,40 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 	SetViewPort (0,0,X(639),Y(353),true);							 // SetViewPort (0,0,X(639),Y(353),true);
 	//For I:=0 to 3 do												 // For I:=0 to 3 do
 
-	let I = 0;
-	let interval = false;
-	let Zeichnen_draw = function() 
-	{ 																// Begin
-		if ( Odd(I) ) {												// If Odd(I) then
-			if (Col=='red') {										// If (Col='red') then
-																	// Begin
-				SetFillStyle (SolidFill,Red);						// SetFillStyle (SolidFill,Red);
-				SetColor (Red);										// SetColor (Red);
-																	// End
-			} else {												// Else
-																	// Begin
-				SetFillStyle (SolidFill,White);						// SetFillStyle (SolidFill,White);
-				SetColor(White);									// SetColor(White);
-			}														// End
-		} else {													// Else
-																	// Begin
-			SetColor (LightGray);									// SetColor (LightGray);
-			SetFillStyle (SolidFill,LightGray);						// SetFillStyle (Solidfill,LightGray);
-		}															// End;
-		FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));	// FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));
+	if ( callback ) {
+		let I = 0;
+		let interval = false;
+		let Zeichnen_draw = function() 
+		{ 																// Begin
+			if ( Odd(I) ) {												// If Odd(I) then
+				if (Col=='red') {										// If (Col='red') then
+																		// Begin
+					SetFillStyle (SolidFill,Red);						// SetFillStyle (SolidFill,Red);
+					SetColor (Red);										// SetColor (Red);
+																		// End
+				} else {												// Else
+																		// Begin
+					SetFillStyle (SolidFill,Black);						// SetFillStyle (SolidFill,White);
+					SetColor(White);									// SetColor(White);
+				}														// End
+			} else {													// Else
+																		// Begin
+				SetColor (LightGray);									// SetColor (LightGray);
+				SetFillStyle (SolidFill,LightGray);						// SetFillStyle (Solidfill,LightGray);
+			}															// End;
+			FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));	// FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));
 
-		if ( ++I >2 ) {
-			clearInterval( interval );
-			callback();
-		}
-	};																// End;
-	interval = setInterval( Zeichnen_draw, 300 ); 					// Delay(300);
+			if ( ++I >3 ) {
+				clearInterval( interval );
+				callback();
+			}
+		};																// End;
+		interval = setInterval( Zeichnen_draw, 300 ); 					// Delay(300);
+	} else {
+		// valerie: idk... this is weird for Zugauswertung
+		//SetFillStyle (SolidFill, 'orange' );
+		//FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));	// FillEllipse (X(130+Spalte*42),Y(358-Zeile*42),X(18),Y(18));
+	}
 
 	Platz[Spalte][Zeile] = Wert;									// Platz[Spalte,Zeile]:=Wert;
 	Nr++;															// Inc (Nr);
@@ -472,10 +483,12 @@ const Zeichnen = function( Wert, Col, callback ) {					 // Procedure Zeichnen (W
 
 // {--------------------------------------------------------------------------}
 // {------------------     Markierung des Siegervierers     ------------------}
+// {------------------     Marking    the Winner            ------------------}
 // {--------------------------------------------------------------------------}
 
 const Markierung = function(Col,callback) {							 			// Procedure Markierung(Col:String);
 	console.log( toString( {fn:'Markierung',Col:Col,callback:callback?true:false} ) );
+
 	let I = 0;														 				// Var I: Integer;
 
 	// 
@@ -538,15 +551,31 @@ const Markierung = function(Col,callback) {							 			// Procedure Markierung(Co
 
 // {--------------------------------------------------------------------------}
 // {------------------     Aktualisierung der Strings     --------------------}
+// {------------------     Updating       the strings     --------------------}
 // {--------------------------------------------------------------------------}
 
+const replaceCharAt = function( target, index, value ) {
+	return target.substring( 0, index ) + value + target.substring( index + 1 )
+};
 
 const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 { 										// Begin
-	console.log( toString( {fn:'AktString',Wert:Wert} ) );
+
+
+	let q1 = Spalte - Zeile + 5;
+	let q2 = -(Spalte+Zeile)+14;
+	console.log( toString( {fn:'AktString',Wert:Wert,Zeile:Zeile,Spalte:Spalte,q1:q1,q2:q2,t:typeof(Wert)} ) );
+
 	let Num, Stelle; 			   		// Var    Num, Stelle:  ShortInt;
-	Waag[ Zeile ][ Spalte ] = Wert;		// Waag[Zeile,Spalte]:=Wert;
-	Senk[ Spalte ][ Zeile ] = Wert;		// Senk[Spalte,Zeile]:=Wert;
+
+	Waag[ Zeile ]  = replaceCharAt( Waag[ Zeile ] ,  Spalte, Wert );		// Waag[Zeile,Spalte]:=Wert;
+	Senk[ Spalte ] = replaceCharAt( Senk[ Spalte ],  Zeile , Wert );		// Senk[Spalte,Zeile]:=Wert;
+	
+
+	// valerie: what the heck?
+	console.log( 'Waag[' + Zeile  + '] ' + Waag[ Zeile ]  + ' > ' + Waag[ Zeile ][ Spalte ] + ' | Wert:' + Wert );
+	console.log( 'Senk[' + Spalte + '] ' + Senk[ Spalte ] + ' > ' + Senk[ Spalte ][ Zeile ] + ' | Wert:' + Wert );
+
 	Num = Spalte - Zeile + 5   		    // Num:=Spalte-Zeile+5;                   {--------------}
 	if( Num > 0 && Num < 10 ) 	   		// If (Num>0) and (Num<10) then
 	{ 							   		// 	Begin
@@ -557,6 +586,7 @@ const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 		}
 		Reob[ Num ][ Stelle ] = Wert; 	// 	Reob[Num,Stelle]:=Wert;
 	} 									// 	End; {If-Begin}                       {--------------}
+
 	Num = -(Spalte+Zeile)+14			// Num:=-(Spalte+Zeile)+14;               {--------------}
 	if( Num > 0 && Num < 10 ) 			// If (Num>0) and (Num<10) then
 	{ 									// 	Begin
@@ -573,11 +603,21 @@ const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 // {------------------     Gewinnsuche     -----------------------------------}
 // {--------------------------------------------------------------------------}
 
-// valerie: somehow I really broke things so this doesn't work
 const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 { 											// Begin
+	if ( true ) { 
+		console.log( '---------------------------------' );
+		console.log( toString( {fn:'Gewinnsuche',Wert:Wert} ) );
+		let q1 = Spalte-Zeile+5;
+		let q2 = -(Spalte+Zeile)+14;
 
-	console.log( toString( {fn:'Gewinnsuche',Wert:Wert} ) );
+		if (true         ) console.log( 'check.Waag:' + Zeile  + ' : ' + Waag[ Zeile  ] + ' | ' + Waag );
+		if (true         ) console.log( 'check.Senk:' + Spalte + ' : ' + Senk[ Spalte ] + ' | ' + Senk );
+		if (q1>0 && q1<10) console.log( 'check.Reob:' + q1     + ' : ' + Reob[ q1     ] + ' | ' + Reob );
+		if (q2>0 && q2<10) console.log( 'check.Liob:' + q2     + ' : ' + Liob[ q2     ] + ' | ' + Liob );
+		console.log( '---------------------------------' );
+	}
+
 	let Num, Stelle;  						// Var    Num, Stelle:  ShortInt;
 
 	// {----------------------------------     Waagrecht suchen     --------------}
@@ -861,9 +901,11 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 };											 				// End;                      {Function Prior}
 
 
-// {--------------------------------------------------------------------------}
-// {------------------     Warnung vor gefhrlichen Zgen     ----------------}
-// {--------------------------------------------------------------------------}
+// {---------------------------------------------------------------------------}
+// {------------------     Warnung vor gefhrlichen Zgen  --------------}
+// {------------------     Warnung vor gefährlichen    Zègen     --------------}
+// {------------------     Warning of dangerous conditions       --------------}
+// {---------------------------------------------------------------------------}
 
 const Warnung = function() 		 	// Function Warnung: Boolean;
 {							 		// Begin
@@ -889,11 +931,11 @@ const Warnung = function() 		 	// Function Warnung: Boolean;
 
 // {--------------------------------------------------------------------------}
 // {------------------     Zugauswertung                    ------------------}
+// {------------------     move evaluation???               ------------------}
 // {--------------------------------------------------------------------------}
 
-const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolean;
+const Zugauswertung = function() 						// Function Zugauswertung: Boolean;
 {														// Begin
-	console.log( toString( {fn:'Zugauswertung',callback:callback?true:false} ) );
 	let I, J;											// Var I,J: Integer;
 	let value  = false;								    // Zugauswertung:=false;
 	for ( I = 1 ; I < Prior_1.length ; I++ )			// For I:=1 to (Length (Prior_1)-1) do
@@ -904,13 +946,9 @@ const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolea
 				if ( Kontrolle() ) 						// 			If Kontrolle then
 				{										// 				Begin
 					value = true;		 				// 				Zugauswertung:=true;
-					Zeichnen( 'C', Farbe_Co 			// 				Zeichnen ('C',Farbe_Co);
-						, function() {
-							AktString( 'C' );			// 				AktString('C');
-							//callback( value );			// 				Exit;
-						}
-					);
-					return value;						// 				Exit;
+					Zeichnen( 'C', Farbe_Co ); 			// 				Zeichnen ('C',Farbe_Co);
+					AktString( 'C' );					// 				AktString('C');
+					return value; 						//              Exit
 				}							 			// 				End;  {If-Kontrolle-Begin}
 			} 											//
 	}						 							// 	End;              {For-I-Begin}
