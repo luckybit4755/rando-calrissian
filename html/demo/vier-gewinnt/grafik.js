@@ -1,12 +1,16 @@
 const GetMaxX = 640;
 const GetMaxY = 480;
 
-const TriplexFont = 'TriplexFont';
-const White = 'white';
-const Blue = 'blue';
+const TriplexFont = 'Sans';
+//const TriplexFont = 'TriplexFont';
+
 const Black = 'black';
-const EmptyFill = 'idk';
+const Blue = 'blue';
 const LightGray = 'LightGray';
+const Red = 'red';
+const White = 'white';
+
+const EmptyFill = 'idk';
 const SolidFill = 'Solidfill';
 const Solidfill = 'Solidfill';
 
@@ -33,8 +37,9 @@ const InitGraph = function() {
 	if ( !Graph.crt ) {
 		Graph.crt = document.createElement( 'div' );
 		document.body.appendChild( Graph.crt );
-		Graph.crt.style.display = 'none';
 	}
+		
+	Graph.crt.style.display = 'none';
 
 	if ( !Graph.line ) {
 		Graph.line = document.createElement( 'input' );
@@ -116,9 +121,15 @@ const Line = function( x1, y1, x2, y2 ) {
 };
 
 const ClearViewPort = function() {
-	console.log( toString( Graph ) );
+	console.log( 'grafik.ClearViewPort:' + toString( Graph.viewport ) );
+
 	Graph.context.fillStyle = Graph.bkColor;
-	Graph.context.fillRect( 0, 0, GetMaxX, GetMaxY );
+
+	if( Graph.viewport ) { 
+		Graph.context.fillRect( Graph.viewport.x, Graph.viewport.y, Graph.viewport.w, Graph.viewport.h );
+	} else {
+		Graph.context.fillRect( 0, 0, GetMaxX, GetMaxY );
+	}
 };
 
 const Delay = function( delay ) {
@@ -127,6 +138,9 @@ const Delay = function( delay ) {
 
 const OutTextXY = function( x, y , text ) {
 	Graph.context.font = Graph.textStyle.fontSize + 'px ' + Graph.textStyle.font; //'33px Arial';
+
+	console.log( 'grafik:' + toString( {fn:'OutTextXY',x:x,y:y,text:text,font:Graph.context.font} ) );
+
 	//Graph.textStyle = { font:font, direction:direction, fontSize:fontSize };
 
 	Graph.context.fillStyle = Graph.color;
@@ -173,8 +187,8 @@ const SetColor = function( color ) {
 	Graph.color = color;
 };
 
-const SetFillStyle = function( idk, color ) {
-	Graph.fillStyle = {idk:idk,color:color};
+const SetFillStyle = function( style, color ) {
+	Graph.fillStyle = {style:style,color:color};
 };
 
 const SetTextJustify = function(a,b) {
@@ -182,20 +196,36 @@ const SetTextJustify = function(a,b) {
 };
 
 const SetTextStyle = function(font,direction,fontSize) {
+	// this is wack
+	if ( fontSize < 10 ) { 
+		fontSize = 10;
+	}
+	if ( isNaN( font ) ) {
+		font = 'TriplexFont';
+	}
+
 	Graph.textStyle = { font:font, direction:direction, fontSize:fontSize };
 };
 
 const SetViewPort = function(a,b,X,Y,idk) {
+	Graph.viewport = {x:a,y:b,w:X,h:Y,idk:idk};
+	console.log( 'grafik.viewport:' + toString( Graph.viewport ) );
 };
 
 const FillEllipse = function( x, y, XRadius, YRadius ) {
+	console.log( 'FillEllipse:' + JSON.stringify( {x:x,y:y,XRadius:XRadius,YRadius:YRadius} ) );
+
 	Graph.context.fillStyle = Graph.bkColor;
 	Graph.context.strokeStyle = Graph.color;
 
-	Graph.context.fillStyle = 'red';
-	Graph.context.strokeStyle = 'yellow';
+	Graph.context.fillStyle = Graph.fillStyle.color;
 
-	console.log( 'FillEllipse:' + JSON.stringify( {x:x,y:y,XRadius:XRadius,YRadius:YRadius} ) );
+/*
+	Graph.context.fillStyle = 'blue';
+	Graph.context.strokeStyle = 'yellow';
+*/
+
+
 	Graph.context.beginPath();
 
 	Graph.context.arc( x, y, XRadius, 0, 2 * Math.PI);  // this is not really right, but ok
