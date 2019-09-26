@@ -97,8 +97,8 @@ const Init = function() {
 	} 	// 	End;
 	for ( I = 1 ; I <= 9 ; I++ )    // For I:=1 to 9 do
 	{	// 	Begin
-		Reob[I] = '';            	// 	Reob[I]:='';
-		Liob[I] = '';            	// 	Liob[I]:='';
+		Reob[I] = 'x';            	// 	Reob[I]:='';
+		Liob[I] = 'x';            	// 	Liob[I]:='';
 		let q = 8-abs(5-I);
 		for ( J = 1 ; J <= (8-abs(5-I)) ; J++ ) // 	For J:=1 to (8-abs(5-I)) do
 		{               	// 		Begin
@@ -342,8 +342,6 @@ const Textzeile = function( Zahl )
 { 	// Begin
 	console.log( toString( {fn:'Textzeile'} ) );
 
-	//SetTextStyle snit
-
 	SetViewPort (0,Y(479)-TextHeight('Ip')-5,X(639),Y(479),true);                   // SetViewPort (0,Y(479)-TextHeight('Ip')-5,X(639),Y(479),true);
 	ClearViewPort();                                                                // ClearViewPort;
 	Line (0,0,X(639),0);                                                            // Line (0,0,X(639),0);
@@ -575,6 +573,7 @@ const AktString = function( Wert ) 		// Procedure AktString (Wert: Char);
 // {------------------     Gewinnsuche     -----------------------------------}
 // {--------------------------------------------------------------------------}
 
+// valerie: somehow I really broke things so this doesn't work
 const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 { 											// Begin
 
@@ -613,7 +612,7 @@ const Gewinnsuche = function(Wert) 			// Procedure Gewinnsuche(Wert:String);
 	if (Num>0 && Num<10) 					// If (Num>0) and (Num<10) then
 	{										// 	Begin
 		Stelle = Pos( Wert,Reob[ Num ] );	// 	Stelle:=Pos (Wert,Reob[Num]);
-		if ( Stelle !=0 ) then				// 	If (Stelle<>0) then
+		if ( Stelle != 0 ) 				// 	If (Stelle<>0) then
 		{ 									// 		Begin
 			if (Num<6) {					// 		If (Num<6) then
 				GewZSt = Stelle-Num+5		// 			GewZSt:=Stelle-Num+5
@@ -857,7 +856,8 @@ const Prior = function(Wert, Pri, Zahl, Setzen )			// Function Prior (Wert, Pri:
 			}
 		}													// 		End;
 	}														// 	End;     {For-Spalte-Begin}
-	Prior = Pri;											// Prior:=Pri;
+	//Prior = Pri;											// Prior:=Pri;
+	return Pri;
 };											 				// End;                      {Function Prior}
 
 
@@ -895,7 +895,7 @@ const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolea
 {														// Begin
 	console.log( toString( {fn:'Zugauswertung',callback:callback?true:false} ) );
 	let I, J;											// Var I,J: Integer;
-	Zugauswertung = false;								// Zugauswertung:=false;
+	let value  = false;								    // Zugauswertung:=false;
 	for ( I = 1 ; I < Prior_1.length ; I++ )			// For I:=1 to (Length (Prior_1)-1) do
 	{ 													// 	Begin
 		Spalte = parseInt( Prior_1[I] );				// 	Val (Prior_1[I],Spalte,Code);
@@ -903,18 +903,18 @@ const Zugauswertung = function( callback ) 				// Function Zugauswertung: Boolea
 			if (Prior_2[J]==Prior_1[I] && !Warnung) {	// 		If (Prior_2[J]=Prior_1[I]) and not (Warnung) then
 				if ( Kontrolle() ) 						// 			If Kontrolle then
 				{										// 				Begin
+					value = true;		 				// 				Zugauswertung:=true;
 					Zeichnen( 'C', Farbe_Co 			// 				Zeichnen ('C',Farbe_Co);
 						, function() {
 							AktString( 'C' );			// 				AktString('C');
-							Zugauswertung = true;		// 				Zugauswertung:=true;
-							callback( Zugauswertung );	// 				Exit;
+							//callback( value );			// 				Exit;
 						}
 					);
-					return Zugauswertung;				// 				Exit;
+					return value;						// 				Exit;
 				}							 			// 				End;  {If-Kontrolle-Begin}
 			} 											//
 	}						 							// 	End;              {For-I-Begin}
-	return Zugauswertung; 								// (valerie: think this is right)
+	return value; 								// (valerie: think this is right)
 }			 											// End;                  {Function Zugauswertung}
 
 // {--------------------------------------------------------------------------}
@@ -939,21 +939,18 @@ const Spieler_Zug = function( callback ) 			// Procedure Spieler_Zug;
 					AktString('S');         	// 	AktString('S');                  {Aktualisieren der Spielfeld-Strings}
 					Gewinnsuche('SSSS');     	// 	Gewinnsuche('SSSS');             {Kontrolle auf Spielergewinn}
 
+
+					let delay = function () { setTimeout( function() { callback() } , 500) }
+
 					if ( Gewinner==GEWINNER_STATES.Spieler )				// If Gewinner=Spieler then
 					{										// 	Begin
-						console.log( 'Spielende.6' );
+						console.log( 'Spieler_Zug:Spielende.6' );
 						Spielende = true;					// 	Spielende:=true;
-						console.log( 'call Markierung from Spieler_Zug' );
-						Markierung(Farbe_Sp,callback);		// 	Markierung(Farbe_Sp);
-					}										// 	End;
-
-					// Delay(500);
-					setInterval( 
-						function() { 
-							callback() 
-						}
-						, 500
-					)
+						Markierung(Farbe_Sp, delay )		// 	Markierung(Farbe_Sp);
+					}										// 	End; 
+					else {
+						delay();
+					}
 				}
 			);
 
@@ -1128,7 +1125,7 @@ const Computer_Zug = function( callback )  									// Procedure Computer_Zug;
 	}
 
 	for ( Spalte = 1 ; Spalte <= 8 ; Spalte++ ) {					// For Spalte:=1 to 8 do
-		If (!Warnung && Kontrolle()) 									// 	If not (Warnung) and (Kontrolle) then
+		if (!Warnung && Kontrolle()) 									// 	If not (Warnung) and (Kontrolle) then
 		{															// 		Begin
 			Zeichnen( 'C', Farbe_Co   								// 		Zeichnen ('C',Farbe_Co);
 				, function() {
@@ -1247,25 +1244,29 @@ const PlayGame = function() {
 					let player = true;
 
 					console.log( 'Spielende:' + Spielende );
+					let fu = 0;
 
 					let next = function() {
+						for ( let i = 0 ; i < 3 ; i++ ) { 
+							console.log( '-----------------------------------------------------------------------------' );
+						}
+						console.log( 'fu: ' + fu++ );
 						if ( Spielende ) {
 							console.log( 'GAME OVER:' + Spielende );
 							Schluss();
 							return;
 						}
 
-						player != player;
 						console.log( 'player is ' + player );
 
 						if ( player ) {
 							console.log( 'TURN: player' );
-							Spieler_Zug( function() { next() } );
+							Spieler_Zug( function() { player = false; next() } );
 						} else {
 							console.log( 'TURN: computer' );
-							Computer_Zug( function() { next() } );
+							Computer_Zug( function() { player = true; next() } );
 						}
-					}
+					};
 
 					next();
 
