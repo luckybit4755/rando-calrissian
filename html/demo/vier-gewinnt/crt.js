@@ -1,7 +1,3 @@
-const LightGreen = 'LightGreen';
-const LightCyan  = 'LightCyan';
-const Blink = '';
-	
 const RestoreCrtMode = function() {
 	Graph.canvas.style.display = 'none';
 	Graph.crt.innerHTML = '';

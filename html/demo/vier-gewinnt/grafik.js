@@ -6,9 +6,13 @@ const TriplexFont = 'Sans';
 
 const Black = 'black';
 const Blue = 'blue';
+const LightCyan = 'LightCyan';
 const LightGray = 'LightGray';
+const LightGreen = 'LightGreen';
 const Red = 'red';
 const White = 'white';
+
+const Blink = '';
 
 const EmptyFill = 'idk';
 const SolidFill = 'Solidfill';
@@ -213,7 +217,7 @@ const SetViewPort = function(a,b,X,Y,idk) {
 };
 
 const FillEllipse = function( x, y, XRadius, YRadius ) {
-	console.log( 'FillEllipse:' + JSON.stringify( {x:x,y:y,XRadius:XRadius,YRadius:YRadius} ) );
+	//console.log( 'FillEllipse:' + JSON.stringify( {x:x,y:y,XRadius:XRadius,YRadius:YRadius} ) );
 
 	Graph.context.fillStyle = Graph.bkColor;
 	Graph.context.strokeStyle = Graph.color;
