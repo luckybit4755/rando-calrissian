@@ -7,6 +7,14 @@
 import sys
 import bpy
 
+# /Applications/Blender.app/Contents/Resources/2.80/scripts/addons/add_mesh_extra_objects/add_mesh_pyramid.py
+import bmesh
+from bpy.types import Operator
+from bpy.props import ( FloatProperty, IntProperty,)
+from math import pi
+from mathutils import ( Quaternion, Vector,)
+from bpy_extras.object_utils import ( AddObjectHelper, object_data_add,)
+
 bl_info = {
     "name"        : "Haus Hersteller",
     "author"      : "Valerie Hammond",
@@ -23,11 +31,31 @@ bl_info = {
 class HausHersteller( bpy.types.Operator ):
     """Create a silly little house"""
     bl_idname = "mesh.silly_house"
-    bl_label = "Silly Little House"
+    bl_label = "Silly Little House AAC" 
     bl_options = {'REGISTER', 'UNDO'}
-
+        
     def execute(self, context):
-        context.active_object.location.x += 1
+        # context.active_object.location.x += 1
+
+        bm = bmesh.new()
+        bm.verts.new( (0,0,0) )
+        bm.verts.new( (0,1,0) )
+        bm.verts.new( (0,1,1) )
+
+        mesh = bpy.data.meshes.new( "SillyHouseMesh" )
+        bm.to_mesh( mesh )
+        mesh.update()
+        #res = object_data_add( context, mesh, operator=self )
+
+        # Wallfactory.py (line 873)
+        haus = bpy.data.objects.new( "SillyHouseObj", mesh )
+        context.collection.objects.link( haus )
+        context.view_layer.objects.active = haus
+        haus.select_set( True )
+
+        haus.location = tuple(context.scene.cursor.location)
+        haus.rotation_quaternion = [1.0, 0.0, 0.0, 0.0]
+
         return {'FINISHED'}
 
 #############################################################################
