@@ -130,8 +130,18 @@ class HausHersteller( bpy.types.Operator ):
         rb = roof_back_right  # forward
         bm.faces.new( [ rf[1], rf[0], rb[3], rb[2] ] ) # outside right
                 
-
         # eaves of the side of the roof
+
+        rf = roof_front_left # forward
+        rb = roof_back_left  # backwards
+        bm.faces.new( [ rb[0], C[1], C[2], rf[3] ] ) # side eaves left
+
+        rf = roof_front_right # backwards
+        rb = roof_back_right  # forward
+        #m.faces.new( [ rb[3], C[0], C[3], rf[0] ] ) # side eaves right( backwards presumably)
+        bm.faces.new( [ rf[0], C[3],C[0], rb[3] ] ) # side eaves right
+
+
 
         
 
@@ -141,9 +151,7 @@ class HausHersteller( bpy.types.Operator ):
         mesh = bpy.data.meshes.new( "SillyHouseMesh" )
         bm.to_mesh( mesh )
         mesh.update()
-        #res = object_data_add( context, mesh, operator=self )
 
-        # Wallfactory.py (line 873)
         haus = bpy.data.objects.new( "SillyHouseObj", mesh )
         context.collection.objects.link( haus )
         context.view_layer.objects.active = haus
@@ -157,19 +165,19 @@ class HausHersteller( bpy.types.Operator ):
     def roofin( self, bm, out, up, length, wall, apex, forward ):
         roof_slope = scale( subtract( wall.co, apex.co ), length )
 
-        roof_out         = bm.verts.new( add( apex.co,        ( 0, out, 0 ) ) )
-        roof_out_up      = bm.verts.new( add( roof_out.co,    ( 0, 0, up ) ) )
-        roof_out_side    = bm.verts.new( add( roof_out.co,    roof_slope ) )
-        roof_out_side_up = bm.verts.new( add( roof_out_up.co, roof_slope ) )
+        roof         = bm.verts.new( add( apex.co,        ( 0, out, 0 ) ) )
+        roof_up      = bm.verts.new( add( roof.co,    ( 0, 0, up ) ) )
+        roof_side    = bm.verts.new( add( roof.co,    roof_slope ) )
+        roof_side_up = bm.verts.new( add( roof_up.co, roof_slope ) )
 
         # front / back of roof...
-        bits = [ roof_out, roof_out_up, roof_out_side_up, roof_out_side ]
+        bits = [ roof, roof_up, roof_side_up, roof_side ]
         if not forward: 
             bits.reverse()
         bm.faces.new( bits )
 
         # roof underhang
-        underhang = [ roof_out_side, wall, apex, roof_out ]
+        underhang = [ roof_side, wall, apex, roof ]
         if not forward:
             underhang.reverse()
         bm.faces.new( underhang )
