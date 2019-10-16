@@ -14,17 +14,17 @@
 #
 #
 
-import sys
+import bmesh
 import bpy
 import random
+import sys
 
-from colorsys import rgb_to_hsv, hsv_to_rgb
-import bmesh
-from bpy.types import Operator
 from bpy.props import ( FloatProperty, IntProperty,)
-from math import pi
-from mathutils import ( Quaternion, Vector,)
-from bpy_extras.object_utils import ( AddObjectHelper, object_data_add,)
+from bpy.types import Operator
+from bpy_extras.object_utils import ( AddObjectHelper, object_data_add )
+from colorsys import rgb_to_hsv, hsv_to_rgb
+from math import pi, sqrt
+from mathutils import ( Quaternion, Vector)
 
 bl_info = {
     "name"        : "Haus Hersteller",
@@ -45,42 +45,6 @@ MATERIAL_FRAME   = 2
 MATERIAL_DOOR    = 3
 MATERIAL_WINDOW  = 4
 MATERIAL_CHIMNEY = 5
-
-def clump( v ):
-    while v < 0:
-        v = v + 1
-    while v > 1:
-        v = v - 1
-    return v
-
-# TODO: random for now, but should push randomly "out"
-def r( v ):
-    return v + 0.3 * random.random()
-
-def q( v ):
-    return v
-
-def zUp( v1, v2, a ):
-    return (
-          ( v1[ 0 ] + v2[ 0 ] ) / 2 + 0
-        , ( v1[ 1 ] + v2[ 1 ] ) / 2 + 0
-        , ( v1[ 2 ] + v2[ 2 ] ) / 2 + a
-    )
-
-# TODO: these must already exist somewhere...
-
-def add( a, b ):
-    return ( a[ 0 ] + b[ 0 ], a[ 1 ] + b[ 1 ], a[ 2 ] + b[ 2 ] )
-
-def subtract( a, b ):
-    return ( a[ 0 ] - b[ 0 ], a[ 1 ] - b[ 1 ], a[ 2 ] - b[ 2 ] )
-
-def scale( a, f ):
-    return ( a[ 0 ] * f, a[ 1 ] * f, a[ 2 ] * f )
-
-def hissy( h, s, v ):
-    x = hsv_to_rgb( h, s, v )
-    return ( x[0], x[1], x[2], 1 )
 
 ###
 
@@ -124,8 +88,8 @@ class HausHersteller( bpy.types.Operator ):
         #################################
         # vertices and faces
 
-        a = 1 + random.random() * 2
-        b = 1 + random.random() * 1
+        a = 1.5 + random.random() * 1.0
+        b = 1.0 + random.random() * 0.5
 
         if random.random() < 0.1:
             tmp = a
@@ -146,7 +110,7 @@ class HausHersteller( bpy.types.Operator ):
             , bm.verts.new( ( r(0), r(a), r(b) ) ) 
         ]
 
-        roof_factor = ( 0.33 + 0.44 * random.random() )
+        roof_factor = ( 0.44 + 0.44 * random.random() )
         roof_height = roof_factor * b;
 
         apex_back  = bm.verts.new( zUp( C[0].co, C[1].co, roof_height ) )
@@ -190,14 +154,18 @@ class HausHersteller( bpy.types.Operator ):
         #################################
         # door and frame
 
+        self.doorMan( bm, C, F )
+
         #################################
         # windows and frames
+        # TODO
 
         #################################
         # chimney
+        # TODO
 
         #################################
-        # 
+        # make it so!
        
         bm.to_mesh( mesh ) 
         mesh.update()
@@ -264,6 +232,47 @@ class HausHersteller( bpy.types.Operator ):
         
         return {"faces":[ top_face, out_face, eve_face ] }
 
+    def doorMan( self, bm, C, F ):
+        # IN-PROGRESS
+       
+        #                d3     d2
+        # right> C[3] .---.-----.---. C[2] <left
+        #             |   |     |   |
+        #             |   |     |   |
+        #             | q3+-----+q2 |
+        #             |   |     |   |
+        #             |   |     |   |
+        #             |   |     |   |
+        #             |   |     |   |
+        # right> F[3] .___._____.___. F[2] <left
+        #                 d1    d0
+        # note: cuz of the wiggles, the surface may not be coplanar! oopsie...
+
+        min = 0.25
+        max = 1 - min
+        rnd = min * 0.5
+
+        r0 = add( F[2].co, scale( front_floor_diff,   p( min,  rnd ) ) )
+        r1 = add( F[2].co, scale( front_floor_diff,   p( max, -rnd ) ) )
+        r2 = add( C[2].co, scale( front_ceiling_diff, p( max, -rnd ) ) )
+        r3 = add( C[2].co, scale( front_ceiling_diff, p( min,  rnd ) ) )
+
+        front_floor_diff   = subtract( F[3].co, F[2].co )
+        front_ceiling_diff = subtract( C[3].co, C[2].co )
+        fronting = scale( crossing( C[2].co,  C[3].co, F[3].co ), 0.04 )
+    
+        d0 = add( r0, fronting )
+        d1 = add( r1, fronting )
+        d2 = add( r2, fronting )
+        d3 = add( r3, fronting ) 
+
+        q2 = add( d0, scale( subtract( d2, d0 ), 0.8 ) )
+        q3 = add( d1, scale( subtract( d3, d1 ), 0.8 ) )
+
+        D = [ bm.verts.new( d0 ) , bm.verts.new( d1 ) , bm.verts.new( q2 ) , bm.verts.new( q3 ) ]
+
+        bm.faces.new( [ D[0], D[1], D[2], D[3] ] ).material_index = MATERIAL_DOOR
+
 #############################################################################
 
 def register():
@@ -281,6 +290,73 @@ def menu_func(self, context):
 
 if __name__ == "__main__":
     register()
+
+#############################################################################
+# random nonsense
+#############################################################################
+
+# plus-or-minus
+def pm( v, r ):
+    return v + r * random.random() - r * random.random()
+
+def p( v, r ):
+    return v + r * random.random();
+
+# TODO: random for now, but should push randomly "out"
+def r( v ):
+    return p( v, 0.3 )
+
+def clump( v ):
+    while v < 0:
+        v = v + 1
+    while v > 1:
+        v = v - 1
+    return v
+
+def q( v ):
+    return v
+
+def zUp( v1, v2, a ):
+    return (
+          ( v1[ 0 ] + v2[ 0 ] ) / 2 + 0
+        , ( v1[ 1 ] + v2[ 1 ] ) / 2 + 0
+        , ( v1[ 2 ] + v2[ 2 ] ) / 2 + a
+    )
+
+def hissy( h, s, v ):
+    x = hsv_to_rgb( h, s, v )
+    return ( x[0], x[1], x[2], 1 )
+
+# TODO: these must already exist somewhere...
+
+def add( a, b ):
+    return ( a[ 0 ] + b[ 0 ], a[ 1 ] + b[ 1 ], a[ 2 ] + b[ 2 ] )
+
+def subtract( a, b ):
+    return ( a[ 0 ] - b[ 0 ], a[ 1 ] - b[ 1 ], a[ 2 ] - b[ 2 ] )
+
+def scale( a, f ):
+    return ( a[ 0 ] * f, a[ 1 ] * f, a[ 2 ] * f )
+
+def crossing( a, b, c ):
+    ab = normalize( subtract( a, b ) ) # b to a
+    bc = normalize( subtract( c, b ) ) # b to c
+    return cross( ab, bc )
+
+def cross( a, b ):
+   return ( 
+          a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ] # xyzzy
+        , a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ]
+        , a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ] 
+    )
+
+def normalize( a ):
+    len = sqrt( a[ 0 ] * a[ 0 ] + a[ 1 ] * a[ 2 ] + a[ 2 ] * a[ 2 ] )
+    if 0 == len:
+        return a
+    return ( a[ 0 ] / len, a[ 1 ] / len, a[ 2 ] / len )
+
+
 
 #############################################################################
 # EOF 
