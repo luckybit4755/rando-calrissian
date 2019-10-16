@@ -3,7 +3,16 @@
 # https://michelanders.nl/wp-content/uploads/2016/08/Creating-add-ons-for-Blender-Michel-J.-Anders-sample2.pdf
 # file:///Applications/Blender.app/Contents/Resources/2.80/scripts/addons/add_mesh_extra_objects/__init__.py
 # /Applications/Blender.app/Contents/Resources/2.80/scripts/addons/add_mesh_extra_objects/add_mesh_pyramid.py
-# 
+#
+# https://docs.blender.org/api/current/bmesh.types.html#bmesh.types.BMFace
+# https://docs.blender.org/api/current/bmesh.types.html#bmesh.types.BMVert
+# https://docs.blender.org/api/current/bpy.types.Material.html#bpy.types.Material
+#
+# https://blender.stackexchange.com/questions/154635/how-to-create-a-new-material-and-set-it-has-active-material-using-python-script/154717
+#
+# IDK: https://blender.stackexchange.com/questions/65359/how-to-create-and-extrude-a-bmesh-face
+#
+#
 
 import sys
 import bpy
@@ -28,6 +37,13 @@ bl_info = {
     "tracker_url" : "",
     "category"    : "Add Mesh"
 }
+
+MATERIAL_HOUSE   = 0
+MATERIAL_ROOF    = 1
+MATERIAL_FRAME   = 2
+MATERIAL_DOOR    = 3
+MATERIAL_WINDOW  = 4
+MATERIAL_CHIMNEY = 5
 
 # TODO: random for now, but should push randomly "out"
 def r( v ):
@@ -57,20 +73,53 @@ def scale( a, f ):
 class HausHersteller( bpy.types.Operator ):
     """Create a silly little house"""
     bl_idname = "mesh.silly_house"
-    bl_label = "Silly Little House AAA" 
+    bl_label = "Silly Little House" 
     bl_options = {'REGISTER', 'UNDO'}
         
     def execute(self, context):
-        a = 2
-        b = 1
+
+        #################################
+        # plumbing to create mesh and object 
 
         bm = bmesh.new()
 
+        mesh = bpy.data.meshes.new( "SillyHouseMesh" )
+ 
+        haus = bpy.data.objects.new( "SillyHouse", mesh )
+        context.collection.objects.link( haus )
+        context.view_layer.objects.active = haus
+        haus.select_set( True )
+
+        haus.location = tuple(context.scene.cursor.location)
+        haus.rotation_quaternion = [1.0, 0.0, 0.0, 0.0]
+
+        #################################
+        # set up the materials
+
+        mat_house = bpy.data.materials.new( "mat_house" )
+        mat_house.diffuse_color = (0.5,0.3,0.1,1) 
+        haus.data.materials.append( mat_house )
+
+        mat_roof = bpy.data.materials.new( "mat_roof" )
+        mat_roof.diffuse_color = (1,0,0,1) 
+        haus.data.materials.append( mat_roof )
+
+        #################################
+        # vertices and faces
+
+        a = 1 + random.random() * 2
+        b = 1 + random.random() * 1
+
+        if random.random() < 0.1
+            tmp = a
+            a = b
+            b = tmp
+
         F = floor = [ 
-              bm.verts.new( ( q(0), q(0), 0 ) ) #        0 ---- 1 back
-            , bm.verts.new( ( q(b), q(0), 0 ) ) #        |      |
-            , bm.verts.new( ( q(b), q(a), 0 ) ) # right> |      | <left
-            , bm.verts.new( ( q(0), q(a), 0 ) ) #        3 ---- 2 front
+              bm.verts.new( ( r(0), r(0), 0 ) ) #        0 ---- 1 back
+            , bm.verts.new( ( r(b), r(0), 0 ) ) #        |      |
+            , bm.verts.new( ( r(b), r(a), 0 ) ) # right> |      | <left
+            , bm.verts.new( ( r(0), r(a), 0 ) ) #        3 ---- 2 front
         ]
         
         C = ceiling = [ 
@@ -80,109 +129,99 @@ class HausHersteller( bpy.types.Operator ):
             , bm.verts.new( ( r(0), r(a), r(b) ) ) 
         ]
 
-        roof_height = ( 0.5 + 0.2 * random.random() ) * b;
+        roof_height = ( 0.1 + 1.0 * random.random() ) * b;
 
         apex_back  = bm.verts.new( zUp( C[0].co, C[1].co, roof_height ) )
         apex_front = bm.verts.new( zUp( C[2].co, C[3].co, roof_height ) )
 
         # core of the house
 
-        bm.faces.new( [ F[0], F[1], C[1], C[0] ] ) # back wall
-        bm.faces.new( [ F[2], F[3], C[3], C[2] ] ) # front wall
+        bm.faces.new( [ F[0], F[1], C[1], C[0] ] ).material_index = MATERIAL_HOUSE # back wall
+        bm.faces.new( [ F[2], F[3], C[3], C[2] ] ).material_index = MATERIAL_HOUSE # front wall
 
-        bm.faces.new( [ F[3], F[0], C[0], C[3] ] ) # right wall
-        bm.faces.new( [ F[1], F[2], C[2], C[1] ] ) # left wall
+        bm.faces.new( [ F[3], F[0], C[0], C[3] ] ).material_index = MATERIAL_HOUSE # right wall
+        bm.faces.new( [ F[1], F[2], C[2], C[1] ] ).material_index = MATERIAL_HOUSE # left wall
 
-        bm.faces.new( [ C[0], C[1], apex_back  ] )  # back apex
-        bm.faces.new( [ C[2], C[3], apex_front ] )  # back apex
+        bm.faces.new( [ C[0], C[1], apex_back  ] ).material_index = MATERIAL_HOUSE  # back apex
+        bm.faces.new( [ C[2], C[3], apex_front ] ).material_index = MATERIAL_HOUSE  # back apex
 
         # roof of the house
 
-        out = 0.2
-        up  = 0.2
-        length = 1.2
+        out    = 0.2 + random.random() * 0.3 # how far forward / back is the roof
+        up     = 0.3 + random.random() * 0.4 # how thick is the roof
+        length = 1.2 + random.random() * 0.3 # length along the side
 
         # front and back of the roof
 
-        roof_front_left  = self.roofin( bm, out, up, length, C[2], apex_front, True )
-        roof_front_right = self.roofin( bm, out, up, length, C[3], apex_front, False )
+        #################################
+        # left side of roof
 
-        roof_back_left  = self.roofin( bm, -out, up, length, C[1], apex_back, False )
-        roof_back_right = self.roofin( bm, -out, up, length, C[0], apex_back, True  )
-
-        # top of the roof
-
-        rf = roof_front_left # forward
-        rb = roof_back_left  # backwards
-        bm.faces.new( [ rf[1], rb[2], rb[1], rf[2] ] ) # top left
-
-        rf = roof_front_right # backwards
-        rb = roof_back_right  # forward
-        bm.faces.new( [ rf[1], rb[2], rb[1], rf[2] ] ) # top right
-
-        # outside of the roof
-
-        rf = roof_front_left # forward
-        rb = roof_back_left  # backwards
-        bm.faces.new( [ rb[1], rb[0], rf[3], rf[2] ] ) # outside left
-       
-        rf = roof_front_right # backwards
-        rb = roof_back_right  # forward
-        bm.faces.new( [ rf[1], rf[0], rb[3], rb[2] ] ) # outside right
-                
-        # eaves of the side of the roof
-
-        rf = roof_front_left # forward
-        rb = roof_back_left  # backwards
-        bm.faces.new( [ rb[0], C[1], C[2], rf[3] ] ) # side eaves left
-
-        rf = roof_front_right # backwards
-        rb = roof_back_right  # forward
-        #m.faces.new( [ rb[3], C[0], C[3], rf[0] ] ) # side eaves right( backwards presumably)
-        bm.faces.new( [ rf[0], C[3],C[0], rb[3] ] ) # side eaves right
-
-
-
-        
+        roof_front_left = self.roofOut( bm, out, up, length, C[2], apex_front, True )
+        roof_back_left = self.roofOut( bm, -out, up, length, C[1], apex_back, False )
+        roof_top_left = self.roofSide( bm, roof_front_left, roof_back_left, C[1], C[2], True )
 
         #################################
-        # add the object and mesh
+        # right side of roof
 
-        mesh = bpy.data.meshes.new( "SillyHouseMesh" )
-        bm.to_mesh( mesh )
+        roof_front_right = self.roofOut( bm, out, up, length, C[3], apex_front, False )
+        roof_back_right = self.roofOut( bm, -out, up, length, C[0], apex_back, True  )
+        roof_top_right = self.roofSide( bm, roof_front_right, roof_back_right, C[0], C[3], False )
+       
+        bm.to_mesh( mesh ) 
         mesh.update()
-
-        haus = bpy.data.objects.new( "SillyHouseObj", mesh )
-        context.collection.objects.link( haus )
-        context.view_layer.objects.active = haus
-        haus.select_set( True )
-
-        haus.location = tuple(context.scene.cursor.location)
-        haus.rotation_quaternion = [1.0, 0.0, 0.0, 0.0]
 
         return {'FINISHED'}
     
-    def roofin( self, bm, out, up, length, wall, apex, forward ):
+    def roofOut( self, bm, out, up, length, wall, apex, forward ):
+        result = { "faces":[] }
+
         roof_slope = scale( subtract( wall.co, apex.co ), length )
 
-        roof         = bm.verts.new( add( apex.co,        ( 0, out, 0 ) ) )
+        roof         = bm.verts.new( add( apex.co,    ( 0, out, 0 ) ) )
         roof_up      = bm.verts.new( add( roof.co,    ( 0, 0, up ) ) )
         roof_side    = bm.verts.new( add( roof.co,    roof_slope ) )
         roof_side_up = bm.verts.new( add( roof_up.co, roof_slope ) )
+        result[ "vertices" ] = [ roof, roof_up, roof_side_up, roof_side ]
 
         # front / back of roof...
-        bits = [ roof, roof_up, roof_side_up, roof_side ]
+        bits = result[ "vertices" ].copy()
         if not forward: 
             bits.reverse()
-        bm.faces.new( bits )
+
+        out_face = bm.faces.new( bits )
+        out_face.material_index = MATERIAL_ROOF
+        result[ "faces" ].append( out_face )
 
         # roof underhang
         underhang = [ roof_side, wall, apex, roof ]
         if not forward:
             underhang.reverse()
-        bm.faces.new( underhang )
+        underhang_face = bm.faces.new( underhang )
+        underhang_face.material_index = MATERIAL_ROOF
+        result[ "faces" ].append( underhang_face )
 
-        return bits
+        return result
+
+    def roofSide( self, bm, roof_front, roof_back, c1, c2, reverse ):
+        rf = roof_front[ "vertices" ]
+        rb = roof_back[ "vertices" ]
+
+        top = [ rf[2], rb[2], rb[1], rf[1] ]
+        out = [ rb[2], rb[3], rf[3], rf[2] ]
+        eve = [ rb[3],    c1,    c2, rf[3] ]
+
+        if reverse:
+            top.reverse()
+        else:
+            out.reverse()
+            eve.reverse()
+
+        top_face = bm.faces.new( top ) # top of roof
+        out_face = bm.faces.new( out ) # outside of roof
+        eve_face = bm.faces.new( eve ) # side eaves left
+        top_face.material_index = out_face.material_index = eve_face.material_index = MATERIAL_ROOF
+        
+        return {"faces":[ top_face, out_face, eve_face ] }
 
 #############################################################################
 
