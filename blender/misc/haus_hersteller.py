@@ -91,24 +91,35 @@ class HausHersteller( bpy.types.Operator ):
         a = 1.5 + random.random() * 1.0
         b = 1.0 + random.random() * 0.5
 
-        if random.random() < 0.1:
-            tmp = a
-            a = b
-            b = tmp
+        # life is easier if the sides are all coplanar...
 
+        q = 0.1 - random.random() * 0.2
         F = floor = [ 
-              bm.verts.new( ( r(0), r(0), 0 ) ) #        0 ---- 1 back
-            , bm.verts.new( ( r(b), r(0), 0 ) ) #        |      |
-            , bm.verts.new( ( r(b), r(a), 0 ) ) # right> |      | <left
-            , bm.verts.new( ( r(0), r(a), 0 ) ) #        3 ---- 2 front
+              ( 0-q, 0-q, 0 ) #        0 ---- 1 back
+            , ( b+q, 0-q, 0 ) #        |      |
+            , ( b+q, a+q, 0 ) # right> |      | <left
+            , ( 0-q, a+q, 0 ) #        3 ---- 2 front
         ]
+        F = floor = self.vertexIt( bm, F )
         
+        q = 0.1 - random.random() * 0.4
         C = ceiling = [ 
-              bm.verts.new( ( r(0), r(0), r(b) ) ) 
-            , bm.verts.new( ( r(b), r(0), r(b) ) ) 
-            , bm.verts.new( ( r(b), r(a), r(b) ) ) 
-            , bm.verts.new( ( r(0), r(a), r(b) ) ) 
+              ( 0-q, 0-q, b ) 
+            , ( b+q, 0-q, b ) 
+            , ( b+q, a+q, b ) 
+            , ( 0-q, a+q, b ) 
         ]
+
+        # might lean a bit... 
+        if random.random() < 0.33:
+            xlean = 0.1 - random.random() * 0.2
+            ylean = 0.1 - random.random() * 0.2
+            index = 0
+            for coordinate in C:
+                C[ index ] = ( coordinate[0] + xlean, coordinate[1] + ylean, coordinate[2] )
+                index = index + 1 # python is neat
+
+        C = ceiling = self.vertexIt( bm, C );
 
         roof_factor = ( 0.44 + 0.44 * random.random() )
         roof_height = roof_factor * b;
@@ -235,43 +246,141 @@ class HausHersteller( bpy.types.Operator ):
     def doorMan( self, bm, C, F ):
         # IN-PROGRESS
        
-        #                d3     d2
+        #                r2     r3
         # right> C[3] .---.-----.---. C[2] <left
         #             |   |     |   |
         #             |   |     |   |
-        #             | q3+-----+q2 |
+        #             | q2+-----+q3 |
         #             |   |     |   |
         #             |   |     |   |
         #             |   |     |   |
         #             |   |     |   |
         # right> F[3] .___._____.___. F[2] <left
-        #                 d1    d0
+        #                 r1    r0
         # note: cuz of the wiggles, the surface may not be coplanar! oopsie...
 
-        min = 0.25
-        max = 1 - min
-        rnd = min * 0.5
+        # how wide the doors are (bigger min means smaller door..., keep it under 0.5 )
+        min = 0.30
+        max = 1.0 - min
+        rnd = min * 0.25
 
-        r0 = add( F[2].co, scale( front_floor_diff,   p( min,  rnd ) ) )
-        r1 = add( F[2].co, scale( front_floor_diff,   p( max, -rnd ) ) )
-        r2 = add( C[2].co, scale( front_ceiling_diff, p( max, -rnd ) ) )
-        r3 = add( C[2].co, scale( front_ceiling_diff, p( min,  rnd ) ) )
+        front_floor_diff   = subtract( F[3].co, F[2].co ) # from 2 to 3
+        front_ceiling_diff = subtract( C[3].co, C[2].co ) # from 2 to 3 
 
-        front_floor_diff   = subtract( F[3].co, F[2].co )
-        front_ceiling_diff = subtract( C[3].co, C[2].co )
-        fronting = scale( crossing( C[2].co,  C[3].co, F[3].co ), 0.04 )
-    
+        r0 = add( F[2].co, scale( front_floor_diff,   p( min,  rnd ) ) ) # close to F[2]
+        r1 = add( F[2].co, scale( front_floor_diff,   p( max, -rnd ) ) ) # close to F[3]
+        r2 = add( C[2].co, scale( front_ceiling_diff, p( max, -rnd ) ) ) # close to C[3]
+        r3 = add( C[2].co, scale( front_ceiling_diff, p( min,  rnd ) ) ) # close to C[2]
+   
+        outness = crossing( C[2].co,  C[3].co, F[3].co )
+        fronting = scale( outness, 0.0133 )
         d0 = add( r0, fronting )
         d1 = add( r1, fronting )
         d2 = add( r2, fronting )
         d3 = add( r3, fronting ) 
 
-        q2 = add( d0, scale( subtract( d2, d0 ), 0.8 ) )
-        q3 = add( d1, scale( subtract( d3, d1 ), 0.8 ) )
+        # how high up the doors come...
+        fq2 = 0.5 + 0.1 * random.random()
+        fq3 = 0.5 + 0.1 * random.random()
+        q2 = add( d1, scale( subtract( d2, d1 ), fq2 ) )  
+        q3 = add( d0, scale( subtract( d3, d0 ), fq3 ) )
 
-        D = [ bm.verts.new( d0 ) , bm.verts.new( d1 ) , bm.verts.new( q2 ) , bm.verts.new( q3 ) ]
+        self.faceIt( bm, [d0,d1,q2,q3], MATERIAL_DOOR )
 
-        bm.faces.new( [ D[0], D[1], D[2], D[3] ] ).material_index = MATERIAL_DOOR
+        # pull back to front of house
+
+        # fq0 and fq1 for window frames at some point
+        fq0 = 0
+        fq1 = 0
+        q0 = add( r0, scale( subtract( r3, r0 ), fq0 ) )
+        q1 = add( r1, scale( subtract( r2, r1 ), fq1 ) )
+        q2 = add( r1, scale( subtract( r2, r1 ), fq2 ) )  
+        q3 = add( r0, scale( subtract( r3, r0 ), fq3 ) )
+
+        #            f2                  q2_up_out .---. q2_up ---------- q3_up .---. q3_up_out
+        #        q2.-----.q3                       |   |         g2->           |   |
+        #          |     |                  q2_out .---. q2 ---------------  q3 .---. q3_out
+        #       f1 |     | f3        -->           |   |         f2->           |   |
+        #          |     |                         |   |  ^                     |   |
+        #          |     |                         |   | f1                  f3 |   |
+        # right> q1._____.q0  <left                |   |                     v  |   |
+        #            f0                            |   |       <-f0             |   |
+        #                                   q1_out .---. q1 ---------------- q0 .---. q0_out
+        #                                          |   |       <-g0             |   |
+        #                                q1_dn_out .---. q1_dn ---------- q0_dn .---. q0_dn_out
+        #                                
+        #                               note: the dn stuff is for window frames not door frames
+        #                                
+
+        f0 = subtract( q1, q0 )
+        f1 = subtract( q2, q1 )
+        f2 = subtract( q3, q2 )
+        f3 = subtract( q0, q3 )
+
+        outF = 0.133
+
+        q0_out = add( q0, scale( f0, 0 - outF ) )
+        q1_out = add( q0, scale( f0, 1 + outF ) )
+        q2_out = add( q2, scale( f2, 0 - outF ) ) 
+        q3_out = add( q2, scale( f2, 1 + outF ) )
+        if False:
+            self.faceIt( bm, [ q0_out, q1_out, q2_out, q3_out ], MATERIAL_FRAME )
+
+        q1_dn      = add( q1, scale( f1, 0 - outF ) ) # f1: q1 to q2
+        q2_up      = add( q1, scale( f1, 1 + outF ) )
+        q3_up      = add( q3, scale( f3, 0 - outF ) ) # f3: q3 to q0
+        q0_dn      = add( q3, scale( f3, 1 + outF ) ) 
+        if False:
+            self.faceIt( bm, [ q0_dn, q1_dn, q2_up, q3_up ], MATERIAL_FRAME )
+
+        g0 = subtract( q1_dn, q0_dn )
+        g2 = subtract( q3_up, q2_up )
+
+        q0_dn_out  = add( q0_dn, scale( g0,  0 - outF ) )
+        q1_dn_out  = add( q0_dn, scale( g0,  1 + outF ) )
+        q2_up_out  = add( q2_up, scale( g2,  0 - outF ) )
+        q3_up_out  = add( q2_up, scale( g2,  1 + outF ) )
+        if False:
+            self.faceIt( bm, [ q0_dn_out, q1_dn_out, q2_up_out, q3_up_out ], MATERIAL_FRAME );
+
+        outness = scale( outness, 0.1 ) # idk...
+        self.boxOut( bm, outness, [ q3_out, q2_out, q2_up_out, q3_up_out ], MATERIAL_FRAME ) # top
+        if True:
+            self.boxOut( bm, outness, [ q1, q1_out, q2_out, q2 ], MATERIAL_FRAME ) # right
+            self.boxOut( bm, outness, [ q0_out, q0, q3, q3_out ], MATERIAL_FRAME ) # left
+        else:
+            this_would_be_for_windows = 'TODO'
+        
+
+    # 2 3 
+    # 1 0
+    def boxOut( self, bm, outness, coordinates, material_index ):
+        outs = []
+        for coordinate in coordinates:
+            outs.append( add( coordinate, outness ) )
+        c = coordinates
+        o = outs
+
+        # FIXME: this is pretty lazy adds a bunch of hidden faces and duplicate vertices...
+        self.faceIt( bm, outs, material_index ) # front
+
+        self.faceIt( bm, [ o[3], o[2], c[2], c[3] ], material_index ) # top
+        self.faceIt( bm, [ c[0], o[0], o[3], c[3] ], material_index ) # left
+        self.faceIt( bm, [ c[1], o[1], o[0], c[0] ], material_index ) # bottom
+        self.faceIt( bm, [ c[1], c[2], o[2], o[1] ], material_index ) # right
+
+    def vertexIt( self, bm, coordinates ):
+        vertices = []
+        for coordinate in coordinates:
+            vertices.append( bm.verts.new( coordinate ) )
+        return vertices
+
+    def faceIt( self, bm, coordinates, material_index ):
+        vertices = self.vertexIt( bm, coordinates )
+        bm.faces.new( vertices ).material_index = material_index
+
+
+
 
 #############################################################################
 
