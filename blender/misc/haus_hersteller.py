@@ -46,6 +46,13 @@ MATERIAL_DOOR    = 3
 MATERIAL_WINDOW  = 4
 MATERIAL_CHIMNEY = 5
 
+def clump( v ):
+    while v < 0:
+        v = v + 1
+    while v > 1:
+        v = v - 1
+    return v
+
 # TODO: random for now, but should push randomly "out"
 def r( v ):
     return v + 0.3 * random.random()
@@ -100,19 +107,19 @@ class HausHersteller( bpy.types.Operator ):
         haus.rotation_quaternion = [1.0, 0.0, 0.0, 0.0]
 
         #################################
-        # set up the materials
-
-        mat_house = bpy.data.materials.new( "mat_house" )
-        haus.data.materials.append( mat_house )
-
-        mat_roof = bpy.data.materials.new( "mat_roof" )
-        haus.data.materials.append( mat_roof )
+        # generate the materials (needs work)
 
         hue = random.random()
         saturation = random.random()
+        value = 0.1
 
-        mat_house.diffuse_color = hissy( hue, saturation, 0.1 )
-        mat_roof.diffuse_color  = hissy( hue, saturation, 0.5 )
+        for part in "house roof frame door window chimney".split( " " ):
+            material_name = "mat_" + part
+            material = bpy.data.materials.new( material_name )
+            haus.data.materials.append( material )
+            material.diffuse_color = hissy( hue, saturation, value )
+            value += 0.1
+            saturation = clump( saturation + 0.05 * random.random() - 0.05 * random.random() )
 
         #################################
         # vertices and faces
@@ -139,7 +146,7 @@ class HausHersteller( bpy.types.Operator ):
             , bm.verts.new( ( r(0), r(a), r(b) ) ) 
         ]
 
-        roof_factor = ( 0.1 + 1.0 * random.random() )
+        roof_factor = ( 0.33 + 0.44 * random.random() )
         roof_height = roof_factor * b;
 
         apex_back  = bm.verts.new( zUp( C[0].co, C[1].co, roof_height ) )
