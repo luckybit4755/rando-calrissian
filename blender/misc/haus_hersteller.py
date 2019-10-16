@@ -18,6 +18,7 @@ import sys
 import bpy
 import random
 
+from colorsys import rgb_to_hsv, hsv_to_rgb
 import bmesh
 from bpy.types import Operator
 from bpy.props import ( FloatProperty, IntProperty,)
@@ -47,7 +48,7 @@ MATERIAL_CHIMNEY = 5
 
 # TODO: random for now, but should push randomly "out"
 def r( v ):
-    return v + 0.2 * random.random()
+    return v + 0.3 * random.random()
 
 def q( v ):
     return v
@@ -70,6 +71,12 @@ def subtract( a, b ):
 def scale( a, f ):
     return ( a[ 0 ] * f, a[ 1 ] * f, a[ 2 ] * f )
 
+def hissy( h, s, v ):
+    x = hsv_to_rgb( h, s, v )
+    return ( x[0], x[1], x[2], 1 )
+
+###
+
 class HausHersteller( bpy.types.Operator ):
     """Create a silly little house"""
     bl_idname = "mesh.silly_house"
@@ -77,7 +84,6 @@ class HausHersteller( bpy.types.Operator ):
     bl_options = {'REGISTER', 'UNDO'}
         
     def execute(self, context):
-
         #################################
         # plumbing to create mesh and object 
 
@@ -97,12 +103,16 @@ class HausHersteller( bpy.types.Operator ):
         # set up the materials
 
         mat_house = bpy.data.materials.new( "mat_house" )
-        mat_house.diffuse_color = (0.5,0.3,0.1,1) 
         haus.data.materials.append( mat_house )
 
         mat_roof = bpy.data.materials.new( "mat_roof" )
-        mat_roof.diffuse_color = (1,0,0,1) 
         haus.data.materials.append( mat_roof )
+
+        hue = random.random()
+        saturation = random.random()
+
+        mat_house.diffuse_color = hissy( hue, saturation, 0.1 )
+        mat_roof.diffuse_color  = hissy( hue, saturation, 0.5 )
 
         #################################
         # vertices and faces
@@ -110,7 +120,7 @@ class HausHersteller( bpy.types.Operator ):
         a = 1 + random.random() * 2
         b = 1 + random.random() * 1
 
-        if random.random() < 0.1
+        if random.random() < 0.1:
             tmp = a
             a = b
             b = tmp
@@ -129,7 +139,8 @@ class HausHersteller( bpy.types.Operator ):
             , bm.verts.new( ( r(0), r(a), r(b) ) ) 
         ]
 
-        roof_height = ( 0.1 + 1.0 * random.random() ) * b;
+        roof_factor = ( 0.1 + 1.0 * random.random() )
+        roof_height = roof_factor * b;
 
         apex_back  = bm.verts.new( zUp( C[0].co, C[1].co, roof_height ) )
         apex_front = bm.verts.new( zUp( C[2].co, C[3].co, roof_height ) )
@@ -147,11 +158,13 @@ class HausHersteller( bpy.types.Operator ):
 
         # roof of the house
 
-        out    = 0.2 + random.random() * 0.3 # how far forward / back is the roof
-        up     = 0.3 + random.random() * 0.4 # how thick is the roof
-        length = 1.2 + random.random() * 0.3 # length along the side
+        upness = roof_factor - 1 # base thickness on the height of the apex
+        if upness < 0:
+            upness = 0.1
 
-        # front and back of the roof
+        out    = 0.2 + random.random() * 0.3    # how far forward / back is the roof
+        up     = 0.2 + random.random() * upness # how thick is the roof
+        length = 1.2 + random.random() * 0.3    # length along the side
 
         #################################
         # left side of roof
@@ -166,6 +179,18 @@ class HausHersteller( bpy.types.Operator ):
         roof_front_right = self.roofOut( bm, out, up, length, C[3], apex_front, False )
         roof_back_right = self.roofOut( bm, -out, up, length, C[0], apex_back, True  )
         roof_top_right = self.roofSide( bm, roof_front_right, roof_back_right, C[0], C[3], False )
+
+        #################################
+        # door and frame
+
+        #################################
+        # windows and frames
+
+        #################################
+        # chimney
+
+        #################################
+        # 
        
         bm.to_mesh( mesh ) 
         mesh.update()
@@ -175,12 +200,21 @@ class HausHersteller( bpy.types.Operator ):
     def roofOut( self, bm, out, up, length, wall, apex, forward ):
         result = { "faces":[] }
 
-        roof_slope = scale( subtract( wall.co, apex.co ), length )
-
         roof         = bm.verts.new( add( apex.co,    ( 0, out, 0 ) ) )
         roof_up      = bm.verts.new( add( roof.co,    ( 0, 0, up ) ) )
-        roof_side    = bm.verts.new( add( roof.co,    roof_slope ) )
-        roof_side_up = bm.verts.new( add( roof_up.co, roof_slope ) )
+
+        out    += random.random() * 0.05
+        up     += random.random() * 0.05
+
+        length += random.random() * 0.05
+        length2 = length * 1.2  # want the top to be a bit further out than the bottom...
+
+        roof_slope1 = scale( subtract( wall.co, apex.co ), length )
+        roof_slope2 = scale( subtract( wall.co, apex.co ), length2 )
+
+        roof_side    = bm.verts.new( add( roof.co,    roof_slope1 ) )
+        roof_side_up = bm.verts.new( add( roof_up.co, roof_slope2 ) )
+
         result[ "vertices" ] = [ roof, roof_up, roof_side_up, roof_side ]
 
         # front / back of roof...
