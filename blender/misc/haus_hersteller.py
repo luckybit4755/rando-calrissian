@@ -60,6 +60,9 @@ class HausHersteller( bpy.types.Operator ):
 
         bm = bmesh.new()
 
+        # this is a little nasty...
+        self.vertex_lookup = {}
+
         mesh = bpy.data.meshes.new( "SillyHouseMesh" )
  
         haus = bpy.data.objects.new( "SillyHouse", mesh )
@@ -124,8 +127,8 @@ class HausHersteller( bpy.types.Operator ):
         roof_factor = ( 0.44 + 0.44 * random.random() )
         roof_height = roof_factor * b;
 
-        apex_back  = bm.verts.new( zUp( C[0].co, C[1].co, roof_height ) )
-        apex_front = bm.verts.new( zUp( C[2].co, C[3].co, roof_height ) )
+        apex_back  = self.c2v( bm, zUp( C[0].co, C[1].co, roof_height ) )
+        apex_front = self.c2v( bm, zUp( C[2].co, C[3].co, roof_height ) )
 
         # core of the house
 
@@ -164,42 +167,51 @@ class HausHersteller( bpy.types.Operator ):
 
         #################################
         # door and frame
-
-        self.doorMan( bm, C, F )
+        
+        front_side = [ F[2], F[3], C[3], C[2] ]
+        self.doorMan( bm, front_side, 0.10, 0.30,0.70,  0.0,0.5, MATERIAL_DOOR )
 
         #################################
         # windows and frames
-        # TODO
+
+        self.windozer( bm, C, F )
 
         #################################
         # chimney
-        # TODO
+
+        if random.random() < 0.5:
+            roof_top = roof_top_left
+        else:
+            roof_top = roof_top_right
+
+        self.chimney( bm, roof_top[ "faces" ][ 0 ] )
 
         #################################
         # make it so!
        
         bm.to_mesh( mesh ) 
         mesh.update()
+        bm.free()
 
         return {'FINISHED'}
     
     def roofOut( self, bm, out, up, length, wall, apex, forward ):
         result = { "faces":[] }
 
-        roof         = bm.verts.new( add( apex.co,    ( 0, out, 0 ) ) )
-        roof_up      = bm.verts.new( add( roof.co,    ( 0, 0, up ) ) )
+        roof         = self.c2v( bm, add( apex.co,    ( 0, out, 0 ) ) )
+        roof_up      = self.c2v( bm, add( roof.co,    ( 0, 0, up ) ) )
 
         out    += random.random() * 0.05
         up     += random.random() * 0.05
 
         length += random.random() * 0.05
-        length2 = length * 1.2  # want the top to be a bit further out than the bottom...
+        length2 = length * ( 1.1 + 0.2 * random.random() )  # want the top to be a bit further out than the bottom...
 
         roof_slope1 = scale( subtract( wall.co, apex.co ), length )
         roof_slope2 = scale( subtract( wall.co, apex.co ), length2 )
 
-        roof_side    = bm.verts.new( add( roof.co,    roof_slope1 ) )
-        roof_side_up = bm.verts.new( add( roof_up.co, roof_slope2 ) )
+        roof_side    = self.c2v( bm, add( roof.co,    roof_slope1 ) )
+        roof_side_up = self.c2v( bm, add( roof_up.co, roof_slope2 ) )
 
         result[ "vertices" ] = [ roof, roof_up, roof_side_up, roof_side ]
 
@@ -243,55 +255,61 @@ class HausHersteller( bpy.types.Operator ):
         
         return {"faces":[ top_face, out_face, eve_face ] }
 
-    def doorMan( self, bm, C, F ):
-        # IN-PROGRESS
-       
-        #                r2     r3
-        # right> C[3] .---.-----.---. C[2] <left
-        #             |   |     |   |
-        #             |   |     |   |
-        #             | q2+-----+q3 |
-        #             |   |     |   |
-        #             |   |     |   |
-        #             |   |     |   |
-        #             |   |     |   |
-        # right> F[3] .___._____.___. F[2] <left
-        #                 r1    r0
+    def doorMan( self, bm, side, outness, left_percent, right_percent, bottom_percent, top_percent, material_index ):
+        #                    r2     r3
+        # right> side[2] .---.-----.---. side[3] <left
+        #                |   |     |   |
+        #                |   |     |   |
+        #                | q2+-----+q3 |
+        #                |   |     |   |
+        #                |   |     |   |
+        #                |   |     |   |
+        #                |   |     |   |
+        # right> side[1] .___._____.___. side[0] <left
+        #                   r1    r0
         # note: cuz of the wiggles, the surface may not be coplanar! oopsie...
 
         # how wide the doors are (bigger min means smaller door..., keep it under 0.5 )
-        min = 0.30
-        max = 1.0 - min
-        rnd = min * 0.25
+        min = left_percent
+        max = right_percent
+        rnd = 0.05
 
-        front_floor_diff   = subtract( F[3].co, F[2].co ) # from 2 to 3
-        front_ceiling_diff = subtract( C[3].co, C[2].co ) # from 2 to 3 
+        front_floor_diff   = subtract( side[1].co, side[0].co ) # across the top
+        front_ceiling_diff = subtract( side[2].co, side[3].co ) # across the bottom
 
-        r0 = add( F[2].co, scale( front_floor_diff,   p( min,  rnd ) ) ) # close to F[2]
-        r1 = add( F[2].co, scale( front_floor_diff,   p( max, -rnd ) ) ) # close to F[3]
-        r2 = add( C[2].co, scale( front_ceiling_diff, p( max, -rnd ) ) ) # close to C[3]
-        r3 = add( C[2].co, scale( front_ceiling_diff, p( min,  rnd ) ) ) # close to C[2]
+        r0 = add( side[0].co, scale( front_floor_diff,   p( min,  rnd ) ) ) # close to side[0]
+        r1 = add( side[0].co, scale( front_floor_diff,   p( max, -rnd ) ) ) # close to side[1]
+        r2 = add( side[3].co, scale( front_ceiling_diff, p( max, -rnd ) ) ) # close to side[2]
+        r3 = add( side[3].co, scale( front_ceiling_diff, p( min,  rnd ) ) ) # close to side[3]
    
-        outness = crossing( C[2].co,  C[3].co, F[3].co )
-        fronting = scale( outness, 0.0133 )
+        normal = crossing( side[3].co,  side[2].co, side[1].co )
+        fronting = scale( normal, 0.0133 )
         d0 = add( r0, fronting )
         d1 = add( r1, fronting )
         d2 = add( r2, fronting )
         d3 = add( r3, fronting ) 
 
         # how high up the doors come...
-        fq2 = 0.5 + 0.1 * random.random()
-        fq3 = 0.5 + 0.1 * random.random()
+        fq0 = bottom_percent
+        fq1 = bottom_percent
+        fq2 = top_percent
+        fq3 = top_percent
+        if not 0 == bottom_percent:
+            fq0 += 0.1 * random.random()
+            fq1 += 0.1 * random.random()
+        if not 0 == top_percent:
+            fq2 += 0.1 * random.random()
+            fq3 += 0.1 * random.random()
+
+        q0 = add( d0, scale( subtract( d3, d0 ), fq0 ) )
+        q1 = add( d1, scale( subtract( d2, d1 ), fq1 ) )
         q2 = add( d1, scale( subtract( d2, d1 ), fq2 ) )  
         q3 = add( d0, scale( subtract( d3, d0 ), fq3 ) )
 
-        self.faceIt( bm, [d0,d1,q2,q3], MATERIAL_DOOR )
+        self.faceIt( bm, [q0,q1,q2,q3], material_index )
 
         # pull back to front of house
 
-        # fq0 and fq1 for window frames at some point
-        fq0 = 0
-        fq1 = 0
         q0 = add( r0, scale( subtract( r3, r0 ), fq0 ) )
         q1 = add( r1, scale( subtract( r2, r1 ), fq1 ) )
         q2 = add( r1, scale( subtract( r2, r1 ), fq2 ) )  
@@ -330,8 +348,6 @@ class HausHersteller( bpy.types.Operator ):
         q2_up      = add( q1, scale( f1, 1 + outF ) )
         q3_up      = add( q3, scale( f3, 0 - outF ) ) # f3: q3 to q0
         q0_dn      = add( q3, scale( f3, 1 + outF ) ) 
-        if False:
-            self.faceIt( bm, [ q0_dn, q1_dn, q2_up, q3_up ], MATERIAL_FRAME )
 
         g0 = subtract( q1_dn, q0_dn )
         g2 = subtract( q3_up, q2_up )
@@ -340,24 +356,22 @@ class HausHersteller( bpy.types.Operator ):
         q1_dn_out  = add( q0_dn, scale( g0,  1 + outF ) )
         q2_up_out  = add( q2_up, scale( g2,  0 - outF ) )
         q3_up_out  = add( q2_up, scale( g2,  1 + outF ) )
-        if False:
-            self.faceIt( bm, [ q0_dn_out, q1_dn_out, q2_up_out, q3_up_out ], MATERIAL_FRAME );
 
-        outness = scale( outness, 0.1 ) # idk...
-        self.boxOut( bm, outness, [ q3_out, q2_out, q2_up_out, q3_up_out ], MATERIAL_FRAME ) # top
-        if True:
-            self.boxOut( bm, outness, [ q1, q1_out, q2_out, q2 ], MATERIAL_FRAME ) # right
-            self.boxOut( bm, outness, [ q0_out, q0, q3, q3_out ], MATERIAL_FRAME ) # left
-        else:
-            this_would_be_for_windows = 'TODO'
-        
+        fronting = scale( normal, outness ) 
+
+        self.boxOut( bm, fronting, [ q3_out, q2_out, q2_up_out, q3_up_out ], MATERIAL_FRAME ) # top
+        self.boxOut( bm, fronting, [ q1, q1_out, q2_out, q2 ], MATERIAL_FRAME ) # right
+        self.boxOut( bm, fronting, [ q0_out, q0, q3, q3_out ], MATERIAL_FRAME ) # left
+
+        if not 0 == bottom_percent:
+            self.boxOut( bm, fronting, [ q0_dn_out, q1_dn_out, q1_out, q0_out ], MATERIAL_FRAME )
 
     # 2 3 
     # 1 0
-    def boxOut( self, bm, outness, coordinates, material_index ):
+    def boxOut( self, bm, fronting, coordinates, material_index ):
         outs = []
         for coordinate in coordinates:
-            outs.append( add( coordinate, outness ) )
+            outs.append( add( coordinate, fronting ) )
         c = coordinates
         o = outs
 
@@ -369,17 +383,58 @@ class HausHersteller( bpy.types.Operator ):
         self.faceIt( bm, [ c[1], o[1], o[0], c[0] ], material_index ) # bottom
         self.faceIt( bm, [ c[1], c[2], o[2], o[1] ], material_index ) # right
 
+    # TODO: little cross bars
+    def windozer( self, bm, C, F ):
+        left_side  = [ F[1], F[2], C[2], C[1] ]
+        right_side = [ F[3], F[0], C[0], C[3] ]
+
+        thickness = 0.02
+
+        bottom = 0.19
+        height = 0.33
+
+        start_1 = 0.16
+        width = 0.24
+
+        top = bottom + height
+        start_2 = 1 - start_1 - width
+
+        self.windowIt( bm, left_side,  thickness, start_1, start_1 + width, bottom, top ) # left window 1
+        self.windowIt( bm, left_side,  thickness, start_2, start_2 + width, bottom, top ) # left window 2
+        self.windowIt( bm, right_side, thickness, start_1, start_1 + width, bottom, top ) # right window 1
+        self.windowIt( bm, right_side, thickness, start_2, start_2 + width, bottom, top ) # right window 2
+
+    def windowIt( self, bm, side, thickness, start, stop, bottom, top ):
+        start  = pm( start  , 0.05 )
+        stop   = pm( stop   , 0.05 )
+        bottom = pm( bottom , 0.05 )
+        top    = pm( top    , 0.05 )
+        self.doorMan( bm, side, thickness, start, stop, bottom, top, MATERIAL_WINDOW )
+
+    def chimney( self, bm, roof_top ):
+        inProgress = True
+
     def vertexIt( self, bm, coordinates ):
         vertices = []
         for coordinate in coordinates:
-            vertices.append( bm.verts.new( coordinate ) )
+            vertices.append( self.c2v( bm, coordinate ) )
         return vertices
 
     def faceIt( self, bm, coordinates, material_index ):
         vertices = self.vertexIt( bm, coordinates )
         bm.faces.new( vertices ).material_index = material_index
 
+    def coordinateToVertex( self, bm, coordinate ):
+        key = str( coordinate[0]) + "," + str(coordinate[1]) + "," + str(coordinate[2] )
+        if key in self.vertex_lookup:
+            # print( "vertex cache hit: " + key )
+            return self.vertex_lookup[ key ]
+        vertex = bm.verts.new( coordinate )
+        self.vertex_lookup[ key ] = vertex
+        return vertex
 
+    def c2v( self, bm, coordinate ):
+        return self.coordinateToVertex( bm, coordinate )
 
 
 #############################################################################
@@ -464,8 +519,6 @@ def normalize( a ):
     if 0 == len:
         return a
     return ( a[ 0 ] / len, a[ 1 ] / len, a[ 2 ] / len )
-
-
 
 #############################################################################
 # EOF 
