@@ -105,7 +105,7 @@ class HausHersteller( bpy.types.Operator ):
         ]
         F = floor = self.vertexIt( bm, F )
         
-        q = 0.1 - random.random() * 0.4
+        q = random.random() * 0.2 - 0.05
         C = ceiling = [ 
               ( 0-q, 0-q, b ) 
             , ( b+q, 0-q, b ) 
@@ -184,7 +184,7 @@ class HausHersteller( bpy.types.Operator ):
         else:
             roof_top = roof_top_right
 
-        self.chimney( bm, roof_top[ "faces" ][ 0 ] )
+        self.chimney( bm, roof_top[ "top" ] )
 
         #################################
         # make it so!
@@ -253,9 +253,9 @@ class HausHersteller( bpy.types.Operator ):
         eve_face = bm.faces.new( eve ) # side eaves left
         top_face.material_index = out_face.material_index = eve_face.material_index = MATERIAL_ROOF
         
-        return {"faces":[ top_face, out_face, eve_face ] }
+        return {"faces":[ top_face, out_face, eve_face ], "top":top }
 
-    def doorMan( self, bm, side, outness, left_percent, right_percent, bottom_percent, top_percent, material_index ):
+    def cut_in_side( self, side, left_percent, right_percent, bottom_percent, top_percent ):
         #                    r2     r3
         # right> side[2] .---.-----.---. side[3] <left
         #                |   |     |   |
@@ -281,15 +281,8 @@ class HausHersteller( bpy.types.Operator ):
         r1 = add( side[0].co, scale( front_floor_diff,   p( max, -rnd ) ) ) # close to side[1]
         r2 = add( side[3].co, scale( front_ceiling_diff, p( max, -rnd ) ) ) # close to side[2]
         r3 = add( side[3].co, scale( front_ceiling_diff, p( min,  rnd ) ) ) # close to side[3]
-   
-        normal = crossing( side[3].co,  side[2].co, side[1].co )
-        fronting = scale( normal, 0.0133 )
-        d0 = add( r0, fronting )
-        d1 = add( r1, fronting )
-        d2 = add( r2, fronting )
-        d3 = add( r3, fronting ) 
 
-        # how high up the doors come...
+        # how high in the side comes
         fq0 = bottom_percent
         fq1 = bottom_percent
         fq2 = top_percent
@@ -301,19 +294,29 @@ class HausHersteller( bpy.types.Operator ):
             fq2 += 0.1 * random.random()
             fq3 += 0.1 * random.random()
 
-        q0 = add( d0, scale( subtract( d3, d0 ), fq0 ) )
-        q1 = add( d1, scale( subtract( d2, d1 ), fq1 ) )
-        q2 = add( d1, scale( subtract( d2, d1 ), fq2 ) )  
-        q3 = add( d0, scale( subtract( d3, d0 ), fq3 ) )
-
-        self.faceIt( bm, [q0,q1,q2,q3], material_index )
-
-        # pull back to front of house
-
         q0 = add( r0, scale( subtract( r3, r0 ), fq0 ) )
         q1 = add( r1, scale( subtract( r2, r1 ), fq1 ) )
         q2 = add( r1, scale( subtract( r2, r1 ), fq2 ) )  
         q3 = add( r0, scale( subtract( r3, r0 ), fq3 ) )
+
+        return [q0,q1,q2,q3]
+
+    def doorMan( self, bm, side, outness, left_percent, right_percent, bottom_percent, top_percent, material_index ):
+        qz = self.cut_in_side( side, left_percent, right_percent, bottom_percent, top_percent )
+        q0 = qz[ 0 ]
+        q1 = qz[ 1 ]
+        q2 = qz[ 2 ]
+        q3 = qz[ 3 ]
+
+        # draw the door/window a little out from the cut
+
+        normal = crossing( side[3].co,  side[2].co, side[1].co )
+        fronting = scale( normal, 0.0133 )
+        self.faceIt( 
+            bm
+            , [ add( q0, fronting ), add( q1, fronting ), add( q2, fronting ), add( q3, fronting )]
+            , material_index 
+        )
 
         #            f2                  q2_up_out .---. q2_up ---------- q3_up .---. q3_up_out
         #        q2.-----.q3                       |   |         g2->           |   |
@@ -372,16 +375,21 @@ class HausHersteller( bpy.types.Operator ):
         outs = []
         for coordinate in coordinates:
             outs.append( add( coordinate, fronting ) )
+        self.boxIt( bm, coordinates, outs, material_index )
+
+    def boxIt( self, bm, coordinates, outs, material_index ):
         c = coordinates
         o = outs
 
-        # FIXME: this is pretty lazy adds a bunch of hidden faces and duplicate vertices...
+        # FIXME: this is pretty lazy adds a bunch of hidden faces 
         self.faceIt( bm, outs, material_index ) # front
 
         self.faceIt( bm, [ o[3], o[2], c[2], c[3] ], material_index ) # top
         self.faceIt( bm, [ c[0], o[0], o[3], c[3] ], material_index ) # left
         self.faceIt( bm, [ c[1], o[1], o[0], c[0] ], material_index ) # bottom
         self.faceIt( bm, [ c[1], c[2], o[2], o[1] ], material_index ) # right
+
+        return outs
 
     # TODO: little cross bars
     def windozer( self, bm, C, F ):
@@ -412,7 +420,29 @@ class HausHersteller( bpy.types.Operator ):
         self.doorMan( bm, side, thickness, start, stop, bottom, top, MATERIAL_WINDOW )
 
     def chimney( self, bm, roof_top ):
-        inProgress = True
+        back1 = pm( 0.7, 0.05 )
+        back2 = pm( 0.7, 0.05 )
+
+        side1 = pm( 0.3, 0.05 )
+        side2 = pm( 0.5, 0.05 )
+
+        qz = self.cut_in_side( roof_top, back1,back2, side1,side2 )
+
+        max = -33
+        height = 0.7
+        for coordinate in qz:
+            z = height + coordinate[ 2 ]
+            if z > max:
+                max = z
+
+        ups = []
+        for coordinate in qz:
+            x = pm( coordinate[0], 0.1 )
+            y = pm( coordinate[1], 0.1 )
+            z = pm( max, 0.1 )
+            ups.append( ( x, y, z ) )
+
+        self.boxIt( bm, qz, ups, MATERIAL_CHIMNEY )
 
     def vertexIt( self, bm, coordinates ):
         vertices = []
