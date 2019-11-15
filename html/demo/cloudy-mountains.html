@@ -1,0 +1,216 @@
+<HTML>
+	<HEAD>
+		<TITLE>cloudy-mountains</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+			canvas {
+				border: 1px solid black;
+			}
+		</style>
+
+		<script type="text/javascript" src="js/functions.js"></script>
+		<script type="text/javascript">
+			const r = function() {
+				return Math.random();
+			};
+
+			const CloudyMountains = function() {
+				let self = this;
+				self.init = function() {
+					self.canvas = getByTag( 'canvas' );
+					self.context = self.canvas.getContext( '2d' );
+					self.size = parseInt( self.canvas.width );
+
+					let n = self.size;
+					let m = n - 1;
+					self.cloud = new Array( n );
+					for ( let i = 0 ; i < n ; i++ ) {
+						self.cloud[ i ] = new Array( n );
+					}
+
+					self.cloud[ 0 ][ 0 ] = r();
+					self.cloud[ m ][ 0 ] = r();
+					self.cloud[ m ][ m ] = r();
+					self.cloud[ 0 ][ m ] = r();
+
+					self.cloudy( 0, 0, n );
+
+					if ( false ) {
+						for ( let y = 0 ; y < n ; y++ ) {
+							let s = '';
+							let m = '' + y;
+							while ( m.length < 3 ) m = ' ' + m;
+							s += m + '| ';
+							for ( let x = 0 ; x < n ; x++ ) {
+								let n = '' + Math.floor( 255 * self.cloud[ x ][ y ] );
+								while ( n.length < 3 ) n = ' ' + n;
+								s += ' ' + n;
+							}
+							console.log( s );
+						}
+					}
+					
+					let min = 9999999;
+					let max = -min;
+					for ( let y = 0 ; y < n ; y++ ) {
+						for ( let x = 0 ; x < n ; x++ ) {
+							let zed = self.cloud[ x ][ y ];
+							if ( zed < min ) min = zed;
+							if ( zed > max ) max = zed;
+						}
+					}
+
+					let diff = max - min;
+					for ( let y = 0 ; y < n ; y++ ) {
+						for ( let x = 0 ; x < n ; x++ ) {
+							let zed = self.cloud[ x ][ y ];
+							self.cloud[ x ][ y ] = ( zed - min ) / diff;
+						}
+					}
+
+					self.frameFunction = frame( self.draw, 24 );
+					//self.frameFunction.start();
+					self.draw();
+				};
+
+				self.cloudy = function( x1, y1, size ) {
+					if ( size < 2 ) return;
+
+					let C = self.cloud;
+
+					let x2 = x1 + size - 1;
+					let y2 = y1 + size - 1;
+					let top    = 0.5 * ( C[ x1 ][ y1 ] + C[ x2 ][ y1 ] );
+					let left   = 0.5 * ( C[ x1 ][ y1 ] + C[ x1 ][ y2 ] );
+					let right  = 0.5 * ( C[ x2 ][ y1 ] + C[ x2 ][ y2 ] );
+					let bottom = 0.5 * ( C[ x1 ][ y2 ] + C[ x2 ][ y2 ] );
+
+					let f = size / ( self.size * 2 );
+
+					let nu_top = top - r() * f;
+					let nu_left = left - r() * f;
+					let nu_right = right - r() * f;
+					let nu_bottom = bottom - r() * f;
+
+					let nu = 0.25 * ( nu_top + nu_left + nu_right + nu_bottom );
+
+					let size2 = size / 2;
+
+					let xm1 = x1 + size2 - 1;
+					let xm2 = x1 + size2 - 0;
+					let ym1 = y1 + size2 - 1;
+					let ym2 = y1 + size2 - 0;
+
+					// (x1,y1)     (xm1,y1) (xm2,y1)          (x2,y1)
+					//
+					// (x1,ym1)    (xm1,ym1) (xm2,ym1)        (x2,ym1)
+					// (x1,ym2)    (xm1,ym2) (xm2,ym2)        (x2,ym2)
+					//
+					// (x1,y2)     (xm1,y2)v(xm2,y2)          (x2,y2)
+					
+					C[ xm1 ][ y1 ] = C[ xm2 ][ y1 ] = nu_top;
+
+					C[ x1 ][ ym1 ] = C[ x1 ][ ym2 ] = nu_left;
+					C[ x2 ][ ym1 ] = C[ x2 ][ ym2 ] = nu_right;
+
+					C[ xm1 ][ y2 ] = C[ xm2 ][ y2 ] = nu_bottom;
+
+					C[ xm1 ][ ym1 ] = C[ xm2 ][ ym1 ] = C[ xm1 ][ ym2 ] = C[ xm2 ][ ym2 ] = nu;
+
+					///////
+					self.cloudy( x1, y1, size2 );
+					self.cloudy( xm2, y1, size2 );
+
+					self.cloudy( x1, ym2, size2 );
+					self.cloudy( xm2, ym2, size2 );
+				};
+
+				self.draw = function() {
+					let o = 0.05;
+					let l = 1 - o;
+
+					o = 0; l = 1;
+
+					let p1, p2, p3, p4;
+
+					p1 = self.toScreen( o, o, o ); p2 = self.toScreen( l, o, o );
+					p4 = self.toScreen( o, l, o ); p3 = self.toScreen( l, l, o );
+					self.drawPolygon( [p1,p2,p3,p4] );
+
+					p1 = self.toScreen( o, o, l ); p2 = self.toScreen( l, o, l );
+					p4 = self.toScreen( o, l, l ); p3 = self.toScreen( l, l, l );
+					self.drawPolygon( [p1,p2,p3,p4] );
+
+					let min = 9999999;
+					let max = -min;
+
+					let n = self.size;
+					for ( let y = 1 ; y < n ; y++ ) {
+						for ( let x = 1 ; x < n ; x++ ) {
+							let zed = self.cloud[ x ][ y ];
+							let fed = self.cloud[ x - 1 ][ y - 1 ];
+							let ded = ( zed - fed + 1 ) / 2;
+
+							let v = Math.floor( 202 * zed );
+							if ( v < min ) min = v;
+							if ( v > max ) max = v;
+							self.context.strokeStyle = 'rgb(v,v,v)'.replace( /v/g, v );
+
+							zed = ( 0.00 * ded ) + ( 0.40 * zed );
+
+							p1 = self.toScreen( x / n, y /n, zed * 0.63 );
+							p2 = self.toScreen( x / n, y /n, zed * 0.66 );
+							self.drawLine( p1, p2 );
+						}
+					}
+					console.log( min + ' to ' + max );
+				};
+
+				self.drawLine = function( a, b ) {
+					self.context.beginPath();
+					self.context.moveTo( a.x, a.y );
+					self.context.lineTo( b.x, b.y );
+					self.context.closePath();
+					self.context.stroke();
+				};
+				
+				self.drawPolygon = function( points ) {
+					self.context.beginPath();
+					for ( let i = 0 ; i < points.length ; i++ ) {
+						let point = points[ i ];
+						if ( i ) {
+							self.context.lineTo( point.x, point.y );
+						} else {
+							self.context.moveTo( point.x, point.y );
+						}
+					}
+
+					self.context.closePath();
+					self.context.stroke();
+				};
+
+				/* ok.. this is quirky */
+				self.toScreen = function( x, y, z ) {
+					let value_x = ( +1.00 * x ) + ( +1.00 * y ) + ( +0.00 * z );
+					let value_y = ( -0.30 * x ) + ( +0.30 * y ) + ( -1.37 * z );
+					let f = 0.5;
+					value_x *= f;
+					value_y *= f;
+					value_y += 0.84;
+					return { x:self.size * value_x , y:self.size * value_y }
+				};
+	
+				self.init();
+			};
+			window.onload = function() {
+				new CloudyMountains();
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
