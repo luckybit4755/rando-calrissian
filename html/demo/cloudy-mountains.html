@@ -5,9 +5,13 @@
 		<style>
 			body {
 				font-family: Comic Sans MS, sans;
+				background:black;
+				margin:2em;
 			}
 			canvas {
-				border: 1px solid black;
+				border:  1px solid #888;
+				margin:  auto;
+				display: block;
 			}
 		</style>
 
@@ -25,6 +29,11 @@
 					self.context = self.canvas.getContext( '2d' );
 					self.size = parseInt( self.canvas.width );
 					self.tileSize = 8;
+					self.tileSize = 16;
+					self.tileSize = 2;
+					self.tileSize = 4;
+
+					self.statisticsDrawing = { time:0, count: 0};
 
 					self.initializeClouds();
 					self.makeClouds( 0, 0, self.size / self.tileSize );
@@ -129,10 +138,31 @@
 					}
 				};
 
+				self.now = function() {
+					return new Date().getTime() / 1000.0;
+				}
+
 				self.draw = function() {
-					self.drawBox();
+					let start = self.now();
+
+					//self.drawBox();
 					self.drawMountain();
-					self.drawLabels();	
+					// self.drawLabels();	
+
+					let stop = self.now();
+					let diff = stop - start;
+
+					self.statisticsDrawing.time += diff;
+					self.statisticsDrawing.count++;
+					if ( 1 == self.statisticsDrawing.count % 33 ) {
+						self.statisticsInfo( 'draw', self.statisticsDrawing );
+					}
+				};
+
+				self.statisticsInfo = function( label, statistics ) {
+					let perFrame = Math.floor( statistics.time / statistics.count * 1000 ) / 1000;
+					let fps = 1 / perFrame;
+					console.log( 'draw: ' + perFrame + ' -> ' + fps + 'fps' );
 				};
 
 				self.drawBox = function() {
@@ -162,6 +192,35 @@
 					self.screen = [];
 
 					let n = self.size / self.tileSize;
+					let blue  = [   0,   0, 255 ];
+					let green = [   0, 255,   0 ];
+					let brown = [  66,  37,  24 ];
+					let gray  = [ 128, 128, 128 ];
+					let white = [ 255, 255, 255 ];
+					let water = 0.25;
+
+					let epsilon = 0.0001;
+
+					let colors = [
+						  { z:-1.0, color:blue}
+						, { z:water, color:blue}
+						, { z:water+epsilon, color:green}
+						, { z:0.30, color:green}
+						, { z:0.37, color:brown}
+						, { z:0.44, color:gray}
+						, { z:0.74, color:gray}
+						, { z:0.75, color:white}
+						, { z:1.01, color:white}
+					];
+
+					// set the water level...
+					for ( let y = 0 ; y < n ; y++ ) {
+						for ( let x = 0 ; x < n ; x++ ) {
+							if ( self.cloud[ x ][ y ] < water ) {
+								self.cloud[ x ][ y ] = water - 0.001;
+							}
+						}
+					}
 
 					for ( let y = 0 ; y < n ; y++ ) {
 						for ( let x = 0 ; x < n ; x++ ) {
@@ -177,6 +236,34 @@
 							let v = Math.floor( 255 * diff );
 							color = self.context.strokeStyle = 'rgb(v,v,v)'.replace( /v/g, v );
 
+							let less = 0;
+							let next = 0;
+							for ( let i = 0 ; i < colors.length ; i++ ) {
+								let cv = colors[ i ];
+								if ( cv.z < zed ) {
+									less = cv;
+								}
+								if ( cv.z > zed ) {
+									next = cv;
+									break;
+								}
+							}
+
+							let color_zed = ( zed - less.z ) / ( next.z - less.z );
+							// TODO: exponential instead of linear...
+
+							let cv = [];
+							for ( let i = 0 ; i < less.color.length; i++ ) {
+								let a = less.color[ i ];
+								let b = next.color[ i ];
+								let c = a + ( b - a ) * color_zed;
+								c = 0.33 * c + 0.77 * c * diff;
+								cv.push( Math.floor( c ) );
+							}
+
+							//console.log( JSON.stringify( less ) + ' < ' + zed + ' < ' + JSON.stringify( next ) + ' so ' + color_zed + ' -> ' + cv );
+							color = self.context.strokeStyle = 'rgb(' + cv.join( ',' ) + ')';
+
 							//???zed = ( 0.00 * diff ) + ( 0.40 * zed );
 
 							// little magic number 4u
@@ -186,12 +273,18 @@
 						}
 					}
 				};
+
+				self.angle = 0;
 					
 				self.drawMountain = function() {
 					let p1, p2, p3, p4;
 
 					let n = self.size / self.tileSize;
 					let l = 1 / self.cloud.length;
+
+					let cos = Math.cos( self.angle );
+					let sin = Math.sin( self.angle );
+					//snit
 
 					for ( let y = 1 ; y < n ; y++ ) {
 						for ( let x = 1 ; x < n ; x++ ) {
@@ -205,12 +298,15 @@
 							self.drawPolygon( [p1.point,p2.point,p3.point,p4.point] );
 							self.context.fill();
 
+							continue;
+
 							// sides for front facing bits
 
 							if ( x == 1 ) {
 								let y_1 = self.toScreen( x * l - l, y * l - l, 0 ).y;
 								let y_2 = self.toScreen( x * l - l, y * l - 0, 0 ).y; 
 
+								self.context.fillStyle = self.context.strokeStyle = 'gray';
 								let toFloor = [p1.point,p2.point,{x:p2.point.x,y:y_2},{x:p1.point.x,y:y_1} ];
 								self.drawPolygon( toFloor );
 								self.context.fill();
@@ -220,6 +316,7 @@
 								let y_2 = self.toScreen( x * l - l,  y * l - 0 +l+l /* wat? */ , 0 ).y;
 								let y_3 = self.toScreen( x * l - 0,  y * l - 0 +l+l /* wat? */ , 0 ).y;
 
+								self.context.fillStyle = self.context.strokeStyle = 'gray';
 								let toFloor = [p2.point,p3.point,{x:p3.point.x,y:y_3},{x:p2.point.x,y:y_2} ];
 								self.drawPolygon( toFloor );
 								self.context.fill();
@@ -233,7 +330,6 @@
 					let o = 0.05;
 					let l = 1 - o;
 
-					let L = 16;
 					self.context.fillStyle = 'red';
 					self.text( '(0,0,0)', o,o,o );
 					self.text( '(1,0,0)', l,o,o );
