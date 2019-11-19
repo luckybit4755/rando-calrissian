@@ -23,8 +23,10 @@
 					self.canvas = getByTag( 'canvas' );
 					self.context = self.canvas.getContext( '2d' );
 					self.size = parseInt( self.canvas.width );
+					self.tileSize = 16;
 
 					let n = self.size;
+					n = self.size / self.tileSize;
 					let m = n - 1;
 					self.cloud = new Array( n );
 					for ( let i = 0 ; i < n ; i++ ) {
@@ -37,6 +39,8 @@
 					self.cloud[ 0 ][ m ] = r();
 
 					self.cloudy( 0, 0, n );
+						
+					console.log( 'begawk! ' + self.begawk );
 
 					if ( false ) {
 						for ( let y = 0 ; y < n ; y++ ) {
@@ -83,19 +87,21 @@
 
 					let x2 = x1 + size - 1;
 					let y2 = y1 + size - 1;
+
 					let top    = 0.5 * ( C[ x1 ][ y1 ] + C[ x2 ][ y1 ] );
 					let left   = 0.5 * ( C[ x1 ][ y1 ] + C[ x1 ][ y2 ] );
 					let right  = 0.5 * ( C[ x2 ][ y1 ] + C[ x2 ][ y2 ] );
 					let bottom = 0.5 * ( C[ x1 ][ y2 ] + C[ x2 ][ y2 ] );
 
-					let f = size / ( self.size * 2 );
+					let f = size / ( self.cloud.length * 2 );
 
-					let nu_top = top - r() * f;
-					let nu_left = left - r() * f;
-					let nu_right = right - r() * f;
+
+					let nu_top    = top    - r() * f;
+					let nu_left   = left   - r() * f;
+					let nu_right  = right  - r() * f;
 					let nu_bottom = bottom - r() * f;
 
-					let nu = 0.25 * ( nu_top + nu_left + nu_right + nu_bottom );
+					let nu = 0.25 * ( nu_top + nu_left + nu_right + nu_bottom ) - r() * f;
 
 					let size2 = size / 2;
 
@@ -110,22 +116,52 @@
 					// (x1,ym2)    (xm1,ym2) (xm2,ym2)        (x2,ym2)
 					//
 					// (x1,y2)     (xm1,y2)v(xm2,y2)          (x2,y2)
-					
-					C[ xm1 ][ y1 ] = C[ xm2 ][ y1 ] = nu_top;
 
-					C[ x1 ][ ym1 ] = C[ x1 ][ ym2 ] = nu_left;
-					C[ x2 ][ ym1 ] = C[ x2 ][ ym2 ] = nu_right;
+					if ( true ) {
+						C[ xm1 ][ y1 ] = C[ xm2 ][ y1 ] = nu_top;
 
-					C[ xm1 ][ y2 ] = C[ xm2 ][ y2 ] = nu_bottom;
+						C[ x1 ][ ym1 ] = C[ x1 ][ ym2 ] = nu_left;
+						C[ x2 ][ ym1 ] = C[ x2 ][ ym2 ] = nu_right;
 
-					C[ xm1 ][ ym1 ] = C[ xm2 ][ ym1 ] = C[ xm1 ][ ym2 ] = C[ xm2 ][ ym2 ] = nu;
+						C[ xm1 ][ y2 ] = C[ xm2 ][ y2 ] = nu_bottom;
+
+						C[ xm1 ][ ym1 ] = C[ xm2 ][ ym1 ] = C[ xm1 ][ ym2 ] = C[ xm2 ][ ym2 ] = nu;
+					} else {
+						self.mightSet( xm1, y1, nu_top );
+						self.mightSet( xm2, y1, nu_top );
+
+						self.mightSet( x1 , ym1, nu_left );
+						self.mightSet( x1 , ym2, nu_left );
+
+						self.mightSet( x2 , ym1, nu_right );
+						self.mightSet( x2 , ym2, nu_right );
+
+						self.mightSet( xm1, y2, nu_bottom );
+						self.mightSet( xm2, y2, nu_bottom );
+
+						self.mightSet( xm1, ym1, nu );
+						self.mightSet( xm2, ym1, nu );
+						self.mightSet( xm1, ym2, nu );
+						self.mightSet( xm2, ym2, nu );
+					}
+
 
 					///////
+
 					self.cloudy( x1, y1, size2 );
 					self.cloudy( xm2, y1, size2 );
 
 					self.cloudy( x1, ym2, size2 );
 					self.cloudy( xm2, ym2, size2 );
+				};
+
+				self.begawk = 0;
+				self.mightSet = function( x, y, value ) {
+					if ( self.cloud[ x ][ y ] ) {
+						self.begawk++;
+						return;
+					}
+					self.cloud[ x ][ y ] = value;
 				};
 
 				self.draw = function() {
@@ -136,37 +172,104 @@
 
 					let p1, p2, p3, p4;
 
+					// top and bottom of cube
+
+					self.context.strokeStyle = 'green';
 					p1 = self.toScreen( o, o, o ); p2 = self.toScreen( l, o, o );
 					p4 = self.toScreen( o, l, o ); p3 = self.toScreen( l, l, o );
 					self.drawPolygon( [p1,p2,p3,p4] );
 
+
+					self.context.strokeStyle = 'blue'
+					p1 = self.toScreen( o, o, o ); p2 = self.toScreen( l, o, o );
 					p1 = self.toScreen( o, o, l ); p2 = self.toScreen( l, o, l );
 					p4 = self.toScreen( o, l, l ); p3 = self.toScreen( l, l, l );
 					self.drawPolygon( [p1,p2,p3,p4] );
 
-					let min = 9999999;
-					let max = -min;
+					// convert to screen coordinates first time thru
 
-					let n = self.size;
-					for ( let y = 1 ; y < n ; y++ ) {
-						for ( let x = 1 ; x < n ; x++ ) {
-							let zed = self.cloud[ x ][ y ];
-							let fed = self.cloud[ x - 1 ][ y - 1 ];
-							let ded = ( zed - fed + 1 ) / 2;
+					let n = self.size /self.tileSize;
+					console.log( n );
 
-							let v = Math.floor( 202 * zed );
-							if ( v < min ) min = v;
-							if ( v > max ) max = v;
-							self.context.strokeStyle = 'rgb(v,v,v)'.replace( /v/g, v );
+					let first = self.screen ? false : true;
+					if ( first ) {
+						self.screen = [];
+						for ( let y = 0 ; y < n ; y++ ) {
+							for ( let x = 0 ; x < n ; x++ ) {
+								if ( !( x in self.screen ) ) {
+									self.screen[ x ] = [];
+								}
 
-							zed = ( 0.00 * ded ) + ( 0.40 * zed );
+								let zed = self.cloud[ x ][ y ];
+								let fed = ( 0 == x || 0 == y ) ? zed : self.cloud[ x - 1 ][ y - 1 ];
+								let ded = ( zed - fed + 1 ) / 2;
 
-							p1 = self.toScreen( x / n, y /n, zed * 0.63 );
-							p2 = self.toScreen( x / n, y /n, zed * 0.66 );
-							self.drawLine( p1, p2 );
+								let v = Math.floor( 13 + 202 * ded );
+								color = self.context.strokeStyle = 'rgb(v,v,v)'.replace( /v/g, v );
+
+								//???zed = ( 0.00 * ded ) + ( 0.40 * zed );
+
+								let point = self.toScreen( x / n, y /n, zed * 0.63 );
+								self.screen[ x ][ y ] = {point:point,color:color,v:v,zed:zed,ded:ded,fed:fed};
+							}
 						}
 					}
-					console.log( min + ' to ' + max );
+
+					l = 1 / self.cloud.length;
+
+					for ( let y = 1 ; y < n ; y++ ) {
+						for ( let x = 1 ; x < n ; x++ ) {
+							p1 = self.screen[ x - 1 ][ y - 1 ];
+							p2 = self.screen[ x - 1 ][ y - 0 ];
+							p3 = self.screen[ x - 0 ][ y - 0 ];
+							p4 = self.screen[ x - 0 ][ y - 1 ];
+
+							self.context.strokeStyle = p3.color;
+							self.context.fillStyle = p3.color;
+							self.drawPolygon( [p1.point,p2.point,p3.point,p4.point] );
+							self.context.fill();
+
+							if ( x == 1 ) {
+								let y_1 = self.toScreen( x * l - l, y * l - l, 0 ).y;
+								let y_2 = self.toScreen( x * l - l, y * l - 0, 0 ).y; 
+
+								let toFloor = [p1.point,p2.point,{x:p2.point.x,y:y_2},{x:p1.point.x,y:y_1} ];
+								self.drawPolygon( toFloor );
+								self.context.fill();
+							}
+							if ( y == n - 1) {
+								let y_2 = self.toScreen( x * l - l,  y * l - 0 +l+l /* wat? */ , 0 ).y;
+								let y_3 = self.toScreen( x * l - 0,  y * l - 0 +l+l /* wat? */ , 0 ).y;
+
+								let toFloor = [p2.point,p3.point,{x:p3.point.x,y:y_3},{x:p2.point.x,y:y_2} ];
+								self.drawPolygon( toFloor );
+								self.context.fill();
+							}
+						}
+					}
+				
+					self.drawLabels();	
+				};
+
+				self.drawLabels = function() {
+					let o = 0.05;
+					let l = 1 - o;
+
+					let L = 16;
+					self.context.fillStyle = 'red';
+					self.text( '(0,0,0)', o,o,o );
+					self.text( '(1,0,0)', l,o,o );
+					self.text( '(0,1,0)', o,l,o );
+					self.text( '(1,1,0)', l,l,o );
+					self.text( '(0,0,1)', o,o,l );
+					self.text( '(1,0,1)', l,o,l );
+					self.text( '(0,1,1)', o,l,l );
+					self.text( '(1,1,1)', l,l,l );
+				};
+
+				self.text = function( text, x, y, z ) {
+					let point = self.toScreen( x, y, z );
+					self.context.fillText( text, point.x, point.y + 2 );
 				};
 
 				self.drawLine = function( a, b ) {
@@ -194,12 +297,8 @@
 
 				/* ok.. this is quirky */
 				self.toScreen = function( x, y, z ) {
-					let value_x = ( +1.00 * x ) + ( +1.00 * y ) + ( +0.00 * z );
-					let value_y = ( -0.30 * x ) + ( +0.30 * y ) + ( -1.37 * z );
-					let f = 0.5;
-					value_x *= f;
-					value_y *= f;
-					value_y += 0.84;
+					let value_x = 0.00 + ( +0.50 * x ) + ( +0.50 * y ) + ( +0.00 * z );
+					let value_y = 0.84 + ( -0.15 * x ) + ( +0.15 * y ) + ( -0.69 * z );
 					return { x:self.size * value_x , y:self.size * value_y }
 				};
 	
