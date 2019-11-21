@@ -175,15 +175,15 @@
 
 					self.statisticsDrawing.time += diff;
 					self.statisticsDrawing.count++;
-					if ( 1 == self.statisticsDrawing.count % 33 ) {
+					if ( 0 == self.statisticsDrawing.count % 33 ) {
 						self.statisticsInfo( 'draw', self.statisticsDrawing );
 					}
 				};
 
 				self.statisticsInfo = function( label, statistics ) {
 					let perFrame = Math.floor( statistics.time / statistics.count * 1000 ) / 1000;
-					let fps = 1 / perFrame;
-					console.log( 'draw: ' + perFrame + ' -> ' + fps + 'fps' );
+					let fps = Math.floor( 1 / perFrame * 10 ) / 10;
+					console.log( 'draw: ' + perFrame + ' -> ' + fps + ' fps' );
 				};
 
 				self.drawBox = function() {
@@ -339,81 +339,21 @@
 						dx = -0.5;
 						for ( let x = 0 ; x < n ; x++, dx +=l ) {
 							let rotated = self.rotate( dx, dy, cos, sin );
-/*
-							if ( self.derpa[ x ][ y ] && self.derpa[ x ][ y ] < rotated.y ) {
-								continue;
-							} else {
-								self.derpa[ x ][ y ] = rotated.y;
-							}
-*/
 
 							let z = self.cloud[ x ][ y ];
-
-							let point = self.toScreen( rotated.x, rotated.y, z );
-							thisRow[ x ] = point;
-
-							let ix = Math.floor( point.x );
-							let iy = Math.floor( point.y );
-
 							let cv = self.screen[ x ][ y ].cv;
 
-							let index = 4 * ( ix + self.size * iy );
-
-							for ( let j = 0 ; j < 3 ; j++, index += 4 * self.size  ) {
-								imageData.data[ index + 0 ] = cv[ 0 ];
-								imageData.data[ index + 1 ] = cv[ 1 ];
-								imageData.data[ index + 2 ] = cv[ 2 ];
-							}
+							thisRow[ x ] = self.toScreen( rotated.x, rotated.y, z );
 
 							if ( !lastRow ) continue;
 							if ( !x ) continue;
 
-						   	// 
-						   	//     p1 +---------+ p2 
-						   	//        |         |
-						   	// 
-						   	// 
-						   		   
-
-
-							// this is a quick hacky polygon fill
-
-							let theDrawn = [];
-
-							if ( lastRow ) { 
-								theDrawn.push( self.line2d( imageData.data, cv, point, lastRow[ x ], z,zBuffer ) ); 
-								if ( 0 != x )  { 
-									theDrawn.push( self.line2d( imageData.data, cv, lastRow[ x ], lastRow[ x - 1 ], z,zBuffer ) );
-								}
-							}
-							if ( 0 != x )  { 
-								theDrawn.push( self.line2d( imageData.data, cv, point, thisRow[ x - 1 ], z,zBuffer ) );
-								if ( lastRow ) {
-									theDrawn.push( self.line2d( imageData.data, cv, lastRow[ x - 1 ], thisRow[ x - 1 ], z,zBuffer ) );
-								}
-							}
-
-							if ( theDrawn.length < 2 ) continue;
-							
-							let firstDrawn = theDrawn[ 0 ];
-							for ( let i = 1 ; i < theDrawn.length ; i++ ) {
-								let drawn = theDrawn[ i ];
-								for ( let ky in drawn ) {
-									if ( ky in firstDrawn ) {
-										firstDrawn[ ky ] = firstDrawn[ ky ].concat( drawn[ ky ] );
-									} else {
-										firstDrawn[ ky ] = drawn[ ky ];
-									}
-								}
-							}
-
-							for( let ky in firstDrawn ) {
-								let xz = firstDrawn[ ky ].sort();
-								let x_min = xz[ 0 ];
-								let x_max = xz[ xz.length - 1 ];
-								for ( ; x_min <= x_max ; x_min++ ) {
-									self.setPixel(imageData.data,cv,x_min,ky, z,zBuffer);
-								}
+							if ( !true ) {
+								// about 6 fps (64 points)
+								self.zFill( x, z, cv, zBuffer, imageData, lastRow, thisRow );
+							} else {
+								// about 13 fps (64 points)
+								self.zFillHack( x, z, cv, zBuffer, imageData, lastRow, thisRow );
 							}
 						}
 					}
@@ -422,6 +362,168 @@
 
 					self.context.fillStyle = 'red';
 					let zeda = self.rotate( 0.5, 0.5, cos, sin );
+				};
+							
+				self.zFill = function( x, z, cv, zBuffer, imageData, lastRow, thisRow ) {
+					//            l1
+					//     p1 +--------+ p2 
+					//        |`       |
+					//     l4 |   `    | l2
+					//        | l5   ` |
+					//     p3 +--------+ p4
+					//           l3
+
+					let p1 = lastRow[ x - 1 ];
+					let p2 = lastRow[ x - 0 ];
+					let p3 = thisRow[ x - 1 ];
+					let p4 = thisRow[ x - 0 ];
+
+					let l1 = self.line2d( imageData.data, cv,   p1,p2,   z,zBuffer );
+					let l2 = self.line2d( imageData.data, cv,   p2,p4,   z,zBuffer );
+
+					if ( self.wireFrame ) {
+						// 60 fps for wireframe (64 points)
+						return;
+					}
+
+					let l3 = self.line2d( imageData.data, cv,   p3,p4,   z,zBuffer );
+					let l4 = self.line2d( imageData.data, cv,   p1,p3,   z,zBuffer );
+					let l5 = self.line2d( imageData.data, cv,   p1,p4,   z,zBuffer );
+
+					// 30 fps for the extra lines (64 points) 
+
+					let triangles = [ [l1,l2,l5], [l3,l4,l5] ];
+					for ( let i = 0 ; i < triangles.length ; i++ ) {
+						let sides = triangles[ i ];
+						let yz = {};
+						for ( let j = 0 ; j < sides.length ; j++ ) {
+							let side = sides[ j ];
+
+							for ( var ky in side ) {
+								let xz = side[ ky ].sort();
+								let min = xz[ 0 ];
+								let max = xz[ xz.length - 1 ];
+								
+								if ( ky in yz ) {
+									let theYz = yz[ ky ];
+									if ( min < theYz.min ) theYz.min = min;
+									if ( max > theYz.max ) theYz.max = max;
+								} else {
+									yz[ ky ] = {min:min,max:max};
+								}
+							}	
+						}
+
+						// about 10 fps at this point...
+
+						for ( var ky in yz ) {
+							let min = yz[ ky ].min;
+							let max = yz[ ky ].max;
+							self.line2d( imageData.data, cv,   {x:min,y:ky},{x:max,y:ky},  z,zBuffer );
+						}
+
+						// drawing the scan lines down to about 7 fps... ouch
+
+					}
+				};
+
+				self.zFillHack = function( x, z, cv, zBuffer, imageData, lastRow, thisRow ) {
+					let theDrawn = [];
+
+					//            l1
+					//     p1 +--------+ p2 
+					//        |`       |
+					//     l4 |   `    | l2
+					//        | l5   ` |
+					//     p3 +--------+ p4
+					//           l3
+
+					let p1 = lastRow[ x - 1 ];
+					let p2 = lastRow[ x - 0 ];
+					let p3 = thisRow[ x - 1 ];
+					let p4 = thisRow[ x - 0 ];
+					let point = thisRow[ x ];
+
+					theDrawn.push( self.line2d( imageData.data, cv, p1, p2, z,zBuffer ) );  // l1
+					theDrawn.push( self.line2d( imageData.data, cv, p2, p4, z,zBuffer ) );  // l2
+					theDrawn.push( self.line2d( imageData.data, cv, p3, p4, z,zBuffer ) );  // l3
+					theDrawn.push( self.line2d( imageData.data, cv, p1, p3, z,zBuffer ) );  // l4
+
+					let ok = {};
+					let lines = [];
+
+					for ( let i = 0 ; i < theDrawn.length ; i++ ) {
+						let drawn = theDrawn[ i ];
+						for ( let y in drawn ) {
+							let xz = drawn[ y ].sort();
+							let min = xz[ 0 ];
+							let max = xz[ xz.length - 1 ];
+
+							if( y in ok ) {
+								let k = ok[ y ];
+								if ( min < k.min ) k.min = min;
+								if ( max > k.max ) k.max = max;
+
+							} else {
+								lines.push( ok[ y ] = {y:y,min:min,max:max} )
+							}
+						}
+					}
+
+					for ( let i = 0 ; i < lines.length ; i++ ) {
+						let line = lines[ i ];
+						let y    = line.y;
+						let min  = line.min;
+						let max  = line.max;
+
+						// up to about 15 fps here
+						for ( ; min <= max ; min++ ) {
+							self.setPixel(imageData.data,cv,min,y, z,zBuffer);
+						}
+					}
+
+					return;
+
+					let firstDrawn = theDrawn[ 0 ];
+
+					let keys = [];
+
+					for ( let i = 1 ; i < theDrawn.length ; i++ ) {
+						let drawn = theDrawn[ i ];
+						for ( let ky in drawn ) {
+							let xz = false;
+							if ( ky in firstDrawn ) {
+								xz = firstDrawn[ ky ] = firstDrawn[ ky ].concat( drawn[ ky ] );
+							} else {
+								xz = firstDrawn[ ky ] = drawn[ ky ];
+							}
+							keys.push( {ky:ky,xz:xz} );
+						}
+					}
+
+					for ( let i = 0 ; i < keys.length ; i++ ) {
+						let fml = keys[ i ];
+						let ky = fml.ky;
+						let xz = fml.xz.sort();
+						
+						let x_min = xz[ 0 ];
+						let x_max = xz[ xz.length - 1 ];
+						for ( ; x_min <= x_max ; x_min++ ) {
+							self.setPixel(imageData.data,cv,x_min,ky, z,zBuffer);
+						}
+					}
+
+					return;
+
+					// 13 fps
+					for( let ky in firstDrawn ) {
+						let xz = firstDrawn[ ky ].sort();
+						let x_min = xz[ 0 ];
+						let x_max = xz[ xz.length - 1 ];
+						for ( ; x_min <= x_max ; x_min++ ) {
+							self.setPixel(imageData.data,cv,x_min,ky, z,zBuffer);
+						}
+					}
 				};
 					
 				self.drawMountains = function() {
@@ -579,16 +681,20 @@
 				self.toScreen = function( x, y, z ) {
 					let value_x = 0.00 + ( +0.50 * x ) + ( +0.50 * y ) + ( +0.00 * z );
 					let value_y = 0.84 + ( -0.15 * x ) + ( +0.15 * y ) + ( -0.69 * z );
-					return { x:self.size * value_x , y:self.size * value_y }
+					return { 
+						  x: Math.floor( self.size * value_x )
+						, y: Math.floor( self.size * value_y )
+					};
 				};
 
 				// from https://stackoverflow.com/questions/4672279/bresenham-algorithm-in-javascript
 				self.line2d = function( data, cv, p1, p2,  z,zBuffer ) {
 					let drew = {};
-					let x0 = Math.floor( p1.x );
-					let y0 = Math.floor( p1.y );
-					let x1 = Math.floor( p2.x );
-					let y1 = Math.floor( p2.y );
+
+					let x0 = p1.x;
+					let y0 = p1.y;
+					let x1 = p2.x;
+					let y1 = p2.y;
 
 					var dx = Math.abs(x1 - x0);
 					var dy = Math.abs(y1 - y0);
