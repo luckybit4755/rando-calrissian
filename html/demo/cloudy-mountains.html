@@ -13,6 +13,12 @@
 				margin:  auto;
 				display: block;
 			}
+			#info {
+				width:33em;
+				margin:auto;
+				color:white;
+				display:block;
+			}
 		</style>
 
 		<script type="text/javascript" src="js/functions.js"></script>
@@ -28,28 +34,35 @@
 					self.canvas = getByTag( 'canvas' );
 					self.context = self.canvas.getContext( '2d' );
 					self.size = parseInt( self.canvas.width );
-					self.tileSize = 8;
-					self.tileSize = 16;
-					self.tileSize = 2;
-					self.tileSize = 4;
-					self.tileSize = 8;
+					self.tileSize = 8;  // 66 fps   :  64 x  64
+					self.tileSize = 16; // 90 fps   :  32 x  32
+					self.tileSize = 2;  // 14 fps   : 256 x 256
+					self.tileSize = 4;  // 31 fps   : 128 x 128
 
 					self.angle = 0;
-					self.raw = !false;
+					self.wireframe = false;
+					self.quick = false;
+					self.statisticsDrawing = { time:0, count: 0};
+
+					// for scanning the polygons
+					self.min = new Array( self.size );
+					self.max = new Array( self.size );
+
 					self.canvas.onclick = function() {
-						self.angle++;
-						if ( self.raw ) {
-							self.raw = false;
-							self.angle = 0;
-						}
-					};
-					document.onkeypress = function( e ) {
-						switch ( e.key ) {
-							case 'r': self.raw = !self.raw; break;
-						};
+						self.wireframe = !self.wireframe;
 					};
 
-					self.statisticsDrawing = { time:0, count: 0};
+					document.onkeypress = function( e ) {
+						switch ( e.key ) {
+							case 'q': self.quick = !self.quick; break;
+							case 'r': 
+								self.statisticsDrawing.time = self.statisticsDrawing.count = 0;
+								self.info( '&#x23F1;...' );
+								break;
+							case ' ': self.statisticsInfo( 'draw', self.statisticsDrawing ); break;
+
+						};
+					};
 
 					self.initializeClouds();
 					self.makeClouds( 0, 0, self.size / self.tileSize );
@@ -180,10 +193,14 @@
 					}
 				};
 
+				self.info = function( msg ) {
+					console.log( getById( 'info' ).innerHTML = msg );
+				};
+
 				self.statisticsInfo = function( label, statistics ) {
 					let perFrame = Math.floor( statistics.time / statistics.count * 1000 ) / 1000;
 					let fps = Math.floor( 1 / perFrame * 10 ) / 10;
-					console.log( 'draw: ' + perFrame + ' -> ' + fps + ' fps' );
+					self.info( fps + ' fps over ' + statistics.count + ' frames' );
 				};
 
 				self.drawBox = function() {
@@ -308,9 +325,7 @@
 					};
 				}
 				
-				self.rawMountains = function() {
-					let p1, p2, p3, p4;
-
+				self.drawMountains = function() {
 					let n = self.size / self.tileSize;
 					let l = 1 / self.cloud.length;
 
@@ -329,13 +344,19 @@
 
 					let half = self.size / 2;
 
+					let array1 = new Array( n );
+					let array2 = new Array( n );
+
 					let lastRow = false;
-					let thisRow = false;
+					let thisRow = array1;
 
-					let theQ;
+					for ( let y = 0 ; y < n ; y++, dy += l ) { 
+						if ( lastRow ) {
+							let tmp = lastRow;
+							lastRow = thisRow;
+							thisRow = tmp;
+						}
 
-					for ( let y = 0 ; y < n ; y++, dy += l, lastRow = thisRow ) {
-						thisRow = new Array( n );
 						dx = -0.5;
 						for ( let x = 0 ; x < n ; x++, dx +=l ) {
 							let rotated = self.rotate( dx, dy, cos, sin );
@@ -345,25 +366,27 @@
 
 							thisRow[ x ] = self.toScreen( rotated.x, rotated.y, z );
 
+							if ( self.quick ) {
+								self.setPixel( imageData.data, cv, thisRow[ x ].x, thisRow[ x ].y );
+								continue;
+							}
+
 							if ( !lastRow ) continue;
 							if ( !x ) continue;
 
-							if ( !true ) {
-								// about 6 fps (64 points)
-								self.zFill( x, z, cv, zBuffer, imageData, lastRow, thisRow );
-							} else {
-								// about 13 fps (64 points)
-								self.zFillHack( x, z, cv, zBuffer, imageData, lastRow, thisRow );
-							}
+							// ~15 fps ( 64x64 points)
+							self.zFill( x, z, cv, zBuffer, imageData, lastRow, thisRow );
 						}
+
+						if ( !lastRow ) {
+							lastRow = array2;
+							//thisRow = array2;
+						} 
 					}
 
 					self.context.putImageData( imageData, 0, 0 );
-
-					self.context.fillStyle = 'red';
-					let zeda = self.rotate( 0.5, 0.5, cos, sin );
 				};
-							
+
 				self.zFill = function( x, z, cv, zBuffer, imageData, lastRow, thisRow ) {
 					//            l1
 					//     p1 +--------+ p2 
@@ -378,78 +401,22 @@
 					let p3 = thisRow[ x - 1 ];
 					let p4 = thisRow[ x - 0 ];
 
-					let l1 = self.line2d( imageData.data, cv,   p1,p2,   z,zBuffer );
-					let l2 = self.line2d( imageData.data, cv,   p2,p4,   z,zBuffer );
+					let y_min = Math.min( p1.y, Math.min( p2.y, Math.min( p3.y, p4.y ) ) );
+					let y_max = Math.max( p1.y, Math.max( p2.y, Math.max( p3.y, p4.y ) ) );
 
-					if ( self.wireFrame ) {
-						// 60 fps for wireframe (64 points)
-						return;
+
+					for ( let y = y_min ; y <= y_max ; y++ ) {
+						self.min[ y ] = 9999999;
+						self.max[ y ] = -self.min[ y ];
 					}
 
-					let l3 = self.line2d( imageData.data, cv,   p3,p4,   z,zBuffer );
-					let l4 = self.line2d( imageData.data, cv,   p1,p3,   z,zBuffer );
-					let l5 = self.line2d( imageData.data, cv,   p1,p4,   z,zBuffer );
+					self.line2d( imageData.data, cv, p1, p2, z,zBuffer );  // l1
+					self.line2d( imageData.data, cv, p2, p4, z,zBuffer );  // l2
 
-					// 30 fps for the extra lines (64 points) 
+					if ( self.wireframe ) return;
 
-					let triangles = [ [l1,l2,l5], [l3,l4,l5] ];
-					for ( let i = 0 ; i < triangles.length ; i++ ) {
-						let sides = triangles[ i ];
-						let yz = {};
-						for ( let j = 0 ; j < sides.length ; j++ ) {
-							let side = sides[ j ];
-
-							for ( var ky in side ) {
-								let xz = side[ ky ].sort();
-								let min = xz[ 0 ];
-								let max = xz[ xz.length - 1 ];
-								
-								if ( ky in yz ) {
-									let theYz = yz[ ky ];
-									if ( min < theYz.min ) theYz.min = min;
-									if ( max > theYz.max ) theYz.max = max;
-								} else {
-									yz[ ky ] = {min:min,max:max};
-								}
-							}	
-						}
-
-						// about 10 fps at this point...
-
-						for ( var ky in yz ) {
-							let min = yz[ ky ].min;
-							let max = yz[ ky ].max;
-							self.line2d( imageData.data, cv,   {x:min,y:ky},{x:max,y:ky},  z,zBuffer );
-						}
-
-						// drawing the scan lines down to about 7 fps... ouch
-
-					}
-				};
-
-				self.zFillHack = function( x, z, cv, zBuffer, imageData, lastRow, thisRow ) {
-					//            l1
-					//     p1 +--------+ p2 
-					//        |`       |
-					//     l4 |   `    | l2
-					//        | l5   ` |
-					//     p3 +--------+ p4
-					//           l3
-
-					let p1 = lastRow[ x - 1 ];
-					let p2 = lastRow[ x - 0 ];
-					let p3 = thisRow[ x - 1 ];
-					let p4 = thisRow[ x - 0 ];
-					let point = thisRow[ x ];
-
-					let ok = {};
-					let lines = [];
-
-					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p1, p2, z,zBuffer ) );  // l1
-					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p2, p4, z,zBuffer ) );  // l2
-					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p3, p4, z,zBuffer ) );  // l3
-					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p1, p3, z,zBuffer ) );  // l4
-
+					self.line2d( imageData.data, cv, p3, p4, z,zBuffer );  // l3
+					self.line2d( imageData.data, cv, p1, p3, z,zBuffer );  // l4
 
 					let r = cv[ 0 ];
 					let g = cv[ 1 ];
@@ -457,14 +424,11 @@
 
 					let data = imageData.data;
 
-					for ( let i = 0 ; i < lines.length ; i++ ) {
-						let line = lines[ i ];
-						let y    = line.y;
-						let min  = line.min;
-						let max  = line.max;
+					for ( let y = y_min ; y <= y_max ; y++ ) {
+						let min = self.min[ y ];
+						let max = self.max[ y ];
 
-						// setting the values in the array directly is about 15 fps :-P
-						// about the same as calling setPixel
+						// this is about 15 fps and mildly faster than using setPixel
 
 						let index = 4 * ( min + y * self.size );
 						for ( let x = min ; x <= max ; x++, index += 4 ) {
@@ -478,137 +442,6 @@
 						}
 
 						continue;
-
-						// up to about 15 fps here
-						for ( ; min <= max ; min++ ) {
-							self.setPixel(imageData.data,cv,min,y, z,zBuffer);
-						}
-					}
-				};
-
-				self.zFillHackLiner = function( ok, lines, drawn ) {
-					for ( let y in drawn ) {
-						let xz = drawn[ y ].sort();
-						let min = xz[ 0 ];
-						let max = xz[ xz.length - 1 ];
-
-						if( y in ok ) {
-							let k = ok[ y ];
-							if ( min < k.min ) k.min = min;
-							if ( max > k.max ) k.max = max;
-
-						} else {
-							lines.push( ok[ y ] = {y:y,min:min,max:max} )
-						}
-					}
-				};
-
-					
-				self.drawMountains = function() {
-					if ( self.raw ) {
-						return self.rawMountains();
-					}
-
-					let p1, p2, p3, p4;
-
-					let n = self.size / self.tileSize;
-					let l = 1 / self.cloud.length;
-
-					self.clear();
-
-					//self.statisticsDrawing
-
-					let directionals = [
-						{ 
-							  start: { x:1, y:1   }
-						  	, stop:  { x:n, y:n   }
-							, inc:   { x:1, y:1   }
-							, side:  { x:1, y:n-1 }
-							, add:{
-								  p1: { x:-1, y:-1 }
-								, p2: { x:-1, y:-0 }
-								, p3: { x:-0, y:-0 }
-								, p4: { x:-0, y:-1 }
-							}
-						}
-						, 
-						{ 
-							  start: { x:n-2, y:n-2 }
-						  	, stop:  { x:-1 , y:-1 }
-							, inc:   { x:-1 , y:-1 }
-							, side:  { x:1  , y:1}
-							, add:{
-								  p1: { x:+1, y:+1 }
-								, p2: { x:+1, y:+0 }
-								, p3: { x:+0, y:+0 }
-								, p4: { x:+0, y:+1 }
-							}
-						}
-					];
-
-					self.angle = 0;
-					let D = directionals[ self.angle % directionals.length ];
-
-					for ( let ix = D.start.x ; ix != D.stop.x ; ix += D.inc.x ) {
-						let x = ix;
-						let xl = x * l;
-						for ( let iy = D.start.y ; iy != D.stop.y ; iy += D.inc.y ) {
-							let y = iy;
-
-							if ( false && 1 == self.angle % directionals.length ) {
-								//x = n - ix;
-								//y = n - iy - 1;
-//								console.log( ix + ' -> ' + x + ' and ' + iy + ' -> ' + y );
-							}
-							
-							let yl = y * l;
-
-	if ( 1 == self.angle % directionals.length ) {
-//console.log( ' from ' + (x + D.add.p1.x) + ' and ' + ( x + D.add.p1.x) + ' cuz ' + x + ' + ' + D.add.p1.x );
-
-	}
-							p1 = self.screen[ x + D.add.p1.x ][ y + D.add.p1.y ];
-	if ( 1 == self.angle % directionals.length ) {
-//console.log( p1 + ' from ' + (x + D.add.p1.x) + ' and ' + ( y + D.add.p1.y) + ' cuz ' + y + ' + ' + D.add.p1.y );
-
-	}
-							p2 = self.screen[ x + D.add.p2.x ][ y + D.add.p2.y ];
-							p3 = self.screen[ x + D.add.p3.x ][ y + D.add.p3.y ];
-							p4 = self.screen[ x + D.add.p4.x ][ y + D.add.p4.y ];
-							
-							p1.point = self.toScreen( xl + D.add.p1.x * l, yl + D.add.p1.y * l, p1.zed );
-							p2.point = self.toScreen( xl + D.add.p2.x * l, yl + D.add.p2.y * l, p2.zed );
-							p3.point = self.toScreen( xl + D.add.p3.x * l, yl + D.add.p3.y * l, p3.zed );
-							p4.point = self.toScreen( xl + D.add.p4.x * l, yl + D.add.p4.y * l, p4.zed );
-
-							self.context.strokeStyle = p3.color;
-							self.context.fillStyle = p3.color;
-							self.drawPolygon( [p1.point,p2.point,p3.point,p4.point] );
-							self.context.fill();
-
-							// sides for front facing bits
-							continue;
-
-							if ( x == D.side.x ) {
-								let y_1 = self.toScreen( xl + D.add.p1.x * l, yl + D.add.p1.x * l, 0 ).y;
-								let y_2 = self.toScreen( xl + D.add.p2.x * l, yl + D.add.p2.y * l, 0 ).y; 
-
-								//self.context.fillStyle = self.context.strokeStyle = 'gray';
-								let toFloor = [p1.point,p2.point,{x:p2.point.x,y:y_2},{x:p1.point.x,y:y_1} ];
-								self.drawPolygon( toFloor );
-								self.context.fill();
-							}
-
-							if ( y == D.side.y ) {
-								let y_2 = self.toScreen( xl + D.add.p2.x * l, yl + D.add.p2.y * l, 0 ).y; 
-								let y_3 = self.toScreen( xl + D.add.p3.x * l, yl + D.add.p3.y * l, 0 ).y; 
-
-								//self.context.fillStyle = self.context.strokeStyle = 'gray';
-								let toFloor = [p2.point,p3.point,{x:p3.point.x,y:y_3},{x:p2.point.x,y:y_2} ];
-								self.drawPolygon( toFloor );
-								self.context.fill();
-							}
-						}
 					}
 				};
 
@@ -667,36 +500,29 @@
 
 				// from https://stackoverflow.com/questions/4672279/bresenham-algorithm-in-javascript
 				self.line2d = function( data, cv, p1, p2,  z,zBuffer ) {
-					let drew = {};
-
 					let x0 = p1.x;
 					let y0 = p1.y;
 					let x1 = p2.x;
 					let y1 = p2.y;
 
-					var dx = Math.abs(x1 - x0);
-					var dy = Math.abs(y1 - y0);
-					var sx = (x0 < x1) ? 1 : -1;
-					var sy = (y0 < y1) ? 1 : -1;
-					var err = dx - dy;
+					let dx = Math.abs(x1 - x0);
+					let dy = Math.abs(y1 - y0);
+					let sx = (x0 < x1) ? 1 : -1;
+					let sy = (y0 < y1) ? 1 : -1;
+					let err = dx - dy;
 
 					while(true) {
 						self.setPixel(data,cv,x0, y0,z,zBuffer); 
-						if( y0 in drew ) {
-							drew[ y0 ].push( x0 );
-						} else {
-							drew[ y0 ] = [ x0 ];
-						}
 
-						//if (Math.abs(x0 - x1) < 0.0001 && Math.abs(y0 - y1) < 0.0001) break;
+						if ( x0 < self.min[ y0 ] ) self.min[ y0 ] = x0;
+						if ( x0 > self.max[ y0 ] ) self.max[ y0 ] = x0;
+
 						if ((x0 === x1) && (y0 === y1)) break;
 
-						var e2 = 2*err;
+						let e2 = 2*err;
 						if (e2 > -dy) { err -= dy; x0  += sx; }
 						if (e2 < dx) { err += dx; y0  += sy; }
 					}
-
-					return drew;
 				};
 
 				self.setPixel = function( data,cv,x,y, z,zbuffer ) {
@@ -721,5 +547,6 @@
 	</HEAD>
 	<BODY>
 		<canvas width="512" height="512"></canvas>
+		<div id='info'><dieter style="color:red;type:sweetie">&#x2764;</dieter></div>
 	</BODY>
 </HTML>
