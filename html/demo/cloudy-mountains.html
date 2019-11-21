@@ -428,8 +428,6 @@
 				};
 
 				self.zFillHack = function( x, z, cv, zBuffer, imageData, lastRow, thisRow ) {
-					let theDrawn = [];
-
 					//            l1
 					//     p1 +--------+ p2 
 					//        |`       |
@@ -444,31 +442,20 @@
 					let p4 = thisRow[ x - 0 ];
 					let point = thisRow[ x ];
 
-					theDrawn.push( self.line2d( imageData.data, cv, p1, p2, z,zBuffer ) );  // l1
-					theDrawn.push( self.line2d( imageData.data, cv, p2, p4, z,zBuffer ) );  // l2
-					theDrawn.push( self.line2d( imageData.data, cv, p3, p4, z,zBuffer ) );  // l3
-					theDrawn.push( self.line2d( imageData.data, cv, p1, p3, z,zBuffer ) );  // l4
-
 					let ok = {};
 					let lines = [];
 
-					for ( let i = 0 ; i < theDrawn.length ; i++ ) {
-						let drawn = theDrawn[ i ];
-						for ( let y in drawn ) {
-							let xz = drawn[ y ].sort();
-							let min = xz[ 0 ];
-							let max = xz[ xz.length - 1 ];
+					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p1, p2, z,zBuffer ) );  // l1
+					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p2, p4, z,zBuffer ) );  // l2
+					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p3, p4, z,zBuffer ) );  // l3
+					self.zFillHackLiner( ok, lines,  self.line2d( imageData.data, cv, p1, p3, z,zBuffer ) );  // l4
 
-							if( y in ok ) {
-								let k = ok[ y ];
-								if ( min < k.min ) k.min = min;
-								if ( max > k.max ) k.max = max;
 
-							} else {
-								lines.push( ok[ y ] = {y:y,min:min,max:max} )
-							}
-						}
-					}
+					let r = cv[ 0 ];
+					let g = cv[ 1 ];
+					let b = cv[ 2 ];
+
+					let data = imageData.data;
 
 					for ( let i = 0 ; i < lines.length ; i++ ) {
 						let line = lines[ i ];
@@ -476,55 +463,46 @@
 						let min  = line.min;
 						let max  = line.max;
 
+						// setting the values in the array directly is about 15 fps :-P
+						// about the same as calling setPixel
+
+						let index = 4 * ( min + y * self.size );
+						for ( let x = min ; x <= max ; x++, index += 4 ) {
+							if ( z < zBuffer[ x ][ y ] ) {
+								continue;
+							} 
+							zBuffer[ x ][ y ] = z;
+							data[ index + 0 ] = r;
+							data[ index + 1 ] = g;
+							data[ index + 2 ] = b;
+						}
+
+						continue;
+
 						// up to about 15 fps here
 						for ( ; min <= max ; min++ ) {
 							self.setPixel(imageData.data,cv,min,y, z,zBuffer);
 						}
 					}
+				};
 
-					return;
+				self.zFillHackLiner = function( ok, lines, drawn ) {
+					for ( let y in drawn ) {
+						let xz = drawn[ y ].sort();
+						let min = xz[ 0 ];
+						let max = xz[ xz.length - 1 ];
 
-					let firstDrawn = theDrawn[ 0 ];
+						if( y in ok ) {
+							let k = ok[ y ];
+							if ( min < k.min ) k.min = min;
+							if ( max > k.max ) k.max = max;
 
-					let keys = [];
-
-					for ( let i = 1 ; i < theDrawn.length ; i++ ) {
-						let drawn = theDrawn[ i ];
-						for ( let ky in drawn ) {
-							let xz = false;
-							if ( ky in firstDrawn ) {
-								xz = firstDrawn[ ky ] = firstDrawn[ ky ].concat( drawn[ ky ] );
-							} else {
-								xz = firstDrawn[ ky ] = drawn[ ky ];
-							}
-							keys.push( {ky:ky,xz:xz} );
-						}
-					}
-
-					for ( let i = 0 ; i < keys.length ; i++ ) {
-						let fml = keys[ i ];
-						let ky = fml.ky;
-						let xz = fml.xz.sort();
-						
-						let x_min = xz[ 0 ];
-						let x_max = xz[ xz.length - 1 ];
-						for ( ; x_min <= x_max ; x_min++ ) {
-							self.setPixel(imageData.data,cv,x_min,ky, z,zBuffer);
-						}
-					}
-
-					return;
-
-					// 13 fps
-					for( let ky in firstDrawn ) {
-						let xz = firstDrawn[ ky ].sort();
-						let x_min = xz[ 0 ];
-						let x_max = xz[ xz.length - 1 ];
-						for ( ; x_min <= x_max ; x_min++ ) {
-							self.setPixel(imageData.data,cv,x_min,ky, z,zBuffer);
+						} else {
+							lines.push( ok[ y ] = {y:y,min:min,max:max} )
 						}
 					}
 				};
+
 					
 				self.drawMountains = function() {
 					if ( self.raw ) {
