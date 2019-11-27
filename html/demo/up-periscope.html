@@ -1,0 +1,186 @@
+<HTML>
+	<HEAD>
+		<TITLE>up-periscope</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+			#demo {
+				display:none;
+			}
+			.periscope {
+				height:40%;
+				width:8%;
+				sleft:10%;
+				stop:10%;
+				position:absolute;
+			}
+			.top {
+				width:98%;
+				background:darkRed;
+				height: 13%;	
+				border: 2px solid black;
+				border-radius:100%;
+				z-index:0;
+			}
+			.inn {
+				width:97%;
+				background:red;
+				position:relative;
+				height:80%;
+				top:-7%;
+				z-index:-1;
+				border: 2px solid black;
+			}
+			.bottom {
+				width:98%;
+				background:red;
+				position:relative;
+				height:20%;
+				top:-17%;
+				border-bottom: 2px solid black;
+				border-radius:100%;
+				z-index:0;
+			}
+		</style>
+
+		<script type="text/javascript" src="js/functions.js"></script>
+
+		<script type="text/javascript">
+			const UpPeriscope = function() {
+				const self = this;
+				self.init = function() { 
+					self.current = new Periscope();
+					self.frameFunction = frame( self.draw, 24 );
+					self.frameFunction.start();
+				};
+
+				self.draw = function() {
+					if( self.current.move() ) {
+						self.current = new Periscope();
+					}
+				};
+
+				self.init();
+			};
+
+			const r = function() {
+				return Math.random();
+			};
+
+			const colorClamp = function( color ) {
+				for ( let i = 0 ; i < color.length ; i++ ) {
+					color[ i ] = Math.floor( Math.max( 0, Math.min( color[ i ], 255 ) ) );
+				}
+				return color;
+			};
+
+			const rgb = function() {
+				let color = [0,0,0];
+				color[ Math.floor( r() * color.length ) ] = 64;
+				for ( let toAllocate = 255 + Math.floor( r() * 255 * 1.3 ) ; toAllocate > 0 ; toAllocate-- ) {
+					color[ Math.floor( r() * color.length ) ]++;
+				}
+				return colorClamp( color );
+			};
+
+			const toCssColor = function( color ) {
+				return 'rgb(' + color.join( ',' ) + ')';
+			};
+
+			const Periscope = function() {
+				const self = this;
+				self.init = function() {
+					let colorMain = rgb();
+
+					let change = 1 + ( r() < 0.5 ? +1 : -1 ) * ( 0.05 + r() * 0.2 );
+					let colorTop  = [];
+					for ( let i = 0 ; i < colorMain.length ; i++ ) {
+						colorTop[ i ] = colorMain[ i ] * change;
+					}
+					colorClamp( colorTop );
+
+					colorMain = toCssColor( colorMain );
+					colorTop = toCssColor( colorTop );
+
+					console.log( colorMain );
+					console.log( colorTop );
+
+					self.main   = document.createElement( 'div' );
+					self.top    = document.createElement( 'div' );
+					self.inn    = document.createElement( 'div' );
+					self.bottom = document.createElement( 'div' );
+
+					self.main.appendChild( self.top );
+					self.main.appendChild( self.inn );
+					self.main.appendChild( self.bottom );
+
+					self.main   .setAttribute( 'class', 'periscope' );
+					self.top    .setAttribute( 'class', 'top' );
+					self.inn    .setAttribute( 'class', 'inn' );
+					self.bottom .setAttribute( 'class', 'bottom' );
+
+					self.top.style.background    = colorTop;
+					self.inn.style.background    = colorMain;
+					self.bottom.style.background = colorMain;
+
+					document.body.appendChild( self.main );
+
+					self.height = 33 + Math.floor( r() * ( 44 + 33 ) );
+					self.main.style.height = self.height + '%';
+
+					self.width = 5 + Math.floor( r() * 30 );
+					self.main.style.width = self.width + '%';
+
+					self.top.style.height = +( self.width * 0.8 ) + '%';
+					self.inn.style.top    = -( self.width * 0.4 ) + '%';
+
+					self.depth = -( 1 + Math.floor( r() * 999 ) ) * 4;
+					self.top.style.zIndex = self.depth;
+					self.inn.style.zIndex = self.depth - 1;
+					self.bottom.style.zIndex = self.depth;
+
+					self.main.style.left = Math.floor( -self.width + r() * ( 100 + self.width ) ) + '%';
+
+					self.goalY = -20;
+					self.main.style.bottom = self.goalY + '%';
+
+					self.y = -self.height / 2;
+					self.main.style.bottom = self.y + '%';
+
+					self.dy = +1;
+				};
+
+				self.move = function() {
+					if ( Math.abs( self.y - self.goalY ) < 4 ) return true;
+
+					self.dy *= 0.95;
+
+					self.y += self.dy;
+					self.main.style.bottom = self.y + '%';
+
+					let inc = 1;
+					if ( self.y < self.goalY ) { 
+						self.dy += inc;
+					} else {
+						self.dy -= inc;
+					}
+				};
+
+				self.init();
+			};
+
+			window.onload = function() {
+				new UpPeriscope();
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<div id="demo" class="periscope">
+			<div class="top"></div>
+			<div class="inn"></div>
+			<div class="bottom"></div>
+		</div>
+	</BODY>
+</HTML>
