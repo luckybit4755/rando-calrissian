@@ -27,14 +27,36 @@
 			const UpPeriscope = function() {
 				const self = this;
 				self.init = function() { 
-					self.current = new Periscope();
+					self.current = new Periscope( self );
 					self.frameFunction = frame( self.draw, 48 );
 					self.frameFunction.start();
+
+					let d = document;
+					d.onclick = d.onkeydown = function() {
+						if ( !self.audioContext ) {
+							self.initAudio();
+
+						}
+					};
+				};
+
+				self.initAudio = function() {
+					self.audioContext = new AudioContext();
+					self.bufferSize = self.audioContext.sampleRate;
+
+					self.buffer = self.audioContext.createBuffer( 1, self.bufferSize, self.audioContext.sampleRate );
+					self.output = self.buffer.getChannelData( 0 );
+
+					self.sound = self.audioContext.createBufferSource();
+					self.sound.buffer = self.buffer;
+					self.sound.loop = true;
+					self.sound.start( 0 );
+					self.sound.connect( self.audioContext.destination );
 				};
 
 				self.draw = function() {
 					if( self.current.move() ) {
-						self.current = new Periscope();
+						self.current = new Periscope( self );
 					}
 				};
 
@@ -65,9 +87,10 @@
 				return 'rgba(' + color.join( ',' ) + ',1)';
 			};
 
-			const Periscope = function() {
+			const Periscope = function( context ) {
 				const self = this;
-				self.init = function() {
+
+				self.init = function( context ) {
 					let colorMain = rgb();
 
 					let change = 1 + ( r() < 0.5 ? +1 : -1 ) * ( 0.15 + r() * 0.33 );
@@ -119,14 +142,62 @@
 					self.goalY = -33;
 					self.main.style.bottom = self.goalY + '%';
 
-					self.y = -self.height * 0.50;
+					self.startY = self.y = -self.height * 0.50;
 					self.main.style.bottom = self.y + '%';
 
 					self.dy = +1;
+
+					if ( context.audioContext ) {
+						self.initAudio( context );
+					}
+				};
+						
+				self.initAudio = function( context ) {
+					self.context = context;
+					self.frequency = 440 - ( self.width * self.width );
+					self.frequency = 680 - ( self.width * self.width * 17 )
+
+					let cur = self.y;
+					let min = Math.min( self.startY, Math.min( self.goalY, self.y ) );
+					let max = Math.max( self.startY, Math.max( self.goalY, self.y ) );
+					let val = cur - min;
+					let dif = max - min;
+					let rat = val / dif;
+
+					rat *= rat;
+
+					if ( isNaN( rat ) ) rat = 0;
+
+					let vol = Math.max( 0.08, rat );
+					vol = Math.floor( vol * 100 ) / 100;
+
+					//console.log( self.frequency + ' at ' + vol + ' cuz ' + Math.floor( self.y ) + ' vs (' + self.startY + ' to ' + self.goalY + ') from (' + min + ' to ' + max + ') distance is ' + Math.floor( val ) + ' of ' + Math.floor( dif ) );
+
+					let big = 0.7;
+					big = 0.2;
+					let lil = 1 - big;
+
+					for (let i = 0; i < context.bufferSize ; i++) {
+						let angle = i / context.bufferSize * Math.PI * 2 * self.frequency;
+						let aval = Math.sin( angle ) * vol;
+
+						// try fading in new values to reduce popping sound
+                       	context.output[ i ] = lil * context.output[ i ] + big * aval;
+					}
 				};
 
 				self.move = function() {
-					if ( Math.abs( self.y - self.goalY ) < 3.44 ) return true;
+					if ( Math.abs( self.y - self.goalY ) < 4 ) {
+						if ( self.sound ) {
+							//self.sound.stop();
+							//self.sound.disconnect( self.audioContext.destination );
+						}
+						return true;
+					}
+
+					if ( self.context ) {
+						self.initAudio( self.context );
+					}
 
 					// dampening
 					//self.dy *= 0.99;
@@ -135,6 +206,7 @@
 					self.main.style.bottom = self.y + '%';
 
 					let inc = 1.77;
+					inc = 0.8;
 					if ( self.y < self.goalY ) { 
 						self.dy += inc;
 					} else {
@@ -142,7 +214,7 @@
 					}
 				};
 
-				self.init();
+				self.init( context );
 			};
 
 			window.onload = function() {
