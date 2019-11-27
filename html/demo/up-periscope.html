@@ -155,7 +155,8 @@
 				self.initAudio = function( context ) {
 					self.context = context;
 					self.frequency = 440 - ( self.width * self.width );
-					self.frequency = 680 - ( self.width * self.width * 17 )
+					self.frequency = 500 - ( self.width * self.width * 1 )
+					self.frequency = 1100 - ( self.width * self.width * 4 );
 
 					let cur = self.y;
 					let min = Math.min( self.startY, Math.min( self.goalY, self.y ) );
