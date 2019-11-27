@@ -5,43 +5,19 @@
 		<style>
 			body {
 				font-family: Comic Sans MS, sans;
-			}
-			#demo {
-				display:none;
+				overflow: hidden;
 			}
 			.periscope {
-				height:40%;
-				width:8%;
-				sleft:10%;
-				stop:10%;
 				position:absolute;
 			}
 			.top {
-				width:98%;
-				background:darkRed;
-				height: 13%;	
-				border: 2px solid black;
+				border: 4px solid black;
 				border-radius:100%;
-				z-index:0;
 			}
 			.inn {
-				width:97%;
-				background:red;
 				position:relative;
-				height:80%;
-				top:-7%;
-				z-index:-1;
-				border: 2px solid black;
-			}
-			.bottom {
-				width:98%;
-				background:red;
-				position:relative;
-				height:20%;
-				top:-17%;
-				border-bottom: 2px solid black;
-				border-radius:100%;
-				z-index:0;
+				height:80%; /* hmmm... */
+				border: 4px solid black;
 			}
 		</style>
 
@@ -52,7 +28,7 @@
 				const self = this;
 				self.init = function() { 
 					self.current = new Periscope();
-					self.frameFunction = frame( self.draw, 24 );
+					self.frameFunction = frame( self.draw, 48 );
 					self.frameFunction.start();
 				};
 
@@ -86,7 +62,7 @@
 			};
 
 			const toCssColor = function( color ) {
-				return 'rgb(' + color.join( ',' ) + ')';
+				return 'rgba(' + color.join( ',' ) + ',1)';
 			};
 
 			const Periscope = function() {
@@ -94,7 +70,7 @@
 				self.init = function() {
 					let colorMain = rgb();
 
-					let change = 1 + ( r() < 0.5 ? +1 : -1 ) * ( 0.05 + r() * 0.2 );
+					let change = 1 + ( r() < 0.5 ? +1 : -1 ) * ( 0.15 + r() * 0.33 );
 					let colorTop  = [];
 					for ( let i = 0 ; i < colorMain.length ; i++ ) {
 						colorTop[ i ] = colorMain[ i ] * change;
@@ -104,63 +80,61 @@
 					colorMain = toCssColor( colorMain );
 					colorTop = toCssColor( colorTop );
 
-					console.log( colorMain );
-					console.log( colorTop );
-
 					self.main   = document.createElement( 'div' );
 					self.top    = document.createElement( 'div' );
 					self.inn    = document.createElement( 'div' );
-					self.bottom = document.createElement( 'div' );
 
 					self.main.appendChild( self.top );
 					self.main.appendChild( self.inn );
-					self.main.appendChild( self.bottom );
 
 					self.main   .setAttribute( 'class', 'periscope' );
 					self.top    .setAttribute( 'class', 'top' );
 					self.inn    .setAttribute( 'class', 'inn' );
-					self.bottom .setAttribute( 'class', 'bottom' );
 
 					self.top.style.background    = colorTop;
-					self.inn.style.background    = colorMain;
-					self.bottom.style.background = colorMain;
+
+					self.inn.style.backgroundImage = 'linear-gradient(66deg, ' + colorTop + ',' + colorMain + ')';
+					if ( r() < 0.1 ) {
+						document.body.style.background = self.inn.style.backgroundImage;
+					}
 
 					document.body.appendChild( self.main );
 
-					self.height = 33 + Math.floor( r() * ( 44 + 33 ) );
+					self.height = 33 + 5 + Math.floor( r() * 100 );
 					self.main.style.height = self.height + '%';
 
 					self.width = 5 + Math.floor( r() * 30 );
+					self.width = 5 + Math.floor( r() * 10 );
 					self.main.style.width = self.width + '%';
 
-					self.top.style.height = +( self.width * 0.8 ) + '%';
+					self.top.style.height = +( self.width * 0.7 ) + '%';
 					self.inn.style.top    = -( self.width * 0.4 ) + '%';
 
 					self.depth = -( 1 + Math.floor( r() * 999 ) ) * 4;
-					self.top.style.zIndex = self.depth;
+					self.main.style.zIndex = self.top.style.zIndex = self.depth;
 					self.inn.style.zIndex = self.depth - 1;
-					self.bottom.style.zIndex = self.depth;
 
 					self.main.style.left = Math.floor( -self.width + r() * ( 100 + self.width ) ) + '%';
 
-					self.goalY = -20;
+					self.goalY = -33;
 					self.main.style.bottom = self.goalY + '%';
 
-					self.y = -self.height / 2;
+					self.y = -self.height * 0.50;
 					self.main.style.bottom = self.y + '%';
 
 					self.dy = +1;
 				};
 
 				self.move = function() {
-					if ( Math.abs( self.y - self.goalY ) < 4 ) return true;
+					if ( Math.abs( self.y - self.goalY ) < 3.44 ) return true;
 
-					self.dy *= 0.95;
+					// dampening
+					//self.dy *= 0.99;
 
 					self.y += self.dy;
 					self.main.style.bottom = self.y + '%';
 
-					let inc = 1;
+					let inc = 1.77;
 					if ( self.y < self.goalY ) { 
 						self.dy += inc;
 					} else {
@@ -177,10 +151,5 @@
 		</script>
 	</HEAD>
 	<BODY>
-		<div id="demo" class="periscope">
-			<div class="top"></div>
-			<div class="inn"></div>
-			<div class="bottom"></div>
-		</div>
 	</BODY>
 </HTML>
