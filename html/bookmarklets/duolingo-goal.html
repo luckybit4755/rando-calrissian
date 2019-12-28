@@ -1,0 +1,65 @@
+<HTML>
+	<HEAD>
+		<TITLE>duolingo-goal</TITLE>
+		<!--
+		show the daily goal somewhere you can actually see it
+		-->
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				if ( false ) {
+					document.getElementsByTagName( 'a' )[ 0 ].click();
+				}
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<div>
+			<h3>Daily Goal</h3><div>44  /50 XP</div>
+		</div>
+		<div style='width:4em;height:4em'>&nbsp;</div>
+
+		<a href="javascript:( function() {
+			let val_status_div = false;
+			let val_uv = false;
+
+			val_status_div = document.getElementById( 'val_status_div' );
+			if ( !val_status_div ) {
+				val_status_div = document.createElement( 'div' );
+				document.body.appendChild( val_status_div );
+			}
+
+			val_status_div.id_ = 'val_status_div'; 
+			val_status_div.style.position = 'fixed'; 
+			val_status_div.style.zIndex = '404';
+			val_status_div.style.top = '1em'; 
+			val_status_div.style.left = '1em';
+			val_status_div.style.width = '6em';
+			val_status_div.style.height = '2em';
+			val_status_div.style.border = '1px solid black';
+			val_status_div.style.background = 'white';
+
+			val_uv = function() {
+				let h3z = document.getElementsByTagName( 'h3' );
+				let search = /.*Daily Goal.*/;
+				for ( let i = 0 ; i < h3z.length ; i++ ) {
+					let h3 = h3z[ i ];
+					if ( search.test( h3.innerHTML ) ) {
+						val_status_div.innerHTML = h3.nextSibling.innerHTML;
+					}
+				}
+				setTimeout( function() { requestAnimationFrame( val_uv ) }, 200 );
+			};
+
+			val_uv();
+		} )();">duolingo-goal</a>
+
+
+	</BODY>
+</HTML>
