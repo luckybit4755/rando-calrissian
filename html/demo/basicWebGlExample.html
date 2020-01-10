@@ -1,0 +1,275 @@
+<HTML>
+	<HEAD>
+		<TITLE>basicWebGlExample</TITLE>
+
+		<!-- once the page is loaded, run the demo -->
+
+		<script type='text/javascript'>
+			window.onload = function() { basicWebGlExample(); };
+		</script>
+
+		<!--  T H E  -  W E B G L  -  W I T C H E R Y : the WebGL witchery -->
+
+		<script type='text/javascript'>
+			/**
+			 *	
+			 * This is a WebGL example of how to compile and link
+			 * the shaders and use vertex, color and face data to 
+			 * draw a triangle.
+			 *	
+			 * It uses semantic tags and aligns the drawing data
+			 * labels so tha the name of the attributes defined
+			 * in the shader program match up directly.
+			 *	
+			 * @v
+			 *	
+			 */
+			const basicWebGlExample = function() {
+
+				/*******************************************************************/
+				/* get the canvas and webGL context */
+
+				let canvas = getThe( 'canvas' );
+				let gl = canvas.getContext( 'webgl' );
+				if ( gl ) { 
+					info( 'created webgl context' );
+				} else {
+					return error( 'failed to get webgl context' );
+				}
+
+				/*******************************************************************/
+				/* create the program, compile and link the shaders */
+
+				let program = gl.createProgram();
+
+				let types = {vertex:gl.VERTEX_SHADER,fragment:gl.FRAGMENT_SHADER};
+				for ( let key in types ) {
+					let type = types[ key ];
+					let source = getThe( key ).innerHTML;
+
+					/* compile the shader */
+					let shader = gl.createShader( type );
+					gl.shaderSource( shader, source );
+					gl.compileShader( shader );
+
+					if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+						info( 'compiled ' + key + ' shader' );
+						gl.attachShader( program, shader );
+					} else {
+						return error( 'failed to compile ' + key + ' shader:' + gl.getShaderInfoLog( shader ) );
+					}
+				}
+
+				/* link the shaders into the program */
+
+				gl.linkProgram( program );
+
+				if ( gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+					info( 'linked the shader program' );
+				} else {
+					return error( 'shader program failed to link: ' +gl.getProgramInfoLog( program ) );
+				}
+
+				/* use the program for this WebGL context */
+
+				gl.useProgram( program );
+
+				/*******************************************************************/
+				/* pull the vertex and color data from the json and use it */
+
+				let floatsPerAttribute = 3; /* eg: (x,y,z) and (r,g,b) */
+
+				let elements = JSON.parse( getThe( 'elements' ).innerHTML );
+
+				for ( let type in elements ) {
+					let element = elements[ type ];
+
+					/* massage the data into a useable form */
+
+					let bufferType = gl.ARRAY_BUFFER;
+					let arrayMaker = function( data ) { return new Float32Array( data ) };
+
+					if ( 'faces' === type ) {
+						bufferType = gl.ELEMENT_ARRAY_BUFFER;
+						arrayMaker = function( data ) { return new Uint16Array( data ) };
+					}
+
+					let data = flattenData( element, parseFloat );
+
+					info( type + ' has ' + data.length + ' values: ' + data.join( ', ' ) );
+						
+					/* create a buffer to hold the data */
+
+					element.data = arrayMaker( data );
+					element.buffer = gl.createBuffer();
+					gl.bindBuffer( bufferType, element.buffer );
+					gl.bufferData( bufferType, element.data, gl.STATIC_DRAW );
+
+					info( 'bound ' + type + ' to a WebGL buffer' ); 
+
+					/* the faces data is not tied to an attribute */
+
+					if ( 'faces' === type ) {
+						continue;
+					}
+				
+					/* find the attributes in the vertex shader and enable them */
+
+					element.location = gl.getAttribLocation( program, type );
+					if ( element.location < 0 ) {
+						return error( 'could not find attribute location for "' + type + '"' );
+					} else {
+						info( 'attribute "' + type + '" is at location ' + element.location );
+					}
+
+					/* enable the element so it works */
+					gl.enableVertexAttribArray( element.location );
+
+					/* bind the buffer and point the attribute at it */
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, element.buffer );
+					gl.vertexAttribPointer( element.location, floatsPerAttribute, gl.FLOAT, false, 0, 0 );
+				}
+
+				/*******************************************************************/
+				/* use the face information to draw the triangle */
+
+				gl.drawElements( gl.TRIANGLES, elements.faces.data.length, gl.UNSIGNED_SHORT, 0 ); 
+
+				/*******************************************************************/
+				/* the end */
+				/*******************************************************************/
+			};
+		</script>
+
+		<!-- boring utility code -->
+
+		<script type='text/javascript'>
+			/**
+		     * 
+		     * Recurse down an object tree and jam all the leaf value nodes into an
+		     * array. The tree semantics and labels are nice for humans, but the 
+		     * program only needs the raw values.
+		     *	  
+		     */
+			const flattenData = function( value, converter, values ) {
+				values = ( 'undefined' === typeof( values ) ) ? [] : values;
+				if ( 'object' === typeof( value ) ) {
+					for ( let key in value ) {
+						flattenData( value[ key ], converter, values );
+					}
+				} else {
+					values.push( converter( value ) );
+				}
+				return values;
+			};
+
+			/**
+			 *
+			 * A lot of these little demos only have one of each
+			 * tag and adding an id attribute just to make retrieval
+			 * easy is hack since it is only for convenience and
+			 * add no real semantic in this case...
+			 *
+			 */
+			const getThe = function( tag ) { 
+				return document.getElementsByTagName( tag )[ 0 ]; 
+			};
+
+			/**
+			 *
+			 * add an element of the type level to the log element
+			 *
+			 */
+			const log = function( level, message ) {
+				let entry = document.createElement( level );
+				entry.appendChild( document.createTextNode( message ) );
+				( log.log || ( log.log = getThe( 'log' ) ) ).appendChild( entry );
+			};
+
+			/**
+			 *
+			 * add an info element with the message to the log
+			 *
+			 */
+			const info = function( message ) {
+				log( 'info', '\u2B29 ' + message );
+			};
+
+			/**
+			 *
+			 * add an error element with the message to the log
+			 *
+			 */
+			const error = function( message ) {
+				log( 'error', '\u2620' + message );
+			};
+		</script>
+
+		<!-- hide some data nodes and style the log section -->
+
+		<style> 
+			visible {
+				font-family: sans-serif; 
+				width:256;
+				margin:10%;
+			}
+			visible * { display:block; }
+			error { color:red; }
+
+			glFun * { display:none; }
+		</style>
+	</HEAD>
+
+	<BODY>
+		<visible>
+			<canvas width="256" height="256"></canvas>
+			<log></log>
+		</visible>
+		
+		<glFun>
+			<!-- T H E - V E R T E X - S H A D E R :  the vertex shader -->
+			<vertex>
+				attribute vec4 position;
+				attribute vec4 color;
+				varying vec4 vColor;
+
+				void main() {
+					gl_Position = position;
+					vColor = color; 
+				}
+			</vertex>
+
+			<!--  T H E  -  F R A G M E N T  -  S H A D E R : the fragment shader -->
+			<fragment>
+				precision mediump float;
+				varying vec4 vColor; 
+
+				void main(void) {
+					gl_FragColor = vColor;
+				}
+			</fragment>
+
+			<!--  E L E M E N T  -  D A T A : data about what to draw -->
+
+			<elements>
+				{
+					"position": [
+						{ "x":"-1", "y":"-1", "z":"+0"},
+						{ "x":"+0", "y":"+1", "z":"+0"},
+						{ "x":"+1", "y":"-1", "z":"+0"}
+					],
+					"color": [
+						{ "red":"1", "green":"0", "blue":"0" },
+						{ "red":"0", "green":"1", "blue":"0" },
+						{ "red":"0", "green":"0", "blue":"1" }
+					],
+					"faces": [
+						[ 0, 1, 2 ]
+					]
+				}
+			</elements>
+
+		</glFun>
+	</BODY>
+</HTML>
