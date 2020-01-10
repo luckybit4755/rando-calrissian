@@ -1,0 +1,58 @@
+<HTML>
+	<HEAD>
+		<TITLE>funGl</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+			canvas {
+				border:1px solid black;
+			}
+		</style>
+
+		<script src="FunGl.js"></script>
+		<script type="text/javascript">
+			/* $( window ).load( function() {} ); */
+		</script>
+	</HEAD>
+	<BODY>
+<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+<!-- vertex shader -->
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    precision mediump float;
+	
+
+    attribute vec4 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    //uniform mat4 uRotationMatrix;
+
+    varying vec4 vColor; // copy to the fragment shader
+
+    void main() {
+        //gl_Position = uRotationMatrix * aVertexPosition;
+		gl_Position = aVertexPosition;
+        vColor = aVertexColor; 
+    }
+</script>
+
+<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+<!-- fragment shader -->
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec4 vColor; // copied from the vertex shader
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<!--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-->
+
+		<canvas id="canvas" width="256" height="256"></canvas>
+
+	</BODY>
+</HTML>
