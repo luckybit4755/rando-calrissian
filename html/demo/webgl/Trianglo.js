@@ -1,0 +1,77 @@
+const Trianglo = function() {};
+
+Trianglo.prototype = {
+	gl: function( canvas ) {
+		let gl = canvas.getContext( 'webgl' );
+		if ( !gl ) throw 'could not get webgl context';
+		return gl;
+	},
+	program: function( gl, vertexSource, fragmentSource ) {
+		let program = gl.createProgram();
+		this.shader( gl, program, vertexSource, gl.VERTEX_SHADER );
+		this.shader( gl, program, fragmentSource, gl.FRAGMENT_SHADER );
+
+		gl.linkProgram( program );
+		if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+			throw gl.getProgramInfoLog( program );
+		}
+		gl.useProgram( program );
+		return program;
+	},
+	shader: function( gl, program, source, type ) {
+		let shader = gl.createShader( type );
+		gl.shaderSource( shader, source );
+		gl.compileShader( shader );
+		if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+			throw gl.getShaderInfoLog( shader );
+		}
+		gl.attachShader( program, shader );
+		return shader;
+	},
+	data: function( gl, program, attributeName, data, floatsPerValue ) {
+		if ( 'undefined' === typeof( floatsPerValue ) ) {
+			floatsPerValue = 3;
+		}
+		data = new Float32Array( data );
+
+		attribute = gl.getAttribLocation( program, attributeName );
+		gl.bindBuffer( gl.ARRAY_BUFFER, gl.createBuffer() );
+		gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+		gl.enableVertexAttribArray( attribute );
+		gl.vertexAttribPointer( attribute, floatsPerValue, gl.FLOAT, false, 0, 0 );
+	},
+	triangles: function( gl, faces ) {
+		if ( faces ) {
+			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer() );
+			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.STATIC_DRAW );
+			gl.drawElements( gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0 );
+		} else {
+			gl.drawArrays( gl.TRIANGLES, 0,  3);
+		}
+	}
+	, demo: function() {
+		let trianglo = this; /* aka new Trianglo() */
+
+		let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+		let vertexSource = document.getElementById( 'vertex-shader' ).innerHTML;
+		let fragmentSource = document.getElementById( 'fragment-shader' ).innerHTML;
+
+		let gl = trianglo.gl( canvas );
+	
+		let program = trianglo.program( gl, vertexSource, fragmentSource );
+
+		trianglo.data( gl, program, 'aPosition', [
+			  -1, -1, 0
+			,  0,  1, 0
+			, +1, -1, 0
+		]);
+
+		trianglo.data( gl, program, 'aColor', [
+			1.0, 0.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 0.0, 1.0
+		]);
+
+		trianglo.triangles( gl, [ 0, 1, 2 ] );
+	}
+};

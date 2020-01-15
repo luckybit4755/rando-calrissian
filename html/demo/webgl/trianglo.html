@@ -1,0 +1,32 @@
+<HTML>
+	<HEAD>
+		<TITLE>trianglo</TITLE>
+
+		<script type="text/javascript" src="Trianglo.js"></script>
+
+		<script type="text/javascript">
+			window.onload = function() { new Trianglo().demo(); };
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec2 aPosition;
+			attribute vec4 aColor;
+			varying vec4 vColor;
+			void main() {
+				   gl_Position = vec4(aPosition, 0, 1);
+				   vColor = aColor; 
+			}
+		</script>
+
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+			varying vec4 vColor; 
+			void main(void) {
+				gl_FragColor = vColor;
+			}
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="640" height="480"></canvas>
+	</BODY>
+</HTML>
