@@ -9,11 +9,13 @@
 		</script>
 
 		<script id="vertex-shader" type="x-shader/x-vertex">
-			attribute vec2 aPosition;
+			attribute vec4 aPosition;
 			attribute vec4 aColor;
+			uniform mat4 uMatrix;
 			varying vec4 vColor;
 			void main() {
-				   gl_Position = vec4(aPosition, 0, 1);
+				   gl_Position = uMatrix * aPosition;
+				   //gl_Position = aPosition;
 				   vColor = aColor; 
 			}
 		</script>
