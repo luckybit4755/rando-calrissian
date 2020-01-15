@@ -2,11 +2,15 @@
 	<HEAD>
 		<TITLE>trianglo</TITLE>
 
+		<!--  B I T  -  O '  -  J A V A S C R I P T : bit o' javascript -->
+
 		<script type="text/javascript" src="Trianglo.js"></script>
 
 		<script type="text/javascript">
 			window.onload = function() { new Trianglo().demo(); };
 		</script>
+
+		<!--  V E R T E X  -  S H A D E R : vertex shader -->
 
 		<script id="vertex-shader" type="x-shader/x-vertex">
 			attribute vec4 aPosition;
@@ -15,10 +19,11 @@
 			varying vec4 vColor;
 			void main() {
 				   gl_Position = uMatrix * aPosition;
-				   //gl_Position = aPosition;
 				   vColor = aColor; 
 			}
 		</script>
+
+		<!--  F R A G M E N T  -  S H A D E R : fragment shader -->
 
 		<script id="fragment-shader" type="x-shader/x-fragment">
 			precision mediump float;
@@ -27,8 +32,25 @@
 				gl_FragColor = vColor;
 			}
 		</script>
+
+		<!--  S O  -  S T Y L I S H ! : so stylish! -->
+
+		<style>
+			body {
+				background: #444;
+			}
+			canvas {
+				margin:auto;
+				margin-top:2em;
+				display:block;
+				border-top:    3px solid #222;
+				border-left:   3px solid #222;
+				border-right:  3px solid #666;
+				border-bottom: 3px solid #666;
+			}
+		</style>
 	</HEAD>
 	<BODY>
-		<canvas width="640" height="480"></canvas>
+		<canvas width="512" height="512"></canvas>
 	</BODY>
 </HTML>
