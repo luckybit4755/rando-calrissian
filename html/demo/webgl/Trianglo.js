@@ -1,6 +1,4 @@
-const Trianglo = function() {};
-
-Trianglo.prototype = {
+const Trianglo = {
 	gl: function( canvas ) {
 		let gl = canvas.getContext( 'webgl' );
 		if ( !gl ) throw 'could not get webgl context';
@@ -11,8 +9,8 @@ Trianglo.prototype = {
 	},
 	program: function( gl, vertexSource, fragmentSource ) {
 		let program = gl.createProgram();
-		this.shader( gl, program, vertexSource, gl.VERTEX_SHADER );
-		this.shader( gl, program, fragmentSource, gl.FRAGMENT_SHADER );
+		Trianglo.shader( gl, program, vertexSource, gl.VERTEX_SHADER );
+		Trianglo.shader( gl, program, fragmentSource, gl.FRAGMENT_SHADER );
 
 		gl.linkProgram( program );
 		if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
@@ -49,33 +47,37 @@ Trianglo.prototype = {
 	clear: function( gl ) {
 		gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	},
-	triangles: function( gl, faces ) {
+	draw: function( gl, faces, what ) {
+		if ( 'undefined' === typeof( what ) ) {
+			what = gl.TRIANGLES;
+		}
 		if ( faces ) {
 			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer() );
 			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.STATIC_DRAW );
-			gl.drawElements( gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0 );
+			gl.drawElements( what, faces.length , gl.UNSIGNED_SHORT, 0 );
 		} else {
-			gl.drawArrays( gl.TRIANGLES, 0,  3);
+			gl.drawArrays( what, 0,  3);
 		}
+	},
+	triangles: function( gl, faces ) {
+		Trianglo.draw( gl, faces );
 	}
 	, demo: function() {
-		let trianglo = this; /* aka new Trianglo() */
-
 		let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 		let vertexSource = document.getElementById( 'vertex-shader' ).innerHTML;
 		let fragmentSource = document.getElementById( 'fragment-shader' ).innerHTML;
 
-		let gl = trianglo.gl( canvas );
+		let gl = Trianglo.gl( canvas );
 	
-		let program = trianglo.program( gl, vertexSource, fragmentSource );
+		let program = Trianglo.program( gl, vertexSource, fragmentSource );
 
-		trianglo.data( gl, program, 'aPosition', [
+		Trianglo.data( gl, program, 'aPosition', [
 			  -1, -1, 0
 			,  0,  1, 0
 			, +1, -1, 0
 		]);
 
-		trianglo.data( gl, program, 'aColor', [
+		Trianglo.data( gl, program, 'aColor', [
 			1.0, 0.0, 0.0,
 			0.0, 1.0, 0.0,
 			0.0, 0.0, 1.0
@@ -88,26 +90,26 @@ Trianglo.prototype = {
 			let c = Math.cos( angle );
 			let s = Math.sin( angle );
 
-			let x = trianglo.rotateX( c, s );
-			let y = trianglo.rotateY( c, s );
-			let z = trianglo.rotateZ( c, s );
-			let q = trianglo.scale( 0.66 );
+			let x = Matrixo.rotateX( c, s );
+			let y = Matrixo.rotateY( c, s );
+			let z = Matrixo.rotateZ( c, s );
+			let q = Matrixo.scale( 0.66 );
 
-			let m = trianglo.multiply( trianglo.multiply( trianglo.multiply( x, y ), z ), q );
+			let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
 
-			trianglo.matrix( gl, program, 'uMatrix', m );
+			Trianglo.matrix( gl, program, 'uMatrix', m );
 
-			trianglo.clear( gl );
-			trianglo.triangles( gl, [ 0, 1, 2 ] );
+			Trianglo.clear( gl );
+			Trianglo.triangles( gl, [ 0, 1, 2 ] );
 
 			setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
 		}
 
 		draw();
 	},
+};
 
-	/* the eternal conflict: add a dependency or jam in stuff that doesn't really belong? */
-
+const Matrixo = {
 	identity: function() {
 		return [
 			1, 0, 0, 0,
@@ -162,7 +164,7 @@ Trianglo.prototype = {
         ]
     },
 	multiply: function( m1, m2 ) {
-		return this.fastMultiply( m1, m2 );
+		return Matrixo.fastMultiply( m1, m2 );
 	},
 	slowMultiply: function( m1, m2 ) {
 		let result = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
@@ -213,5 +215,57 @@ Trianglo.prototype = {
 			m1[ 12 ] * m2[ 2 ] + m1[ 13 ] * m2[ 6 ] + m1[ 14 ] * m2[ 10 ] + m1[ 15 ] * m2[ 14 ],
 			m1[ 12 ] * m2[ 3 ] + m1[ 13 ] * m2[ 7 ] + m1[ 14 ] * m2[ 11 ] + m1[ 15 ] * m2[ 15 ]
 		];
+	}
+};
+
+const Vectoro = {
+	copy: function( v ) {
+		return [ v[ 0 ], v[ 1 ], v[ 2 ] ];
+	}
+	, scale: function( s, v ) {
+		return [ v[ 0 ] * s, v[ 1 ] * s, v[ 2 ] * s ];
+	}
+	, normalize: function( v ) {
+		let length = Vectoro.length( v );
+		if ( 0 === length ) {
+			length = 1;
+		}
+		return Vectoro.scale( 1 / length, v );
+	}
+	, length: function( v ) {
+		return Math.sqrt( Vectoro.dot( v, v ) );
+	}
+	, dot: function( v, u ) {
+		return ( v[ 0 ] * u[ 0 ] + v[ 1 ] * u[ 1 ] + v[ 2 ] * u[ 2 ] );
+	}
+	, cross: function( v, u ) {
+        return [
+			  v[ 1 ]*u[ 2 ] - v[ 2 ]*u[ 1 ] // x = v.y * u.z - v.z - u.y <-- xyzzy
+			, v[ 2 ]*u[ 0 ] - v[ 0 ]*u[ 2 ] // y =v.z * u.x - v.x - u.z
+			, v[ 0 ]*u[ 1 ] - v[ 1 ]*u[ 0 ] // zv.x * u.y - v.y - u.x
+        ];
+	}
+	, subtract: function( v, u ) {
+		return [ v[ 0 ] - u[ 0 ], v[ 1 ] - u[ 1 ], v[ 2 ] - u[ 2 ] ];
+	}
+	, normalVector: function( v0, v1, v2 ) {
+		return Vectoro.cross( Vectoro.subtract( v0, v1 ), Vectoro.subtract( v2, v1 ) );
+	}
+	, add: function( v, u ) {
+		return [ v[ 0 ] + u[ 0 ], v[ 1 ] + u[ 1 ], v[ 2 ] + u[ 2 ] ];
+	}
+	, toString: function( v, precision ) {
+		if ( 'undefined' === typeof( precision ) ) {
+			precision = 1000;
+		}
+		return (
+			'('
+			+ Math.floor( v[ 0 ] * precision ) / precision 
+			+ ','
+			+ Math.floor( v[ 1 ] * precision ) / precision 
+			+ ','
+			+ Math.floor( v[ 2 ] * precision ) / precision 
+			+ ')'
+		);
 	}
 };
