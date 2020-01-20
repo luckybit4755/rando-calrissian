@@ -64,12 +64,9 @@ const Glo = {
 	}
 	, demo: function() {
 		let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
-		let vertexSource = document.getElementById( 'vertex-shader' ).innerHTML;
-		let fragmentSource = document.getElementById( 'fragment-shader' ).innerHTML;
-
 		let gl = Glo.gl( canvas );
-	
-		let program = Glo.program( gl, vertexSource, fragmentSource );
+
+		let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
 
 		Glo.data( gl, program, 'aPosition', [
 			  -1, -1, 0
