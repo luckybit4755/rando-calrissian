@@ -1,4 +1,4 @@
-const Trianglo = {
+const Glo = {
 	gl: function( canvas ) {
 		let gl = canvas.getContext( 'webgl' );
 		if ( !gl ) throw 'could not get webgl context';
@@ -9,8 +9,8 @@ const Trianglo = {
 	},
 	program: function( gl, vertexSource, fragmentSource ) {
 		let program = gl.createProgram();
-		Trianglo.shader( gl, program, vertexSource, gl.VERTEX_SHADER );
-		Trianglo.shader( gl, program, fragmentSource, gl.FRAGMENT_SHADER );
+		Glo.shader( gl, program, vertexSource, gl.VERTEX_SHADER );
+		Glo.shader( gl, program, fragmentSource, gl.FRAGMENT_SHADER );
 
 		gl.linkProgram( program );
 		if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
@@ -60,24 +60,24 @@ const Trianglo = {
 		}
 	},
 	triangles: function( gl, faces ) {
-		Trianglo.draw( gl, faces );
+		Glo.draw( gl, faces );
 	}
 	, demo: function() {
 		let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 		let vertexSource = document.getElementById( 'vertex-shader' ).innerHTML;
 		let fragmentSource = document.getElementById( 'fragment-shader' ).innerHTML;
 
-		let gl = Trianglo.gl( canvas );
+		let gl = Glo.gl( canvas );
 	
-		let program = Trianglo.program( gl, vertexSource, fragmentSource );
+		let program = Glo.program( gl, vertexSource, fragmentSource );
 
-		Trianglo.data( gl, program, 'aPosition', [
+		Glo.data( gl, program, 'aPosition', [
 			  -1, -1, 0
 			,  0,  1, 0
 			, +1, -1, 0
 		]);
 
-		Trianglo.data( gl, program, 'aColor', [
+		Glo.data( gl, program, 'aColor', [
 			1.0, 0.0, 0.0,
 			0.0, 1.0, 0.0,
 			0.0, 0.0, 1.0
@@ -97,10 +97,10 @@ const Trianglo = {
 
 			let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
 
-			Trianglo.matrix( gl, program, 'uMatrix', m );
+			Glo.matrix( gl, program, 'uMatrix', m );
 
-			Trianglo.clear( gl );
-			Trianglo.triangles( gl, [ 0, 1, 2 ] );
+			Glo.clear( gl );
+			Glo.triangles( gl, [ 0, 1, 2 ] );
 
 			setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
 		}
