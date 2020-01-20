@@ -10,3 +10,9 @@ canvas {
 	border-right:  3px solid #666;
 	border-bottom: 3px solid #666;
 }
+
+info {
+	font-family: sans-serif;
+	display:block;
+	color: #aa0;
+}
