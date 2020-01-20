@@ -1,0 +1,141 @@
+<HTML>
+	<HEAD>
+		<TITLE>prismatic_sphere</TITLE>
+
+		<!--  S O  -  S T Y L I S H ! : so stylish! -->
+
+		<link rel="stylesheet" href="css/css.css"></link>
+
+		<!--  B I T  -  O '  -  J A V A S C R I P T : bit o' javascript -->
+
+		<script type="text/javascript" src="js/Glo.js"></script>
+		<script type="text/javascript" src="js/Matrixo.js"></script>
+		<script type="text/javascript" src="js/Shaders.js"></script>
+		<script type="text/javascript" src="js/Vectoro.js"></script>
+
+		<script type="text/javascript">
+			const prismatic_sphere = function() {
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let gl = Glo.gl( canvas );
+				let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
+
+				let vertices = [
+					-1,+0,+0, // 0
+					+1,+0,+0, // 1
+					+0,-1,+0, // 2
+					+0,+1,+0, // 3
+					+0,+0,-1, // 4
+					+0,+0,+1  // 5
+				];
+				let faces = [
+					4, 0, 3,
+					0, 5, 3,
+					5, 1 ,3, 
+					1, 4, 3,
+
+					4, 0, 2,
+					0, 5, 2,
+					5, 1, 2,
+					1, 4, 2
+				];
+
+				let edges = facesToEdges( faces );
+				let colors = verticesToColors( vertices );
+				let angle = 0;
+
+				const addMidpoint = function( v0, v1, vertices ) {
+					let idx = vertices.length;
+					let nu = [];
+					let length = 0;
+					for ( let i = 0 ; i < 3 ; i++, v0++, v1++ ) {
+						let v = 0.5 * ( vertices[ v0 ] + vertices[ v1 ] );
+						length += v * v;
+						nu.push( v );
+					}
+					length = Math.sqrt( length );
+
+					for ( let i = 0 ; i < nu.length ; i++ ) {
+						nu[ i ] /= length;
+					}
+
+					vertices.push.apply( vertices, nu );
+					return idx;
+				};
+
+				let splitsville = function() {
+					let nuFaces = [];
+					for( let i = 0 ; i < faces.length ; i+= 3 ) {
+						let v0 = 3 * faces[ i + 0 ];
+						let v1 = 3 * faces[ i + 1 ];
+						let v2 = 3 * faces[ i + 2 ];
+
+						// 3 new points at the midpoints
+						let a = addMidpoint( v0, v1, vertices );
+						let b = addMidpoint( v1, v2, vertices );
+						let c = addMidpoint( v2, v0, vertices );
+
+						// 4 new faces 
+
+						v0 /= 3; v1 /= 3; v2 /= 3; a /= 3; b /= 3; c /= 3;
+
+						nuFaces.push( v0 ); nuFaces.push( a ); nuFaces.push( c );
+						nuFaces.push( v1 ); nuFaces.push( b ); nuFaces.push( a );
+						nuFaces.push( v2 ); nuFaces.push( c ); nuFaces.push( b );
+						nuFaces.push( a  ); nuFaces.push( b ); nuFaces.push( c );
+					}
+
+					faces = nuFaces;
+					edges = facesToEdges( faces );
+					colors = verticesToColors( vertices );
+				};
+				canvas.onclick = splitsville;
+
+                let draw = function() {
+                    angle += 0.033;
+                    let c = Math.cos( angle );
+                    let s = Math.sin( angle );
+
+                    let x = Matrixo.rotateX( c, s );
+                    let y = Matrixo.rotateY( c, s );
+                    let z = Matrixo.rotateZ( c, s );
+                    let q = Matrixo.scale( 0.66 );
+
+                    let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
+                    Glo.matrix( gl, program, 'uMatrix', m );
+
+                    Glo.clear( gl );
+					Glo.data( gl, program, 'aPosition', vertices );
+					Glo.data( gl, program, 'aColor', colors );
+					Glo.draw( gl, edges, gl.LINES );
+
+					setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
+				};
+				draw();
+			};
+
+			const facesToEdges = function( faces ) {
+				let edges = [];
+				for ( let i = 0 ; i < faces.length ; i += 3 ) {
+					edges.push( faces[ i + 0 ] );
+					edges.push( faces[ i + 1 ] );
+					edges.push( faces[ i + 1 ] );
+					edges.push( faces[ i + 2 ] );
+					edges.push( faces[ i + 2 ] );
+					edges.push( faces[ i + 0 ] );
+				}
+				return edges;
+			};
+
+			const verticesToColors = function( vertices ) {
+				return vertices.map( function( v ) { return 0.5 * ( 1 + v ) } );
+			};
+		</script>
+
+		<script type="text/javascript">
+			window.onload = prismatic_sphere;
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
