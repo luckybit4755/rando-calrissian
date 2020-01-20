@@ -43,52 +43,11 @@
 				let colors = verticesToColors( vertices );
 				let angle = 0;
 
-				const addMidpoint = function( v0, v1, vertices ) {
-					let idx = vertices.length;
-					let nu = [];
-					let length = 0;
-					for ( let i = 0 ; i < 3 ; i++, v0++, v1++ ) {
-						let v = 0.5 * ( vertices[ v0 ] + vertices[ v1 ] );
-						length += v * v;
-						nu.push( v );
-					}
-					length = Math.sqrt( length );
-
-					for ( let i = 0 ; i < nu.length ; i++ ) {
-						nu[ i ] /= length;
-					}
-
-					vertices.push.apply( vertices, nu );
-					return idx;
-				};
-
-				let splitsville = function() {
-					let nuFaces = [];
-					for( let i = 0 ; i < faces.length ; i+= 3 ) {
-						let v0 = 3 * faces[ i + 0 ];
-						let v1 = 3 * faces[ i + 1 ];
-						let v2 = 3 * faces[ i + 2 ];
-
-						// 3 new points at the midpoints
-						let a = addMidpoint( v0, v1, vertices );
-						let b = addMidpoint( v1, v2, vertices );
-						let c = addMidpoint( v2, v0, vertices );
-
-						// 4 new faces 
-
-						v0 /= 3; v1 /= 3; v2 /= 3; a /= 3; b /= 3; c /= 3;
-
-						nuFaces.push( v0 ); nuFaces.push( a ); nuFaces.push( c );
-						nuFaces.push( v1 ); nuFaces.push( b ); nuFaces.push( a );
-						nuFaces.push( v2 ); nuFaces.push( c ); nuFaces.push( b );
-						nuFaces.push( a  ); nuFaces.push( b ); nuFaces.push( c );
-					}
-
-					faces = nuFaces;
+				canvas.onclick = function() {
+					faces = splitsville( faces, vertices );
 					edges = facesToEdges( faces );
 					colors = verticesToColors( vertices );
-				};
-				canvas.onclick = splitsville;
+				}
 
                 let draw = function() {
                     angle += 0.033;
@@ -128,6 +87,49 @@
 
 			const verticesToColors = function( vertices ) {
 				return vertices.map( function( v ) { return 0.5 * ( 1 + v ) } );
+			};
+
+			const splitsville = function( faces, vertices ) {
+				let nuFaces = [];
+				for( let i = 0 ; i < faces.length ; i+= 3 ) {
+					let v0 = 3 * faces[ i + 0 ];
+					let v1 = 3 * faces[ i + 1 ];
+					let v2 = 3 * faces[ i + 2 ];
+
+					// 3 new points at the midpoints
+					let a = addMidpoint( v0, v1, vertices );
+					let b = addMidpoint( v1, v2, vertices );
+					let c = addMidpoint( v2, v0, vertices );
+
+					// 4 new faces 
+
+					v0 /= 3; v1 /= 3; v2 /= 3; a /= 3; b /= 3; c /= 3;
+
+					nuFaces.push( v0 ); nuFaces.push( a ); nuFaces.push( c );
+					nuFaces.push( v1 ); nuFaces.push( b ); nuFaces.push( a );
+					nuFaces.push( v2 ); nuFaces.push( c ); nuFaces.push( b );
+					nuFaces.push( a  ); nuFaces.push( b ); nuFaces.push( c );
+				}
+				return nuFaces;
+			};
+
+			const addMidpoint = function( v0, v1, vertices ) {
+				let idx = vertices.length;
+				let nu = [];
+				let length = 0;
+				for ( let i = 0 ; i < 3 ; i++, v0++, v1++ ) {
+					let v = 0.5 * ( vertices[ v0 ] + vertices[ v1 ] );
+					length += v * v;
+					nu.push( v );
+				}
+				length = Math.sqrt( length );
+
+				for ( let i = 0 ; i < nu.length ; i++ ) {
+					nu[ i ] /= length;
+				}
+
+				vertices.push.apply( vertices, nu );
+				return idx;
 			};
 		</script>
 
