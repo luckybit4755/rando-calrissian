@@ -105,4 +105,11 @@ const Matrixo = {
 			m1[ 12 ] * m2[ 3 ] + m1[ 13 ] * m2[ 7 ] + m1[ 14 ] * m2[ 11 ] + m1[ 15 ] * m2[ 15 ]
 		];
 	}
+	, multiplyMatrices: function() {
+		let m = arguments[ 0 ];
+		for ( let i = 1 ; i < arguments.length ; i++ ) {
+			m = Matrixo.fastMultiply( m, arguments[ i ] );
+		}
+		return m;
+	}
 };

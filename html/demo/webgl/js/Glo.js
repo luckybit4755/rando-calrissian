@@ -29,13 +29,44 @@ const Glo = {
 		gl.attachShader( program, shader );
 		return shader;
 	},
+	_buffer: function( gl, data ) {
+		let need = true;
+		if ( 'glod' in data ) {
+			if ( data.length == data.glod.length ) {
+				need = false;
+			} else {
+				console.log( 'deleteBuffer' );
+				gl.deleteBuffer( data.glod.buffer  );
+			}
+		} 
+
+		if ( need ) {
+			console.log( 'createBuffer' );
+			data.glod = { length:data.length, buffer:gl.createBuffer() }
+		}
+		return data.glod.buffer;
+	},
+	_bufferN: function( gl, name ) {
+		if ( !( 'glo' in gl ) ) gl.glo = {buffers:{}};
+		return (
+			( name in gl.glo.buffers )
+			? ( gl.glo.buffers[ name ] )
+			: ( gl.glo.buffers[ name ] = gl.createBuffer() )
+		)
+	},
 	data: function( gl, program, name, data, floatsPerValue ) {
 		if ( 'undefined' === typeof( floatsPerValue ) ) { floatsPerValue = 3; }
 
-		data = new Float32Array( data );
-		let location = gl.getAttribLocation( program, name );
-		gl.bindBuffer( gl.ARRAY_BUFFER, gl.createBuffer() );
+		// try to cut down on buffer creation
+		//let buffer = Glo._buffer( gl, data );
+		let buffer = Glo._bufferN( gl, name );
+
+		data = new Float32Array( data ); 
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
 		gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+
+		let location = gl.getAttribLocation( program, name );
 		gl.enableVertexAttribArray( location );
 		gl.vertexAttribPointer( location, floatsPerValue, gl.FLOAT, false, 0, 0 );
 	},
@@ -52,7 +83,8 @@ const Glo = {
 			what = gl.TRIANGLES;
 		}
 		if ( faces ) {
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer() );
+			let buffer = Glo._bufferN( gl, name );
+			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, buffer );
 			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.STATIC_DRAW );
 			gl.drawElements( what, faces.length , gl.UNSIGNED_SHORT, 0 );
 		} else {
