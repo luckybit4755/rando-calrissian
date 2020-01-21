@@ -12,12 +12,14 @@
 		<script type="text/javascript" src="js/Matrixo.js"></script>
 		<script type="text/javascript" src="js/Shaders.js"></script>
 		<script type="text/javascript" src="js/Vectoro.js"></script>
+		<script type="text/javascript" src="js/Utilo.js"></script>
 
 		<script type="text/javascript">
 			const prismatic_sphere = function() {
-				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let canvas = Utilo.getByTag( 'canvas' );
+
 				let gl = Glo.gl( canvas );
-				let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
+				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
 
 				let vertices = [
 					-1,+0,+0, // 0
@@ -32,7 +34,6 @@
 					0, 5, 3,
 					5, 1 ,3, 
 					1, 4, 3,
-
 					4, 0, 2,
 					0, 5, 2,
 					5, 1, 2,
@@ -41,33 +42,54 @@
 
 				let edges = facesToEdges( faces );
 				let colors = verticesToColors( vertices );
+				let inverted = colors.map(function(v){return 1-v});
 				let angle = 0;
+				let solid = 0;
 
 				canvas.onclick = function() {
 					faces = splitsville( faces, vertices );
 					edges = facesToEdges( faces );
 					colors = verticesToColors( vertices );
-				}
+					inverted = colors.map(function(v){return 1-v});
+					console.log( [faces.length, 'faces and', vertices.length, 'vertices' ].join( ' ' ) );
+					Utilo.fullscreen( canvas );
+				};
+			
+				document.onkeypress = function() {
+					solid++;
+				};
 
                 let draw = function() {
-                    angle += 0.033;
+                    angle += 0.022;
                     let c = Math.cos( angle );
                     let s = Math.sin( angle );
 
-                    let x = Matrixo.rotateX( c, s );
-                    let y = Matrixo.rotateY( c, s );
-                    let z = Matrixo.rotateZ( c, s );
-                    let q = Matrixo.scale( 0.66 );
-
-                    let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
-                    Glo.matrix( gl, program, 'uMatrix', m );
+                    Glo.matrix( gl, program, 'uMatrix', 
+						Matrixo.multiplyMatrices(
+							  Matrixo.rotateX( c, s ) 
+							, Matrixo.rotateY( c, s ) 
+							, Matrixo.rotateZ( c, s ) 
+							, Matrixo.scale( 0.66 ) 
+						)
+					);	
 
                     Glo.clear( gl );
 					Glo.data( gl, program, 'aPosition', vertices );
-					Glo.data( gl, program, 'aColor', colors );
-					Glo.draw( gl, edges, gl.LINES );
 
-					setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
+					switch ( solid % 3 ) {
+						case 0:
+							Glo.data( gl, program, 'aColor', colors );
+							Glo.draw( gl, faces );
+						case 1:
+							Glo.data( gl, program, 'aColor', inverted );
+							Glo.draw( gl, edges, gl.LINES );
+							break;
+						case 2:
+							Glo.data( gl, program, 'aColor', colors );
+							Glo.draw( gl, faces );
+					}
+					
+					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
 				};
 				draw();
 			};
@@ -114,6 +136,15 @@
 			};
 
 			const addMidpoint = function( v0, v1, vertices ) {
+				if( 'undefined' === typeof( this.cache ) ) {
+					this.cache = {};
+				}
+
+				let key = ( v0 <= v1 ? [ v0, v1 ] : [ v1, v0 ] ).join( ',' );
+				if ( key in this.cache ) {
+					return this.cache[ key ];
+				}
+
 				let idx = vertices.length;
 				let nu = [];
 				let length = 0;
@@ -128,6 +159,18 @@
 					nu[ i ] /= length;
 				}
 
+				this.cache[ key ] = idx;
+				/* 
+						   96 faces and        90 vertices vs      54   
+						  384 faces and       378 vertices vs     198  
+						1,536 faces and     1,530 vertices vs     774  
+						6,144 faces and     6,138 vertices vs   3,078 
+					   24,576 faces and    24,570 vertices vs  12,294
+					   98,304 faces and    98,298 vertices vs  49,158
+					  393,216 faces and   393,210 vertices vs 196,614
+					1,572,864 faces and 1,572,858 vertices vs 786,438 
+				*/
+
 				vertices.push.apply( vertices, nu );
 				return idx;
 			};
@@ -140,5 +183,6 @@
 	<BODY>
 		<canvas width="512" height="512"></canvas>
 		<info>click to subdivide sphere</info>
+		<info>press any key to change drawing mode</info>
 	</BODY>
 </HTML>
