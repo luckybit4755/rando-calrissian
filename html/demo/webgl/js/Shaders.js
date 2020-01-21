@@ -21,13 +21,15 @@ const Shaders = {
 	}
 	, lit: {
 		vertex:`
-			attribute vec4 aPosition;
-			attribute vec4 aColor;
+			precision mediump float;
 
-			uniform mat4 uMatrix;
+			attribute vec4  aPosition;
+			varying   vec4  vPosition;
 
-			varying vec4 vColor;
-			varying vec4 vPosition;
+			attribute vec4  aColor;
+			varying   vec4  vColor;
+
+			uniform   mat4  uMatrix;
 
 			void main() {
 				   gl_Position = uMatrix * aPosition;
@@ -37,6 +39,7 @@ const Shaders = {
 		`
 		, fragment:`
 			precision mediump float;
+
 			varying vec4 vColor; 
 			varying vec4 vPosition; 
 
@@ -56,6 +59,31 @@ const Shaders = {
 					1
 				);
 				gl_FragColor = farqo * 0.4 + 0.6 * vColor;
+			}
+		`
+	}
+	, texture: {
+		vertex:`
+			precision mediump float;
+
+			attribute vec4  aPosition;
+
+			attribute vec2  aTexture;
+			varying   vec2  vTexture;
+
+			void main() {
+				   gl_Position = aPosition;
+				   vTexture = aTexture;
+			}
+		`
+		, fragment:`
+			precision mediump float;
+
+			varying vec2      vTexture;
+			uniform sampler2D uSampler;
+
+			void main(void) {
+				gl_FragColor = texture2D( uSampler, vTexture );
 			}
 		`
 	}

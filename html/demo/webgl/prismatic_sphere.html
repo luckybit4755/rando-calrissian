@@ -13,32 +13,18 @@
 		<script type="text/javascript" src="js/Shaders.js"></script>
 		<script type="text/javascript" src="js/Vectoro.js"></script>
 		<script type="text/javascript" src="js/Utilo.js"></script>
+		<script type="text/javascript" src="js/model/triangular_prism/TriangularPrism.js"></script>
 
 		<script type="text/javascript">
 			const prismatic_sphere = function() {
 				let canvas = Utilo.getByTag( 'canvas' );
 
-				let gl = Glo.gl( canvas );
+				let gl = Glo.gl( canvas, {preserveDrawingBuffer:true} );
 				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
+				let textureProgram = Glo.program( gl, Shaders.texture.vertex, Shaders.texture.fragment );
 
-				let vertices = [
-					-1,+0,+0, // 0
-					+1,+0,+0, // 1
-					+0,-1,+0, // 2
-					+0,+1,+0, // 3
-					+0,+0,-1, // 4
-					+0,+0,+1  // 5
-				];
-				let faces = [
-					4, 0, 3,
-					0, 5, 3,
-					5, 1 ,3, 
-					1, 4, 3,
-					4, 0, 2,
-					0, 5, 2,
-					5, 1, 2,
-					1, 4, 2
-				];
+				let vertices = TriangularPrism.vertices;
+				let faces = TriangularPrism.faces;
 
 				let edges = facesToEdges( faces );
 				let colors = verticesToColors( vertices );
@@ -47,11 +33,14 @@
 				let solid = 0;
 
 				canvas.onclick = function() {
-					faces = splitsville( faces, vertices );
+					faces = TriangularPrism.subdivide();
 					edges = facesToEdges( faces );
 					colors = verticesToColors( vertices );
 					inverted = colors.map(function(v){return 1-v});
 					console.log( [faces.length, 'faces and', vertices.length, 'vertices' ].join( ' ' ) );
+				};
+
+				Utilo.getByTag( 'button' ).onclick = function() {
 					Utilo.fullscreen( canvas );
 				};
 			
@@ -59,7 +48,16 @@
 					solid++;
 				};
 
+				let image = new Image();
+				let texture_ready = false;
+
                 let draw = function() {
+                    Glo.clear( gl );
+
+					/* draw the triangular prism */
+
+					gl.useProgram( program );
+
                     angle += 0.022;
                     let c = Math.cos( angle );
                     let s = Math.sin( angle );
@@ -73,7 +71,6 @@
 						)
 					);	
 
-                    Glo.clear( gl );
 					Glo.data( gl, program, 'aPosition', vertices );
 
 					switch ( solid % 3 ) {
@@ -88,8 +85,29 @@
 							Glo.data( gl, program, 'aColor', colors );
 							Glo.draw( gl, faces );
 					}
-					
-					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
+
+					/* draw the texture image */
+
+					if ( texture_ready ) {
+						gl.useProgram( textureProgram );
+						Glo.data( gl, textureProgram, 'aPosition', [ -1,+1, 0.9,  +0,+1,0.9,  -1,+0, 0.9,  +0,+0,0.9 ] );
+						Glo.data( gl, textureProgram, 'aTexture', [ 0,0,  1,0,  0,1,  1,1 ], 2);
+						Glo.draw( gl, [ 0, 1, 2,    1, 3, 2 ] );
+					}
+
+					canvas.toBlob(function(blob) {
+						document.body.style.background = 'url(' + canvas.toDataURL('image/png') + ')';
+						let url = URL.createObjectURL( blob );
+						image.onload = function() {
+							Glo.textureSetup( gl, program, image );
+							Glo.texture( gl, program, 'uSampler', image );
+							texture_ready = true;
+
+    						URL.revokeObjectURL( url );
+							setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
+  						};
+						image.src = url;
+					})
 				};
 				draw();
 			};
@@ -110,78 +128,23 @@
 			const verticesToColors = function( vertices ) {
 				return vertices.map( function( v ) { return 0.5 * ( 1 + v ) } );
 			};
-
-			const splitsville = function( faces, vertices ) {
-				let nuFaces = [];
-				for( let i = 0 ; i < faces.length ; i+= 3 ) {
-					let v0 = 3 * faces[ i + 0 ];
-					let v1 = 3 * faces[ i + 1 ];
-					let v2 = 3 * faces[ i + 2 ];
-
-					// 3 new points at the midpoints
-					let a = addMidpoint( v0, v1, vertices );
-					let b = addMidpoint( v1, v2, vertices );
-					let c = addMidpoint( v2, v0, vertices );
-
-					// 4 new faces 
-
-					v0 /= 3; v1 /= 3; v2 /= 3; a /= 3; b /= 3; c /= 3;
-
-					nuFaces.push( v0 ); nuFaces.push( a ); nuFaces.push( c );
-					nuFaces.push( v1 ); nuFaces.push( b ); nuFaces.push( a );
-					nuFaces.push( v2 ); nuFaces.push( c ); nuFaces.push( b );
-					nuFaces.push( a  ); nuFaces.push( b ); nuFaces.push( c );
-				}
-				return nuFaces;
-			};
-
-			const addMidpoint = function( v0, v1, vertices ) {
-				if( 'undefined' === typeof( this.cache ) ) {
-					this.cache = {};
-				}
-
-				let key = ( v0 <= v1 ? [ v0, v1 ] : [ v1, v0 ] ).join( ',' );
-				if ( key in this.cache ) {
-					return this.cache[ key ];
-				}
-
-				let idx = vertices.length;
-				let nu = [];
-				let length = 0;
-				for ( let i = 0 ; i < 3 ; i++, v0++, v1++ ) {
-					let v = 0.5 * ( vertices[ v0 ] + vertices[ v1 ] );
-					length += v * v;
-					nu.push( v );
-				}
-				length = Math.sqrt( length );
-
-				for ( let i = 0 ; i < nu.length ; i++ ) {
-					nu[ i ] /= length;
-				}
-
-				this.cache[ key ] = idx;
-				/* 
-						   96 faces and        90 vertices vs      54   
-						  384 faces and       378 vertices vs     198  
-						1,536 faces and     1,530 vertices vs     774  
-						6,144 faces and     6,138 vertices vs   3,078 
-					   24,576 faces and    24,570 vertices vs  12,294
-					   98,304 faces and    98,298 vertices vs  49,158
-					  393,216 faces and   393,210 vertices vs 196,614
-					1,572,864 faces and 1,572,858 vertices vs 786,438 
-				*/
-
-				vertices.push.apply( vertices, nu );
-				return idx;
-			};
 		</script>
 
 		<script type="text/javascript">
 			window.onload = prismatic_sphere;
 		</script>
+
+		<style>
+			button {
+				width:512px;
+				margin:auto;
+				display:block;
+			}
+		</style>
 	</HEAD>
 	<BODY>
 		<canvas width="512" height="512"></canvas>
+		<button style="width:512px;margin:auto;display:block;">fullscreen</button>
 		<info>click to subdivide sphere</info>
 		<info>press any key to change drawing mode</info>
 	</BODY>
