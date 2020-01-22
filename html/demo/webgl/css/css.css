@@ -19,3 +19,9 @@ info {
 	margin:auto;
 	background:rgba(0,0,0,0.88);
 }
+
+button.fullscreen {
+	width:512px;
+	margin:auto;
+	display:block;
+}
