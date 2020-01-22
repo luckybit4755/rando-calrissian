@@ -51,18 +51,18 @@
 				let image = new Image();
 				let texture_ready = false;
 
-                let draw = function() {
-                    Glo.clear( gl );
+				let draw = function() {
+					Glo.clear( gl );
 
 					/* draw the triangular prism */
 
 					gl.useProgram( program );
 
-                    angle += 0.022;
-                    let c = Math.cos( angle );
-                    let s = Math.sin( angle );
+					angle += 0.022;
+					let c = Math.cos( angle );
+					let s = Math.sin( angle );
 
-                    Glo.matrix( gl, program, 'uMatrix', 
+					Glo.matrix( gl, program, 'uMatrix', 
 						Matrixo.multiplyMatrices(
 							  Matrixo.rotateX( c, s ) 
 							, Matrixo.rotateY( c, s ) 
@@ -92,7 +92,7 @@
 						gl.useProgram( textureProgram );
 						Glo.data( gl, textureProgram, 'aPosition', [ -1,+1, 0.9,  +0,+1,0.9,  -1,+0, 0.9,  +0,+0,0.9 ] );
 						Glo.data( gl, textureProgram, 'aTexture', [ 0,0,  1,0,  0,1,  1,1 ], 2);
-						Glo.draw( gl, [ 0, 1, 2,    1, 3, 2 ] );
+						Glo.draw( gl, [ 0, 1, 2,	1, 3, 2 ] );
 					}
 
 					canvas.toBlob(function(blob) {
@@ -103,7 +103,7 @@
 							Glo.texture( gl, program, 'uSampler', image );
 							texture_ready = true;
 
-    						URL.revokeObjectURL( url );
+							URL.revokeObjectURL( url );
 							setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
   						};
 						image.src = url;
