@@ -117,9 +117,9 @@ const Glo = {
 			gl_texture_id = gl.TEXTURE0;
 		}
 		let samplerValue = gl_texture_id - gl.TEXTURE0;
-		                            gl.activeTexture( gl_texture_id );
-                            gl.bindTexture( gl.TEXTURE_2D, image.glo_texture );
-                            Glo.value( gl, program, name, samplerValue );
+		gl.activeTexture( gl_texture_id );
+		gl.bindTexture( gl.TEXTURE_2D, image.glo_texture );
+		Glo.value( gl, program, name, samplerValue );
 	}
 	
 	, demo: function() {
