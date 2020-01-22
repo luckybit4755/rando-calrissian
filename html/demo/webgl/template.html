@@ -1,0 +1,67 @@
+<HTML>
+	<HEAD>
+		<TITLE>template</TITLE>
+
+		<!--  S O  -  S T Y L I S H ! : so stylish! -->
+
+		<link rel="stylesheet" href="css/css.css"></link>
+
+		<!--  B I T  -  O '  -  J A V A S C R I P T : bit o' javascript -->
+
+		<script type="text/javascript" src="js/Glo.js"></script>
+		<script type="text/javascript" src="js/Matrixo.js"></script>
+		<script type="text/javascript" src="js/Shaders.js"></script>
+		<script type="text/javascript" src="js/Vectoro.js"></script>
+		<script type="text/javascript" src="js/Utilo.js"></script>
+		<script type="text/javascript" src="js/model/triangular_prism/TriangularPrism.js"></script>
+
+		<script type="text/javascript">
+			const template = function() {
+				let canvas = Utilo.getByTag( 'canvas' );
+
+				let gl = Glo.gl( canvas );
+				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
+
+				let faces    = [ 0,1,2 ];
+				let vertices = [ 0,1,0, 1,0,0, 0,0,0 ];
+				let colors   = [ 1,0,0, 0,1,0, 0,0,1 ];
+
+				let angle = 0;
+
+				Utilo.getByTag( 'button' ).onclick = function() { Utilo.fullscreen( canvas ); };
+			
+                let draw = function() {
+                    Glo.clear( gl );
+
+                    angle += 0.022;
+                    let c = Math.cos( angle );
+                    let s = Math.sin( angle );
+
+                    Glo.matrix( gl, program, 'uMatrix', 
+						Matrixo.multiplyMatrices(
+							  Matrixo.rotateX( c, s ) 
+							, Matrixo.rotateY( c, s ) 
+							, Matrixo.rotateZ( c, s ) 
+							, Matrixo.scale( 0.66 ) 
+						)
+					);	
+
+					Glo.data( gl, program, 'aPosition', vertices );
+					Glo.data( gl, program, 'aColor', colors );
+					Glo.draw( gl, faces );
+
+					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
+				};
+				draw();
+			};
+		</script>
+
+		<script type="text/javascript">
+			window.onload = template;
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+		<button class="fullscreen">fullscreen</button>
+	</BODY>
+</HTML>
