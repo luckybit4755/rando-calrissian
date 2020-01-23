@@ -10,6 +10,7 @@
 
 		<script type="text/javascript" src="js/Glo.js"></script>
 		<script type="text/javascript" src="js/Matrixo.js"></script>
+		<script type="text/javascript" src="js/Mesho.js"></script>
 		<script type="text/javascript" src="js/Mouseo.js"></script>
 		<script type="text/javascript" src="js/Shaders.js"></script>
 		<script type="text/javascript" src="js/Vectoro.js"></script>
@@ -30,7 +31,7 @@
 
 				let edges, colors, inverted;
 				let onChange = function( t ) {
-					edges = facesToEdges( t.faces );
+					edges = Mesho.facesToEdges( t.faces );
 					colors = t.vertices.map( v => 0.5 * ( 1 + v ) );
 					inverted = colors.map( v => 1 - v );
 					console.log( [t.faces,t.vertices].map(v=>v.length).join( ' x ' ) );
@@ -170,13 +171,16 @@
 
 			const facesToEdges = function( faces ) {
 				let edges = [];
-				for ( let i = 0 ; i < faces.length ; i += 3 ) {
-					edges.push( faces[ i + 0 ] );
-					edges.push( faces[ i + 1 ] );
-					edges.push( faces[ i + 1 ] );
-					edges.push( faces[ i + 2 ] );
-					edges.push( faces[ i + 2 ] );
-					edges.push( faces[ i + 0 ] );
+				let perFaces = 3;
+				for ( let i = 0 ; i < faces.length ; i+= perFaces ) {
+					for ( let j = 0 ; j < perFaces ; j++ ) {
+						edges.push( faces[ i + j ] );
+						if ( 2 == j ) {
+							edges.push( faces[ i + 0  ] );
+						} else {
+							edges.push( faces[ i + j + 1 ] );
+						}
+					}
 				}
 				return edges;
 			};

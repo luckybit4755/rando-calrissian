@@ -69,4 +69,23 @@ const Mesho = {
 
 		return { faces:nuFaces, vertices:nuVertices, normals:nuNormals };
 	}
+	, facesToEdges: function( faces, perFace ) {
+		if ( 'undefined' === typeof( perFace ) ) {
+			perFace = 3;
+		}
+
+		let edges = [];
+		for ( let i = 0 ; i < faces.length ; i+= perFace ) {
+			for ( let j = 0 ; j < perFace ; j++ ) {
+				edges.push( faces[ i + j ] );
+				if ( perFace - 1 == j ) {
+					edges.push( faces[ i + 0  ] );
+				} else {
+					edges.push( faces[ i + j + 1 ] );
+				}   
+			}   
+		}       
+		return edges;
+	}  
+
 };
