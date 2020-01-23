@@ -38,12 +38,12 @@ const Utilo = {
 
 		return frameFunction;
 	}
-	, undefinedOr: function( v, alternative ) {
+	, idk: function( v, alternative ) {
 		return 'undefined' === typeof( v ) ? alternative : v;
 	}
 	, getByTag: function( tag, index ) {
-		tag = Utilo.undefinedOr( tag, 'canvas' );
-		index = Utilo.undefinedOr( index, 0 );
+		tag = Utilo.idk( tag, 'canvas' );
+		index = Utilo.idk( index, 0 );
 		let tagged = document.getElementsByTagName( tag );
 		return isNaN( index ) ? tagged : tagged[ index ];
 	}
@@ -66,7 +66,6 @@ const Utilo = {
 		}
 		return false;
 	}
-
 	, makeElement: function( stuff ) {
 		stuff.type = stuff.type || 'div';
 		let element = document.createElement( stuff.type );
@@ -100,8 +99,8 @@ const Utilo = {
 		return value;
 	}
 	, flatten: function( value, converter, values ) {
-		converter = ( 'undefined' === typeof( converter ) ) ? Utilo.identity : converter;
-		values    = ( 'undefined' === typeof( values )    ) ? [] : values;
+		converter = Utilo.idk( converter, Utilo.identity );
+		values = Utilo.idk( values, [] );
 		if ( 'object' === typeof( value ) ) {
 			for ( let key in value ) {
 				Utilo.flatten( value[ key ], converter, values );

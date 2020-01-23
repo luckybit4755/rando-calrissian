@@ -55,7 +55,7 @@ const Glo = {
 		)
 	},
 	data: function( gl, program, name, data, floatsPerValue ) {
-		if ( 'undefined' === typeof( floatsPerValue ) ) { floatsPerValue = 3; }
+		floatsPerValue = Utilo.idk( floatsPerValue, 3 );
 
 		// try to cut down on buffer creation
 		//let buffer = Glo._buffer( gl, data );
@@ -84,9 +84,7 @@ const Glo = {
 		gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	},
 	draw: function( gl, faces, what ) {
-		if ( 'undefined' === typeof( what ) ) {
-			what = gl.TRIANGLES;
-		}
+		what = Utilo.idk( what, gl.TRIANGLES );
 		if ( faces ) {
 			let buffer = Glo._bufferN( gl, '_faces' );
 			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, buffer );
@@ -113,9 +111,7 @@ const Glo = {
 	}
 	, texture: function( gl, program, name, image, gl_texture_id ) {
 		if ( !( 'glo_texture' in image ) ) throw 'need to call textureSetup for image first';
-		if ( 'undefined' === typeof( gl_texture_id ) ) {
-			gl_texture_id = gl.TEXTURE0;
-		}
+		gl_texture_id = Utilo.idk( gl_texture_id, gl.TEXTURE0 );
 		let samplerValue = gl_texture_id - gl.TEXTURE0;
 		gl.activeTexture( gl_texture_id );
 		gl.bindTexture( gl.TEXTURE_2D, image.glo_texture );

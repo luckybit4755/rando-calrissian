@@ -1,9 +1,7 @@
 const Mesho = {
 	// quick and hacky
 	triangulate: function( faces, perFace ) {
-		if ( 'undefined' === typeof( perFace ) ) {
-			perFace = 4;
-		}
+		perFace = Utilo.idk( perFace, 4 );
 
 		let nu = [];
 		for ( let i = 0 ; i < faces.length ; i += perFace ) {
@@ -22,9 +20,7 @@ const Mesho = {
 		return nu;
 	}
 	, normals: function( faces, vertices, perFace ) {
-		if ( 'undefined' === typeof( perFace ) ) {
-			perFace = 3;
-		}
+		perFace = Utilo.idk( perFace, 3 );
 
 		let normals = [];
 		for ( let i = 0 ; i < faces.length ; i += perFace ) {
@@ -70,9 +66,7 @@ const Mesho = {
 		return { faces:nuFaces, vertices:nuVertices, normals:nuNormals };
 	}
 	, facesToEdges: function( faces, perFace ) {
-		if ( 'undefined' === typeof( perFace ) ) {
-			perFace = 3;
-		}
+		perFace = Utilo.idk( perFace, 3 );
 
 		let edges = [];
 		for ( let i = 0 ; i < faces.length ; i+= perFace ) {

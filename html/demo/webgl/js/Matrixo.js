@@ -43,8 +43,8 @@ const Matrixo = {
 		];
     },
     scale: function( x, y, z ) {
-		if ( 'undefined' === typeof( y ) ) { y = x }
-		if ( 'undefined' === typeof( z ) ) { z = x }
+		y = Utilo.idk( y, x );
+		z = Utilo.idk( z, x );
         return [
 			x, 0, 0, 0,
 			0, y, 0, 0,

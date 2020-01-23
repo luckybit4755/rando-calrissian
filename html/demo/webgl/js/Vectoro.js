@@ -47,9 +47,7 @@ const Vectoro = {
 		return [ v[ 0 ] + u[ 0 ], v[ 1 ] + u[ 1 ], v[ 2 ] + u[ 2 ] ];
 	}
 	, toString: function( v, precision ) {
-		if ( 'undefined' === typeof( precision ) ) {
-			precision = 1000;
-		}
+		precision = Util.idk( precision, 1000 );
 		return (
 			'('
 			+ Math.floor( v[ 0 ] * precision ) / precision 
