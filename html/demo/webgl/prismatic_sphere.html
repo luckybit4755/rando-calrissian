@@ -10,46 +10,60 @@
 
 		<script type="text/javascript" src="js/Glo.js"></script>
 		<script type="text/javascript" src="js/Matrixo.js"></script>
+		<script type="text/javascript" src="js/Mouseo.js"></script>
 		<script type="text/javascript" src="js/Shaders.js"></script>
 		<script type="text/javascript" src="js/Vectoro.js"></script>
 		<script type="text/javascript" src="js/Utilo.js"></script>
-		<script type="text/javascript" src="js/model/triangular_prism/TriangularPrism.js"></script>
+		<script type="text/javascript" src="js/model/TriangularPrism.js"></script>
 
 		<script type="text/javascript">
 			const prismatic_sphere = function() {
 				let canvas = Utilo.getByTag( 'canvas' );
 
+				/* setup */
+
 				let gl = Glo.gl( canvas, {preserveDrawingBuffer:true} );
 				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
 				let textureProgram = Glo.program( gl, Shaders.texture.vertex, Shaders.texture.fragment );
 
-				let vertices = TriangularPrism.vertices;
-				let faces = TriangularPrism.faces;
-
-				let edges = facesToEdges( faces );
-				let colors = verticesToColors( vertices );
+				let instance = TriangularPrism.instantiate();
+				let edges = facesToEdges( instance.faces );
+				let colors = verticesToColors( instance.vertices );
 				let inverted = colors.map(function(v){return 1-v});
-				let angle = 0;
-				let solid = 0;
-
-				canvas.onclick = function() {
-					faces = TriangularPrism.subdivide();
-					edges = facesToEdges( faces );
-					colors = verticesToColors( vertices );
-					inverted = colors.map(function(v){return 1-v});
-					console.log( [faces.length, 'faces and', vertices.length, 'vertices' ].join( ' ' ) );
-				};
-
-				Utilo.getByTag( 'button' ).onclick = function() {
-					Utilo.fullscreen( canvas );
-				};
-			
-				document.onkeypress = function() {
-					solid++;
-				};
 
 				let image = new Image();
 				let texture_ready = false;
+
+				let style = 0;
+
+				/* event handlers */
+
+				let mouseControls = Mouseo.simpleControls( canvas );
+
+				Utilo.getByContents( 'fullscreen' ).onclick = function() { Utilo.fullscreen( canvas ); };
+
+				Utilo.getByContents( 'split' ).onclick = function() {
+					instance.subdivide();
+					edges = facesToEdges( instance.faces );
+					colors = verticesToColors( instance.vertices );
+					inverted = colors.map(function(v){return 1-v});
+				
+					console.log( [faces.length, 'faces and', vertices.length, 'vertices' ].join( ' ' ) );
+				};
+
+				Utilo.getByContents( 'reset' ).onclick = function() {
+					instance = TriangularPrism.instantiate();
+					edges = facesToEdges( instance.faces );
+					colors = verticesToColors( instance.vertices );
+					inverted = colors.map(function(v){return 1-v});
+				};
+
+				Utilo.getByContents( 'style' ).onclick = function() {
+					style++;
+				};
+
+
+				/* draw loop */
 
 				let draw = function() {
 					Glo.clear( gl );
@@ -58,32 +72,23 @@
 
 					gl.useProgram( program );
 
-					angle += 0.022;
-					let c = Math.cos( angle );
-					let s = Math.sin( angle );
+					mouseControls.idle( 3000, 0.03 );
+					let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
+					Glo.matrix( gl, program, 'uMatrix', m );
 
-					Glo.matrix( gl, program, 'uMatrix', 
-						Matrixo.multiplyMatrices(
-							  Matrixo.rotateX( c, s ) 
-							, Matrixo.rotateY( c, s ) 
-							, Matrixo.rotateZ( c, s ) 
-							, Matrixo.scale( 0.66 ) 
-						)
-					);	
+					Glo.data( gl, program, 'aPosition', instance.vertices );
 
-					Glo.data( gl, program, 'aPosition', vertices );
-
-					switch ( solid % 3 ) {
+					switch ( style % 3 ) {
 						case 0:
 							Glo.data( gl, program, 'aColor', colors );
-							Glo.draw( gl, faces );
+							Glo.draw( gl, instance.faces );
 						case 1:
 							Glo.data( gl, program, 'aColor', inverted );
 							Glo.draw( gl, edges, gl.LINES );
 							break;
 						case 2:
 							Glo.data( gl, program, 'aColor', colors );
-							Glo.draw( gl, faces );
+							Glo.draw( gl, instance.faces );
 					}
 
 					/* draw the texture image */
@@ -133,19 +138,15 @@
 		<script type="text/javascript">
 			window.onload = prismatic_sphere;
 		</script>
-
-		<style>
-			button {
-				width:512px;
-				margin:auto;
-				display:block;
-			}
-		</style>
 	</HEAD>
 	<BODY>
-		<canvas width="512" height="512"></canvas>
-		<button style="width:512px;margin:auto;display:block;">fullscreen</button>
-		<info>click to subdivide sphere</info>
-		<info>press any key to change drawing mode</info>
+		<lul>
+			<canvas width="512" height="512"></canvas>
+			<button>fullscreen</button>
+			<button>split</button>
+			<button>reset</button>
+			<button>style</button>
+			<info>click and drag to rotate</info>
+		</lul>
 	</BODY>
 </HTML>

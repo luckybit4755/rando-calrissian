@@ -1,9 +1,24 @@
 body {
 	background: #444;
+	margin-top:2em;
 }
+
+lul,button {
+	border-top:    3px solid #666;
+	border-left:   3px solid #666;
+	border-right:  3px solid #222;
+	border-bottom: 3px solid #222;
+}
+
+lul {
+	margin:auto;
+	display:block;
+	width:518px;
+	padding:2px;
+}
+
 canvas {
 	margin:auto;
-	margin-top:2em;
 	display:block;
 	border-top:    3px solid #222;
 	border-left:   3px solid #222;
@@ -14,14 +29,18 @@ canvas {
 info {
 	font-family: sans-serif;
 	display:block;
-	color: #aa0;
+	color: #0c0;
 	width:512px;
 	margin:auto;
-	background:rgba(0,0,0,0.88);
+	padding:0.33em;
+	background:rgba(0,0,0,0.77);
 }
 
-button.fullscreen {
-	width:512px;
-	margin:auto;
-	display:block;
+button {
+	margin:0.5em;
+	font-weight:bold;
+	padding:0.77em;
+	border-radius:1em;
+	background:  #333;
+	color: #cc0;
 }

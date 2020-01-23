@@ -121,47 +121,4 @@ const Glo = {
 		gl.bindTexture( gl.TEXTURE_2D, image.glo_texture );
 		Glo.value( gl, program, name, samplerValue );
 	}
-	
-	, demo: function() {
-		let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
-		let gl = Glo.gl( canvas );
-
-		let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
-
-		Glo.data( gl, program, 'aPosition', [
-			  -1, -1, 0
-			,  0,  1, 0
-			, +1, -1, 0
-		]);
-
-		Glo.data( gl, program, 'aColor', [
-			1.0, 0.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 0.0, 1.0
-		]);
-
-		let angle = 0;
-
-		let draw = function() {
-			angle += 0.033;
-			let c = Math.cos( angle );
-			let s = Math.sin( angle );
-
-			let x = Matrixo.rotateX( c, s );
-			let y = Matrixo.rotateY( c, s );
-			let z = Matrixo.rotateZ( c, s );
-			let q = Matrixo.scale( 0.66 );
-
-			let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
-
-			Glo.matrix( gl, program, 'uMatrix', m );
-
-			Glo.clear( gl );
-			Glo.triangles( gl, [ 0, 1, 2 ] );
-
-			setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
-		}
-
-		draw();
-	},
 };

@@ -11,11 +11,56 @@
 		<script type="text/javascript" src="js/Glo.js"></script>
 		<script type="text/javascript" src="js/Matrixo.js"></script>
 		<script type="text/javascript" src="js/Shaders.js"></script>
+		<script type="text/javascript" src="js/Utilo.js"></script>
+		<script type="text/javascript" src="js/Mouseo.js"></script>
 		<script type="text/javascript" src="js/Vectoro.js"></script>
 
 		<script type="text/javascript">
 			const SQRT_3 = Math.sqrt( 3 );
 			const INVERSE_SQRT_3 = 1 / SQRT_3;
+
+			const inevitable_cube = function() {
+				let canvas = Utilo.getByTag( 'canvas' );
+				let mouseControls = Mouseo.simpleControls( canvas );
+
+				let gl = Glo.gl( canvas );
+
+				let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
+
+				let cube = makeCube();
+
+				let cyans  = cube.vertices.map( function( v, i ) { return i % 3 ? 1 : 0 } );
+				let colors = cube.vertices.map( function( v ) { 
+					return ( v + INVERSE_SQRT_3 ) / ( INVERSE_SQRT_3 * 2 );
+				} );
+
+				let draw = function() {
+					Glo.clear( gl );
+
+					mouseControls.idle( 5000, 0.03 );
+					let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
+					Glo.matrix( gl, program, 'uMatrix', m );
+
+					// triangles
+					Glo.data( gl, program, 'aPosition', cube.vertices );
+					Glo.data( gl, program, 'aColor', colors );
+					Glo.draw( gl, cube.triangles );
+
+					// edges
+					// this is interesting: https://mattdesl.svbtle.com/drawing-lines-is-hard
+					Glo.data( gl, program, 'aColor', cyans );
+					Glo.draw( gl, cube.edges, gl.LINES );
+
+					// draw the normals
+					Glo.data( gl, program, 'aPosition', cube.centroids );
+					Glo.data( gl, program, 'aColor', cube.centroid_colors );
+					Glo.draw( gl, cube.centroid_lines, gl.LINES );
+
+					setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
+				}
+
+				draw();
+			};
 
 			const v3po = function( v ) {
 				return ( '0' == v ) ? -INVERSE_SQRT_3 : parseInt( v ) * INVERSE_SQRT_3;
@@ -139,65 +184,15 @@
 
 				return cube;
 			};
+		</script>
 
-			const inevitable_cube = function() {
-				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
-
-				let gl = Glo.gl( canvas );
-
-				let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
-
-				let cube = makeCube();
-
-				let cyans  = cube.vertices.map( function( v, i ) { return i % 3 ? 1 : 0 } );
-				let colors = cube.vertices.map( function( v ) { 
-					return ( v + INVERSE_SQRT_3 ) / ( INVERSE_SQRT_3 * 2 );
-				} );
-
-				let angle = 0;
-
-				let draw = function() {
-					angle += 0.033;
-					let c = Math.cos( angle );
-					let s = Math.sin( angle );
-
-					Glo.matrix( gl, program, 'uMatrix',
-						Matrixo.multiplyMatrices(
-							  Matrixo.rotateX( c, s )
-							, Matrixo.rotateY( c, s )
-							, Matrixo.rotateZ( c, s )
-							, Matrixo.scale( 0.66 )
-						)
-					);
-
-
-					Glo.clear( gl );
-
-					// triangles
-					Glo.data( gl, program, 'aPosition', cube.vertices );
-					Glo.data( gl, program, 'aColor', colors );
-					Glo.draw( gl, cube.triangles );
-
-					// edges
-					// this is interesting: https://mattdesl.svbtle.com/drawing-lines-is-hard
-					Glo.data( gl, program, 'aColor', cyans );
-					Glo.draw( gl, cube.edges, gl.LINES );
-
-					// draw the normals
-					Glo.data( gl, program, 'aPosition', cube.centroids );
-					Glo.data( gl, program, 'aColor', cube.centroid_colors );
-					Glo.draw( gl, cube.centroid_lines, gl.LINES );
-
-					setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
-				}
-
-				draw();
-			};
-
+		<script type="text/javascript">
 			window.onload = inevitable_cube;
 		</script>
 	</HEAD>
 	<BODY>
-		<canvas width="512" height="512"></canvas>
+		<lul>
+			<canvas width="512" height="512"></canvas>
+		</lul>
 	</BODY>
 </HTML>

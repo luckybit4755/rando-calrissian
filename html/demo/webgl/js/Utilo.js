@@ -1,9 +1,9 @@
 const Utilo = {
 	fullscreen: function( element ) {
-		var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
+		let fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
 
-		for ( var i = 0 ; i < fz.length ; i++ ) {
-			var f = fz[ i ];
+		for ( let i = 0 ; i < fz.length ; i++ ) {
+			let f = fz[ i ];
 			if ( f in element ) {
 				element[ f ]();
 				break;
@@ -13,7 +13,7 @@ const Utilo = {
 	, frame: function( drawCallback, fps ) {
 		fps = fps || 24;
 
-		var frameFunction = function() {};
+		let frameFunction = function() {};
 		frameFunction.count = 0;
 		frameFunction.timeOut = false;
 
@@ -38,16 +38,39 @@ const Utilo = {
 
 		return frameFunction;
 	}
-	, getByTag: function( tag ) {
-		return document.getElementsByTagName( tag || 'canvas' )[ 0 ];
+	, undefinedOr: function( v, alternative ) {
+		return 'undefined' === typeof( v ) ? alternative : v;
+	}
+	, getByTag: function( tag, index ) {
+		tag = Utilo.undefinedOr( tag, 'canvas' );
+		index = Utilo.undefinedOr( index, 0 );
+		let tagged = document.getElementsByTagName( tag );
+		return isNaN( index ) ? tagged : tagged[ index ];
 	}
 	, getById: function( id ) {
 		return document.getElementById( id );
 	}
+	, getByContents: function( value ) {
+		let treeWalker = document.createTreeWalker(
+			document.body
+			, NodeFilter.SHOW_TEXT
+			, { acceptNode: function(node) { return NodeFilter.FILTER_ACCEPT } }
+			, false
+		);
+
+		while( treeWalker.nextNode() ) {
+			let node = treeWalker.currentNode;
+			if ( value === node.nodeValue.trim() ) {
+				return node.parentNode;
+			}
+		}
+		return false;
+	}
+
 	, makeElement: function( stuff ) {
 		stuff.type = stuff.type || 'div';
-		var element = document.createElement( stuff.type );
-		for ( var k in stuff ) {
+		let element = document.createElement( stuff.type );
+		for ( let k in stuff ) {
 			if ( /^(kids|type)$/.test( k ) ) continue;
 			switch ( k ) {
 				case 'txt': element.appendChild( document.createTextNode( stuff[ k ] ) ); break;
@@ -55,17 +78,16 @@ const Utilo = {
 			}
 		}
 		if ( 'kids' in stuff ) {
-			for ( var i = 0 ; i < stuff.kids.length ; i++ ) {
+			for ( let i = 0 ; i < stuff.kids.length ; i++ ) {
 				element.appendChild( makeElement( stuff.kids[ i ] ) );
 			}
 		}
 		return element;
 	}
-
-	/* from http://www.quirksmode.org/js/findpos.html */
 	, elementPosition: function( element ) {
-		var left = 0;
-		var top = 0;
+		/* from http://www.quirksmode.org/js/findpos.html */
+		let left = 0;
+		let top = 0;
 		if ( element.offsetParent ) {
 			do {
 				left += element.offsetLeft;
@@ -73,5 +95,20 @@ const Utilo = {
 			} while ( element = element.offsetParent );
 		}
 		return { x : left, y : top };
+	}
+	, identity: function( value ) {
+		return value;
+	}
+	, flatten: function( value, converter, values ) {
+		converter = ( 'undefined' === typeof( converter ) ) ? Utilo.identity : converter;
+		values    = ( 'undefined' === typeof( values )    ) ? [] : values;
+		if ( 'object' === typeof( value ) ) {
+			for ( let key in value ) {
+				Utilo.flatten( value[ key ], converter, values );
+			}
+		} else {
+			values.push( converter( value ) );
+		}
+		return values;
 	}
 };
