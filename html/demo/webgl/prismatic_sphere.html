@@ -25,11 +25,20 @@
 				let gl = Glo.gl( canvas, {preserveDrawingBuffer:true} );
 				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
 				let textureProgram = Glo.program( gl, Shaders.texture.vertex, Shaders.texture.fragment );
+				
+				/* model object stuff */
 
-				let instance = TriangularPrism.instantiate();
-				let edges = facesToEdges( instance.faces );
-				let colors = verticesToColors( instance.vertices );
-				let inverted = colors.map(function(v){return 1-v});
+				let edges, colors, inverted;
+				let onChange = function( t ) {
+					edges = facesToEdges( t.faces );
+					colors = t.vertices.map( v => 0.5 * ( 1 + v ) );
+					inverted = colors.map( v => 1 - v );
+					console.log( [t.faces,t.vertices].map(v=>v.length).join( ' x ' ) );
+					return t;
+				}
+				let instance = onChange( TriangularPrism.instantiate() );
+
+				/* things about drawing */
 
 				let image = new Image();
 				let texture_ready = false;
@@ -49,19 +58,11 @@
 				};
 
 				keyz.s = Utilo.getByContents( 'split' ).onclick = function() {
-					instance.subdivide();
-					edges = facesToEdges( instance.faces );
-					colors = verticesToColors( instance.vertices );
-					inverted = colors.map(function(v){return 1-v});
-
-					console.log( [instance.faces.length, 'faces and', instance.vertices.length, 'vertices' ].join( ' ' ) );
+					onChange( instance.subdivide() );
 				};
 
 				keyz.r = Utilo.getByContents( 'reset' ).onclick = function() {
-					instance = TriangularPrism.instantiate();
-					edges = facesToEdges( instance.faces );
-					colors = verticesToColors( instance.vertices );
-					inverted = colors.map(function(v){return 1-v});
+					onChange( instance = TriangularPrism.instantiate() );
 				};
 
 				keyz.l = Utilo.getByContents( 'look' ).onclick = function() { look++; };
@@ -127,7 +128,7 @@
 			};
 
 			const drawTexture = function( gl, textureProgram, mouseControls, mirror ) {
-				mirror = mirror % 4;
+				mirror = mirror % 5;
 				if ( 0 == mirror ) return;
 
 				gl.useProgram( textureProgram );
@@ -178,10 +179,6 @@
 					edges.push( faces[ i + 0 ] );
 				}
 				return edges;
-			};
-
-			const verticesToColors = function( vertices ) {
-				return vertices.map( function( v ) { return 0.5 * ( 1 + v ) } );
 			};
 		</script>
 
