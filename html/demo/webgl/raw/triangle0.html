@@ -1,0 +1,136 @@
+<HTML>
+	<HEAD>
+		<TITLE>triangle0</TITLE>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				/********************************************/
+				/* initialization */
+
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let gl = canvas.getContext( "webgl" );
+				if ( !gl ) {
+					throw 'could not get webgl context';
+				}
+			
+				/********************************************/
+				/* set up the shaders */
+
+				let program = gl.createProgram();
+
+				/*************/
+
+				let src, shader, type;
+
+				/*************/
+
+				src    = document.getElementById( 'vertex-shader' ).innerHTML
+				type   = gl.VERTEX_SHADER;
+
+				shader = gl.createShader( type );
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+					throw gl.getShaderInfoLog( shader );
+				}
+				gl.attachShader( program, shader );
+
+				/*************/
+
+				src    = document.getElementById( 'fragment-shader' ).innerHTML
+				type   = gl.FRAGMENT_SHADER;
+
+				shader = gl.createShader( type );
+				gl.shaderSource( shader, src );
+				gl.compileShader( shader );
+				if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+					throw gl.getShaderInfoLog( shader );
+				}
+				gl.attachShader( program, shader );
+
+				/*************/
+
+				gl.linkProgram( program );
+				if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+					throw gl.getProgramInfoLog( program );
+				}
+				gl.useProgram( program );
+
+				/********************************************/
+				/* push data into the program */
+
+				let data, attributeName, floatsPerValue, attribute;
+
+				/********************************************/
+				/* push data into the position attribute */
+
+				data = new Float32Array([
+					  -1, -1, 0
+					,  0,  1, 0
+					, +1, -1, 0
+				]);
+				attributeName = 'aPosition';
+				floatsPerValue = 3;
+
+				attribute = gl.getAttribLocation( program, attributeName );
+				gl.bindBuffer( gl.ARRAY_BUFFER, gl.createBuffer() );
+				gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+				gl.enableVertexAttribArray( attribute );
+				gl.vertexAttribPointer( attribute, floatsPerValue, gl.FLOAT, false, 0, 0 );
+
+				/********************************************/
+				/* push data into the color attribute */
+
+				// create a buffer to hold the color
+				data = new Float32Array([
+					1.0, 0.0, 0.0, 1.0,
+					0.0, 1.0, 0.0, 1.0,
+					0.0, 0.0, 1.0, 1.0
+				]);
+				attributeName = 'aColor';
+				floatsPerValue = 4;
+
+				attribute = gl.getAttribLocation( program, attributeName );
+				gl.bindBuffer( gl.ARRAY_BUFFER, gl.createBuffer() );
+				gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+				gl.enableVertexAttribArray( attribute );
+				gl.vertexAttribPointer( attribute, floatsPerValue, gl.FLOAT, false, 0, 0 );
+
+				/********************************************/
+				/* actually draw the triangle */
+
+				let useFaces = true;
+				
+				if ( useFaces ) {
+					gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer() );
+					gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0,1,2]), gl.STATIC_DRAW );
+					gl.drawElements( gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0 );
+				} else {
+					gl.drawArrays( gl.TRIANGLES, 0,  3);
+				}
+			};
+		</script>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec2 aPosition;
+			attribute vec4 aColor;
+			varying vec4 vColor;
+			void main() {
+				   gl_Position = vec4(aPosition, 0, 1);
+				   vColor = aColor; 
+			}
+		</script>
+
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+			varying vec4 vColor; 
+			void main(void) {
+				gl_FragColor = vColor;
+			}
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="640" height="480"></canvas>
+	</BODY>
+
+</HTML>
