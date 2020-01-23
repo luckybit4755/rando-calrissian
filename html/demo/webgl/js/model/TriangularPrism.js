@@ -54,7 +54,8 @@ const TriangularPrism = {
 			nuFaces.push( v2 ); nuFaces.push( c ); nuFaces.push( b );
 			nuFaces.push( a  ); nuFaces.push( b ); nuFaces.push( c );
 		}
-		return instance.faces = nuFaces;
+		instance.faces = nuFaces;
+		return instance;
 	}
 	, _addMidpoint: function( instance, v0, v1, vertices ) {
 		if ( !( 'cache' in instance ) ) {
