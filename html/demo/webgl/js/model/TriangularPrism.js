@@ -2,8 +2,8 @@ const TriangularPrism = {
 	/* ok... this seems nuts... */
 	instantiate: function() {
 		let instance = {
-			faces:TriangularPrism.faces,
-			vertices:TriangularPrism.vertices
+			faces:TriangularPrism.faces.slice()
+			, vertices:TriangularPrism.vertices.slice()
 		}
 		instance.subdivide = function() {
 			return TriangularPrism.subdivide( instance );

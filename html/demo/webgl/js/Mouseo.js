@@ -29,21 +29,26 @@ const Mouseo = {
 			canvas.onmousemove( e )
 		};
 
-		let matrix = function() {
-			return Matrixo.multiply(
-				  Matrixo.rotateX( Math.cos( angleX ), Math.sin( angleX ) ) 
-				, Matrixo.rotateY( Math.cos( angleY ), Math.sin( angleY ) ) 
-			);
-		};
-
-		let idle = function( timeout, delta ) {
-			if ( !last || new Date().getTime() - last > timeout ) {
-				angleX += delta;
-				angleY += delta;
+		return {
+			matrix:function() {
+				return Matrixo.multiply(
+					  Matrixo.rotateX( Math.cos( angleX ), Math.sin( angleX ) ) 
+					, Matrixo.rotateY( Math.cos( angleY ), Math.sin( angleY ) ) 
+				)
 			}
-		};
-
-		return { matrix:matrix, idle:idle };
+			, idle: function( timeout, delta ) {
+				if ( !last || new Date().getTime() - last > timeout ) {
+					angleX += delta;
+					angleY += delta;
+				}
+			}
+			, getAngleX() {
+				return angleX;
+			}
+			, getAngleY() {
+				return angleY;
+			}
+		}
 	}
 	, toAngle: function( now, start, size ) {
 		return ( now - start ) / size * 2 * Math.PI;

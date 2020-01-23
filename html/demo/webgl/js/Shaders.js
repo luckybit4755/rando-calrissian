@@ -83,7 +83,8 @@ const Shaders = {
 			uniform sampler2D uSampler;
 
 			void main(void) {
-				gl_FragColor = texture2D( uSampler, vTexture );
+				vec4 t = 0.6 * texture2D( uSampler, vTexture );
+				gl_FragColor = vec4( t[0], t[1], t[2], 1.0 );
 			}
 		`
 	}
