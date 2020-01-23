@@ -112,4 +112,24 @@ const Matrixo = {
 		}
 		return m;
 	}
+	, lookAt: function() {
+		//https://gamedev.stackexchange.com/questions/133867/whats-wrong-with-this-camera-implementation/134124
+/*
+   var r = this.right,
+        u = this.up,
+        f = this.front,
+        p = this.position;
+
+    var view = [r[0], u[0], -f[0], 0.0,
+                r[1], u[1], -f[1], 0.0,
+                r[2], u[2], -f[2], 0.0,
+                0.0,  0.0,  0.0,  1.0]
+    var a = [1.0, 0.0, 0.0, 0.0,
+             0.0, 1.0, 0.0, 0.0,
+             0.0, 0.0, 1.0, 0.0,
+             -p[0], -p[1], -p[2], 1.0];
+
+    mat4.multiply(view, view, a);
+*/
+	}
 };

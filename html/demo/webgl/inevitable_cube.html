@@ -161,13 +161,15 @@
 					let c = Math.cos( angle );
 					let s = Math.sin( angle );
 
-					let x = Matrixo.rotateX( c, s );
-					let y = Matrixo.rotateY( c, s );
-					let z = Matrixo.rotateZ( c, s );
-					let q = Matrixo.scale( 0.66 );
+					Glo.matrix( gl, program, 'uMatrix',
+						Matrixo.multiplyMatrices(
+							  Matrixo.rotateX( c, s )
+							, Matrixo.rotateY( c, s )
+							, Matrixo.rotateZ( c, s )
+							, Matrixo.scale( 0.66 )
+						)
+					);
 
-					let m = Matrixo.multiply( Matrixo.multiply( Matrixo.multiply( x, y ), z ), q );
-					Glo.matrix( gl, program, 'uMatrix', m );
 
 					Glo.clear( gl );
 

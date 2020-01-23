@@ -1,0 +1,88 @@
+<HTML>
+	<HEAD>
+		<TITLE>normal_cube</TITLE>
+
+		<!--  S O  -  S T Y L I S H ! : so stylish! -->
+
+		<link rel="stylesheet" href="css/css.css"></link>
+
+		<!--  B I T  -  O '  -  J A V A S C R I P T : bit o' javascript -->
+
+		<script type="text/javascript" src="js/Glo.js"></script>
+		<script type="text/javascript" src="js/Matrixo.js"></script>
+		<script type="text/javascript" src="js/Mesho.js"></script>
+		<script type="text/javascript" src="js/Mouseo.js"></script>
+		<script type="text/javascript" src="js/Shaders.js"></script>
+		<script type="text/javascript" src="js/Vectoro.js"></script>
+		<script type="text/javascript" src="js/Utilo.js"></script>
+		<script type="text/javascript" src="js/model/Cube.js"></script>
+
+		<script type="text/javascript">
+			const normal_cube = function() {
+				let canvas = Utilo.getByTag( 'canvas' );
+
+				let gl = Glo.gl( canvas );
+				let program = Glo.program( gl, Shaders.normal.vertex, Shaders.normal.fragment );
+
+				let vertices = Cube.vertices;
+				let faces = Mesho.triangulate( Cube.faces, Cube.perFace );
+				let normals = Mesho.normals( faces, vertices );
+				let u = Mesho.uniqVertices( faces, vertices, normals );
+
+				faces = u.faces;
+				vertices = u.vertices;
+				normals = u.normals;
+
+				let COLORS = {
+					red: [1,0,0],   
+					green: [0,1,0],   
+					blue: [0,0,1],   
+					yellow: [1,1,0],   
+					cyan: [0,1,1],   
+					purple: [1,0,1]
+				}
+				let k = [];
+				Object.values( COLORS ).map(function(v){k=k.concat(v)});
+
+				colors = [];
+				for ( let i = 0 ; i < faces.length ; i++ ) {
+					// 3 vertices per face and 2 faces per quad...
+					let faceIndex = 3 * Math.floor( i / ( 3 * 2 ) );
+					let q = k.slice( faceIndex, faceIndex + 3 );
+					colors = colors.concat( q );
+				}
+				console.log( colors.length );
+
+				Utilo.getByTag( 'button' ).onclick = function() { Utilo.fullscreen( canvas ); };
+
+				let mouseControls = Mouseo.simpleControls( canvas );
+
+                let draw = function() {
+                    Glo.clear( gl );
+					let now = new Date().getTime();
+
+					mouseControls.idle( 5000, 0.03 );
+
+					let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.44 ) );
+                    Glo.matrix( gl, program, 'uMatrix', m );
+
+					Glo.data( gl, program, 'aPosition', vertices );
+					Glo.data( gl, program, 'aColor', colors );
+					Glo.data( gl, program, 'aNormal', normals );
+					Glo.draw( gl, faces );
+
+					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
+				};
+				draw();
+			};
+		</script>
+
+		<script type="text/javascript">
+			window.onload = normal_cube;
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+		<button class="fullscreen">fullscreen</button>
+	</BODY>
+</HTML>

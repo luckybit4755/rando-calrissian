@@ -1,0 +1,21 @@
+------
+leak stuff:
+This is leaking and probly fragmenting graphic memory, atm and needs to be addressed at some point
+see https://stackoverflow.com/questions/23120851/webgl-deletebuffer-leaking-memory
+
+It's never a good idea to repeatedly create and delete buffers in your animation loop, as it causes video memory fragmentation. Video memory isn't managed by powerful garbage collectors like in Java or .NET, since it would be in strong contrast to performance. What's freed with "deleteBuffer" might not actually be freed for new use until the complete GL context is deleted.
+
+If you need to use a lot of dynamicly changing buffers, either use the gl.DYNAMIC_DRAW hint which will cause the driver to store the buffer in CPU memory and stream it to the GPU for each individual rendering (at a performance penalty of course) or keep re-using your buffers (over-provisioning its dimension might be advisable).
+
+Many professional 3D engines ever only use one large vertex buffer object for all meshes, using bufferSubData and drawing commands with offsets.
+
+------
+camera stuff:
+http://in2gpu.com/2016/03/14/opengl-fps-camera-quaternion/
+https://gamedev.stackexchange.com/questions/133867/whats-wrong-with-this-camera-implementation/134124
+------
+dual quaternions (idk...)
+http://chinedufn.com/dual-quaternion-shader-explained/
+https://www.cs.utah.edu/~ladislav/kavan07skinning/kavan07skinning.pdf
+https://www.cs.utah.edu/~ladislav/dq/
+------

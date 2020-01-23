@@ -61,4 +61,17 @@ const Utilo = {
 		}
 		return element;
 	}
+
+	/* from http://www.quirksmode.org/js/findpos.html */
+	, elementPosition: function( element ) {
+		var left = 0;
+		var top = 0;
+		if ( element.offsetParent ) {
+			do {
+				left += element.offsetLeft;
+				top  += element.offsetTop;
+			} while ( element = element.offsetParent );
+		}
+		return { x : left, y : top };
+	}
 };

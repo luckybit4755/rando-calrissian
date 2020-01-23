@@ -87,4 +87,51 @@ const Shaders = {
 			}
 		`
 	}
+	, normal: {
+		vertex:`
+			precision mediump float;
+
+			attribute vec4  aPosition;
+			varying   vec4  vPosition;
+
+			attribute vec4  aColor;
+			varying   vec4  vColor;
+
+			attribute vec4  aNormal; // short for "Abby Normal"
+			varying   vec4  vNormal;
+
+			uniform   mat4  uMatrix;
+
+			void main() {
+				   gl_Position = uMatrix * aPosition;
+				   vPosition = gl_Position;
+				   vColor = aColor;
+				   vNormal = uMatrix * aNormal; 
+			}
+		`
+		, fragment:`
+			precision mediump float;
+
+			varying vec4 vColor; 
+			varying vec4 vPosition; 
+			varying vec4 vNormal;
+
+			float lightStrength = 6.0;
+			vec4  lightPosition = vec4( 3,0,-3,0 );
+			vec4  light = normalize( lightPosition );
+
+			void main(void) {
+				float lightValue = dot( vNormal, light );
+				float lightDistance = length( vPosition - lightPosition );
+
+				lightValue += 0.33;
+				lightValue *= lightValue;
+				
+				lightDistance /= lightStrength;
+				lightDistance *= lightDistance;
+
+				gl_FragColor = lightValue * vColor / lightDistance + 0.033 * vColor;
+			}
+		`
+	}
 };
