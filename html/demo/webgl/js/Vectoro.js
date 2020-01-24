@@ -47,15 +47,6 @@ const Vectoro = {
 		return [ v[ 0 ] + u[ 0 ], v[ 1 ] + u[ 1 ], v[ 2 ] + u[ 2 ] ];
 	}
 	, toString: function( v, precision ) {
-		precision = Util.idk( precision, 1000 );
-		return (
-			'('
-			+ Math.floor( v[ 0 ] * precision ) / precision 
-			+ ','
-			+ Math.floor( v[ 1 ] * precision ) / precision 
-			+ ','
-			+ Math.floor( v[ 2 ] * precision ) / precision 
-			+ ')'
-		);
+		return '(' + v.map(a=>Utilo.floatless(a,precision)).join(',') + ')';
 	}
 };

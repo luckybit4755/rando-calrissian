@@ -110,4 +110,9 @@ const Utilo = {
 		}
 		return values;
 	}
+	, floatless: function( v, precision ) {
+		if ( isNaN( v ) ) return v;
+		precision = Utilo.idk( precision, 1000 );
+		return Math.floor( v * precision ) / precision
+	}
 };
