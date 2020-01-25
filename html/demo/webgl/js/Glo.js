@@ -64,7 +64,8 @@ const Glo = {
 		data = new Float32Array( data ); 
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-		gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+		gl.bufferData( gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW );
+		//gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
 
 		let location = gl.getAttribLocation( program, name );
 		gl.enableVertexAttribArray( location );
@@ -88,7 +89,8 @@ const Glo = {
 		if ( faces ) {
 			let buffer = Glo._bufferN( gl, '_faces' );
 			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, buffer );
-			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.STATIC_DRAW );
+			gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.DYNAMIC_DRAW );
+			//gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), gl.STATIC_DRAW );
 			gl.drawElements( what, faces.length , gl.UNSIGNED_SHORT, 0 );
 		} else {
 			gl.drawArrays( what, 0,  3);
