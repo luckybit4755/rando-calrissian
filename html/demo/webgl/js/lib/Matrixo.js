@@ -1,3 +1,5 @@
+import Utilo from './Utilo.js';
+
 const Matrixo = {
 	identity: function() {
 		return [
@@ -198,3 +200,5 @@ const Matrixo = {
 */
 	}
 };
+
+export default Matrixo;

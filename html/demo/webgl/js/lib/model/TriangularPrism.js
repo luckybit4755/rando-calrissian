@@ -97,3 +97,5 @@ const TriangularPrism = {
 		return idx;
 	}
 };
+
+export default TriangularPrism;

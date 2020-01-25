@@ -122,3 +122,5 @@ const Utilo = {
 		return current;
 	}
 };
+
+export default Utilo;

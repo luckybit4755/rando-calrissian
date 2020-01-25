@@ -147,3 +147,5 @@ const Shaders = {
 		`
 	}
 };
+
+export default Shaders;

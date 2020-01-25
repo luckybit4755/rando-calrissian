@@ -32,10 +32,6 @@ const Cube = {
         4, 6, 2, 0,
         6, 7, 3, 2 
     ]
-}
+};
 
-
-
-
-
-
+export default Cube;

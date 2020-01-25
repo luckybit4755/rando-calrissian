@@ -1,3 +1,5 @@
+import Utilo from './Utilo.js';
+
 const Glo = {
 	gl: function( canvas, flags ) {
 		let gl = canvas.getContext( 'webgl', flags );
@@ -120,3 +122,5 @@ const Glo = {
 		Glo.value( gl, program, name, samplerValue );
 	}
 };
+
+export default Glo;

@@ -1,3 +1,5 @@
+import Utilo from './Utilo.js';
+
 // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/transforms/index.htm
 // https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/functions/index.htm
@@ -150,3 +152,5 @@ const Quaterniono = {
 		);
 	}
 };
+
+export default Quaterniono;

@@ -1,3 +1,5 @@
+import Utilo from './Utilo.js';
+
 const Vectoro = {
 	copy: function( v ) {
 		return [ v[ 0 ], v[ 1 ], v[ 2 ] ];
@@ -50,3 +52,5 @@ const Vectoro = {
 		return '(' + v.map(a=>Utilo.floatless(a,precision)).join(',') + ')';
 	}
 };
+
+export default Vectoro;

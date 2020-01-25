@@ -8,3 +8,5 @@ const Constantso = {
 		purple: [1,0,1]
 	}
 };
+
+export default Constantso;

@@ -1,3 +1,5 @@
+import Matrixo from './Matrixo.js';
+
 const Mouseo = {
 	// note quite right, but ok...
 	simpleControls: function( canvas ) {
@@ -54,3 +56,5 @@ const Mouseo = {
 		return ( now - start ) / size * 2 * Math.PI;
 	}
 };
+
+export default Mouseo;

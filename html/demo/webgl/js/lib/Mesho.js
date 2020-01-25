@@ -1,3 +1,7 @@
+import Constantso from './Constantso.js';
+import Utilo from './Utilo.js';
+import Vectoro from './Vectoro.js';
+
 const Mesho = {
 	// quick and hacky
 	triangulate: function( faces, perFace ) {
@@ -99,3 +103,5 @@ const Mesho = {
 		return { vertices:vertices, faces:faces, colors:colors };
 	}
 };
+
+export default Mesho;
