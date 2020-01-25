@@ -81,5 +81,21 @@ const Mesho = {
 		}       
 		return edges;
 	}  
-
+	, axis: function() {
+		let vertices = [];
+		let faces = [];
+		let colors = [];
+		let k = Object.values( Constantso.colors );
+		for ( let d = 0 ; d < 3 ; d++ ) {
+			for ( let v = -1 ; v < 2 ; v += 2 ) {
+				//colors = colors.concat( Object.values( Constantso.colors )[ d ] );
+				for ( let p = 0 ; p < 3 ; p++ ) {
+					colors.push( k[ d ][ p ] );
+					vertices.push( p == d ? v : 0 );
+				}
+				faces.push( faces.length );
+			}
+		}
+		return { vertices:vertices, faces:faces, colors:colors };
+	}
 };
