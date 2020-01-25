@@ -115,4 +115,10 @@ const Utilo = {
 		precision = Utilo.idk( precision, 1000 );
 		return Math.floor( v * precision ) / precision
 	}
+	, pushAll: function( current, nu ) {
+		for ( let i = 0 ; i < nu.length ; i++ ) { 
+			current.push( nu[ i ] );
+		}
+		return current;
+	}
 };
