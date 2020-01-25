@@ -37,6 +37,7 @@ const Quaterniono = {
 		const w = q[ 3 ];
 
 		// from https://openhome.cc/Gossip/WebGL/samples/Quaternion-1.html
+		// from https://openhome.cc/Gossip/WebGL/Quaternion.html
 		const x2 = x + x;
 		const y2 = y + y;
 		const z2 = z + z;
@@ -56,51 +57,6 @@ const Quaterniono = {
 			zx + wy,         zy - wx,        1 - xx - yy,   0,
 			0,               0,              0,             1
 		];
-	}
-	, slerp: function( q, p, t ) {
-		// from https://en.wikipedia.org/wiki/Slerp
-		// Only unit quaternions are valid rotations.
-		// Normalize to avoid undefined behavior.
-		let v0 = Quaterniono.normalize( q );
-		let v1 = Quaterniono.normalize( p );
-
-		// Compute the cosine of the angle between the two vectors.
-		let dot = Quaterniono.dot( v0, v1 );
-
-		// If the dot product is negative, slerp won't take
-		// the shorter path. Note that v1 and -v1 are equivalent when
-		// the negation is applied to all four components. Fix by
-		// reversing one quaternion.
-		if (dot < 0.0) {
-			v1 = Quaterniono.scale( 1, v1 );
-			dot = -dot;
-		}
-
-		const DOT_THRESHOLD = 0.9995;
-		if (dot > DOT_THRESHOLD) {
-			// If the inputs are too close for comfort, linearly interpolate
-			// and normalize the result.
-			return Quaterniono.normalize(
-				Quaterniono.add( 
-					v0,
-					Quaterniono.scale( t, Quaterniono.subtract( v1, v0 ) )
-				)
-			);
-		}
-
-		// Since dot is in range [0, DOT_THRESHOLD], acos is safe
-		const theta_0     = Math.acos( dot );    // theta_0 = angle between input vectors
-		const theta       = theta_0 * t;         // theta = angle between v0 and result
-		const sin_theta   = Math.sin( theta );   // compute this value only once
-		const sin_theta_0 = Math.sin( theta_0 ); // compute this value only once
-
-		const s0 = Math.cos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
-		const s1 = sin_theta / sin_theta_0;
-
-		return Quaterniono.add(
-			Quaterniono.scale( s0, v0 ),
-			Quaterniono.scale( s1, v1 )
-		);
 	}
 	, normalize: function( q ) {
 		const length = Quaterniono.length( q );
@@ -144,5 +100,53 @@ const Quaterniono = {
 			q[ 2 ] - p[ 2 ],
 			q[ 3 ] - p[ 3 ]
 		];
+	}
+	, interpolateLinearly: function( q, p, t ) {
+		return Quaterniono.normalize(
+			Quaterniono.add( 
+				q,
+				Quaterniono.scale( t, Quaterniono.subtract( p, q ) )
+			)
+		);
+	}
+	, slerp: function( q, p, t ) {
+		// from https://en.wikipedia.org/wiki/Slerp
+		// Only unit quaternions are valid rotations.
+		// Normalize to avoid undefined behavior.
+		let v0 = Quaterniono.normalize( q );
+		let v1 = Quaterniono.normalize( p );
+
+		// Compute the cosine of the angle between the two vectors.
+		let dot = Quaterniono.dot( v0, v1 );
+
+		// If the dot product is negative, slerp won't take
+		// the shorter path. Note that v1 and -v1 are equivalent when
+		// the negation is applied to all four components. Fix by
+		// reversing one quaternion.
+		if (dot < 0.0) {
+			v1 = Quaterniono.scale( -1, v1 );
+			dot = -dot;
+		}
+
+		const DOT_THRESHOLD = 0.9995;
+		if (dot > DOT_THRESHOLD) {
+			// If the inputs are too close for comfort, linearly interpolate
+			// and normalize the result.
+			return Quaterniono.interpolateLinearly( v0, v1, t );
+		}
+
+		// Since dot is in range [0, DOT_THRESHOLD], acos is safe
+		const theta_0     = Math.acos( dot );    // theta_0 = angle between input vectors
+		const theta       = theta_0 * t;         // theta   = angle between v0 and result
+		const sin_theta   = Math.sin( theta );   // compute this value only once
+		const sin_theta_0 = Math.sin( theta_0 ); // compute this value only once
+
+		const s0 = Math.cos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
+		const s1 = sin_theta / sin_theta_0;
+
+		return Quaterniono.add(
+			Quaterniono.scale( s0, v0 ),
+			Quaterniono.scale( s1, v1 )
+		);
 	}
 };
