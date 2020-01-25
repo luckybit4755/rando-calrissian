@@ -13,9 +13,11 @@ Many professional 3D engines ever only use one large vertex buffer object for al
 camera stuff:
 http://in2gpu.com/2016/03/14/opengl-fps-camera-quaternion/
 https://gamedev.stackexchange.com/questions/133867/whats-wrong-with-this-camera-implementation/134124
+https://openhome.cc/Gossip/WebGL/Lib2.html <--
 ------
 dual quaternions (idk...)
 http://chinedufn.com/dual-quaternion-shader-explained/
 https://www.cs.utah.edu/~ladislav/kavan07skinning/kavan07skinning.pdf
 https://www.cs.utah.edu/~ladislav/dq/
 ------
+this would have been helpful earlier: https://openhome.cc/Gossip/WebGL/samples/js/gl-comm-2.js
