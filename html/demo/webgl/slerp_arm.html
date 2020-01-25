@@ -21,15 +21,30 @@
 		<script type="text/javascript">
 			const rando = function() { return Math.random(); }
 
-			const Limb = function( length, limbs ) {
-				this.init = function( length, limbs ) {
+			const Limb = function( length, depth, children ) {
+				this.init = function( length, depth, children ) {
+					depth = Utilo.idk( depth, 4 )
+					children = Utilo.idk( children, 1 );
+
 					this.start = this.rando();
 					this.stop = this.rando();
 					this.length = length;
 					this.idk = Quaterniono.set( 0, this.length, 0 );
-					if ( limbs ) {
-						this.limb = new Limb( 0.77 * length, limbs - 1 );
-					}
+
+					if ( depth <= 0 ) return;
+
+					this.limbs = [];
+
+					if ( children > 10 ) throw 'planB';
+
+					let nextLength   = length * 0.77;
+					let nextDepth    = depth - 1;
+					let nextChildren = children + 1;
+					for ( let i = 0 ; i < children ; i++ ) {
+						let limb = new Limb( nextLength, nextDepth, nextChildren );
+						this.limbs.push( limb );
+						//break;
+					};
 				};
 				this.rando = function() {
 					return Quaterniono.rotate(
@@ -38,17 +53,28 @@
 					);
 				};
 
-				this.slerp = function( q, t, qz ) {
+				this.slerp = function( last, t, vertices, faces, parentIndex ) {
 					let slerped = Quaterniono.slerp( this.start, this.stop, t );
+					//slerped = Quaterniono.interpolateLinearly( this.start, this.stop, t );
 					let rotated = Quaterniono.rotatePoint( slerped, this.idk );
-					let next = Quaterniono.add( q, rotated );
-					qz.push( next );
-					if ( this.limb ) {
-						this.limb.slerp( next, t, qz );
+					let next = Quaterniono.add( last, rotated );
+
+					let index = vertices.length / 3;
+					for ( let i = 0 ; i < 3 ; i++ ) {
+						vertices.push( next[ i ] );
+					}
+					faces.push( parentIndex );
+					faces.push( index );
+
+					if ( !this.limbs ) return;
+
+					for ( let i = 0 ; i < this.limbs.length ; i++ ) {
+						let limb = this.limbs[ i ];
+						limb.slerp( next, t, vertices, faces, index );
 					}
 				};
 
-				this.init( length, limbs );
+				this.init( length, depth, children );
 			};
 			const slerp_arm = function() {
 				/* little dom fun */
@@ -62,12 +88,8 @@
 				let gl = Glo.gl( canvas );
 				let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
 
-				let limb = new Limb( 0.44, 3 );
-				console.log( JSON.stringify( limb,(k,v)=>Utilo.floatless(v),'\t' ) );
-
-				let faces    = [ 0,1,2 ];
-				let vertices = [ 0,1,0, 1,0,0, 0,0,0 ];
-				let colors   = [ 1,0,0, 0,1,0, 0,0,1 ];
+				let limb = new Limb( 0.44, 5 );
+				//console.log( JSON.stringify( limb,(k,v)=>Utilo.floatless(v),'\t' ) );
 
 				/* drawing loop */
 
@@ -75,6 +97,9 @@
 				let t_velocity_start = 0.01;
 				let t_velocity = t_velocity_start;
 				let t_acceleration = 1.01;
+
+				let root = Quaterniono.set( 0,0,0 );
+				let axis = Mesho.axis();
 			
                 let draw = function() {
                     Glo.clear( gl );
@@ -83,23 +108,11 @@
 					let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
 					Glo.matrix( gl, program, 'uMatrix', m );
 
-					let qz = [Quaterniono.set( 0,0,0 )];
-					limb.slerp( qz[ 0 ], t, qz );
+					let faces = [];
+					let vertices = [0,0,0];
+					limb.slerp( root, t, vertices, faces, 0 );
 
-					// convert to vertices
-					let vertices = [];
-					for ( let i = 0 ; i < qz.length ; i++ ) {
-						for ( let j = 0 ; j < 3 ; j++ ) {
-							vertices.push( qz[ i ][ j ] );
-						}
-					}
-					colors = vertices.map((v,i)=>i%3?t:1-t);
-
-					faces = [];
-					for ( let i = 0 ; i < qz.length - 1 ; i++ ) {
-						faces.push( i + 0 );
-						faces.push( i + 1 );
-					}
+					let colors = vertices.map((v,i)=>i%3?t:1-t);
 
 					if ( false ) {
 						let msg = JSON.stringify( vertices,(k,v)=>Utilo.floatless(v) );
@@ -117,6 +130,23 @@
 					Glo.data( gl, program, 'aPosition', vertices );
 					Glo.data( gl, program, 'aColor', colors );
 					Glo.draw( gl, faces, gl.LINES );
+/*
+					vertices = [];
+					faces = [];
+					colors = [];
+					for ( let d = 0 ; d < 3 ; d++ ) {
+						for ( let v = -1 ; v < 2 ; v += 2 ) {
+							colors = colors.concat( Object.values( Constantso.colors )[ d ] );
+							for ( let p = 0 ; p < 3 ; p++ ) {
+								vertices.push( p == d ? v : 0 );
+							}
+							faces.push( faces.length );
+						}
+					}
+*/
+					Glo.data( gl, program, 'aPosition', axis.vertices );
+					Glo.data( gl, program, 'aColor', axis.colors );
+					Glo.draw( gl, axis.faces, gl.LINES );
 
 					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
 				};
