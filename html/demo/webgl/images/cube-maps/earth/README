@@ -1,0 +1,5 @@
+From http://www.humus.name/index.php?page=Textures&&start=72
+
+Resized like this:
+
+clear ; for f in *.jpg ; do g=$( echo ${f} | sed 's,\.jpg$,-512.jpg,' ) ; convert -resize 512x512 ${f} ${g} ; echo ${f} " : " $( imginfo -f ${f} ) ; echo ${g} " : " $( imginfo -f ${g} ) ; done

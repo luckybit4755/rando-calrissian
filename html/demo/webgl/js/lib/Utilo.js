@@ -44,7 +44,7 @@ const Utilo = {
 	, getByTag: function( tag, index ) {
 		tag = Utilo.idk( tag, 'canvas' );
 		index = Utilo.idk( index, 0 );
-		let tagged = document.getElementsByTagName( tag );
+		let tagged = Array.from( document.getElementsByTagName( tag ) );
 		return isNaN( index ) ? tagged : tagged[ index ];
 	}
 	, getById: function( id ) {

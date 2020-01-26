@@ -44,3 +44,11 @@ button {
 	background:  #333;
 	color: #cc0;
 }
+
+a {
+	color:white;
+}
+
+hidden {
+	display: none;
+}

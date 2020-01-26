@@ -1,4 +1,4 @@
-const Shaders = {
+const Shadero = {
 	simple: {
 		vertex:`
 			attribute vec4 aPosition;
@@ -132,6 +132,8 @@ const Shaders = {
 			vec4  lightPosition = vec4( 3,0,-3,0 );
 			vec4  light = normalize( lightPosition );
 
+			uniform samplerCube uCubeSampler;
+
 			void main(void) {
 				float lightValue = dot( vNormal, light );
 				float lightDistance = length( vPosition - lightPosition );
@@ -142,10 +144,17 @@ const Shaders = {
 				lightDistance /= lightStrength;
 				lightDistance *= lightDistance;
 
-				gl_FragColor = lightValue * vColor / lightDistance + 0.033 * vColor;
+				//vec4 color = vec4(1.0,1.0,1.0,1.0);
+				//vec4 color = vColor;
+				vec4 color = textureCube(
+                    uCubeSampler
+                    , vec3( -vPosition.x, vPosition.y, vPosition.z )
+                );
+
+				gl_FragColor = lightValue * color / lightDistance + 0.033 * color;
 			}
 		`
 	}
 };
 
-export default Shaders;
+export default Shadero;

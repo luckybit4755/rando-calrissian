@@ -3,7 +3,7 @@ import Glo        from '../lib/Glo.js';
 import Matrixo    from '../lib/Matrixo.js';
 import Mesho      from '../lib/Mesho.js';
 import Mouseo     from '../lib/Mouseo.js';
-import Shaders    from '../lib/Shaders.js';
+import Shadero    from '../lib/Shadero.js';
 import Utilo      from '../lib/Utilo.js';
 import Vectoro    from '../lib/Vectoro.js';
 
@@ -18,7 +18,7 @@ const template = function() {
 	/* setup */
 
 	let gl = Glo.gl( canvas );
-	let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
+	let program = Glo.program( gl, Shadero.lit.vertex, Shadero.lit.fragment );
 
 	let faces    = [ 0,1,2 ];
 	let vertices = [ 0,1,0, 1,0,0, 0,0,0 ];

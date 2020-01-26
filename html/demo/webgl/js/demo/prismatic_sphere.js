@@ -2,10 +2,10 @@ import Glo             from '../lib/Glo.js';
 import Matrixo         from '../lib/Matrixo.js';
 import Mesho           from '../lib/Mesho.js';
 import Mouseo          from '../lib/Mouseo.js';
-import Shaders         from '../lib/Shaders.js';
-import Vectoro         from '../lib/Vectoro.js';
-import Utilo           from '../lib/Utilo.js';
+import Shadero         from '../lib/Shadero.js';
 import TriangularPrism from '../lib/model/TriangularPrism.js';
+import Utilo           from '../lib/Utilo.js';
+import Vectoro         from '../lib/Vectoro.js';
 
 const prismatic_sphere = function() {
 	let canvas = Utilo.getByTag( 'canvas' );
@@ -13,8 +13,8 @@ const prismatic_sphere = function() {
 	/* setup */
 
 	let gl = Glo.gl( canvas, {preserveDrawingBuffer:true} );
-	let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
-	let textureProgram = Glo.program( gl, Shaders.texture.vertex, Shaders.texture.fragment );
+	let program = Glo.program( gl, Shadero.lit.vertex, Shadero.lit.fragment );
+	let textureProgram = Glo.program( gl, Shadero.texture.vertex, Shadero.texture.fragment );
 	
 	/* model object stuff */
 

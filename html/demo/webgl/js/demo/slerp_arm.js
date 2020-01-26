@@ -4,7 +4,7 @@ import Matrixo     from '../lib/Matrixo.js';
 import Mesho       from '../lib/Mesho.js';
 import Mouseo      from '../lib/Mouseo.js';
 import Quaterniono from '../lib/Quaterniono.js';
-import Shaders     from '../lib/Shaders.js';
+import Shadero     from '../lib/Shadero.js';
 import Utilo       from '../lib/Utilo.js';
 import Vectoro     from '../lib/Vectoro.js';
 
@@ -20,7 +20,7 @@ const slerp_arm = function() {
 	/* setup */
 
 	let gl = Glo.gl( canvas );
-	let program = Glo.program( gl, Shaders.lit.vertex, Shaders.lit.fragment );
+	let program = Glo.program( gl, Shadero.lit.vertex, Shadero.lit.fragment );
 
 	let limb = new Limb( 0.44, 5 );
 	//console.log( JSON.stringify( limb,(k,v)=>Utilo.floatless(v),'\t' ) );

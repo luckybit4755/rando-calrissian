@@ -1,6 +1,6 @@
 import Glo     from '../lib/Glo.js';
 import Matrixo from '../lib/Matrixo.js';
-import Shaders from '../lib/Shaders.js';
+import Shadero from '../lib/Shadero.js';
 import Utilo   from '../lib/Utilo.js';
 import Mouseo  from '../lib/Mouseo.js';
 import Vectoro from '../lib/Vectoro.js';
@@ -14,7 +14,7 @@ const inevitable_cube = function() {
 
 	let gl = Glo.gl( canvas );
 
-	let program = Glo.program( gl, Shaders.simple.vertex, Shaders.simple.fragment );
+	let program = Glo.program( gl, Shadero.simple.vertex, Shadero.simple.fragment );
 
 	let cube = makeCube();
 
