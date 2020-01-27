@@ -20,6 +20,7 @@ lul {
 canvas {
 	margin:auto;
 	display:block;
+	background: black;
 	border-top:    3px solid #222;
 	border-left:   3px solid #222;
 	border-right:  3px solid #666;

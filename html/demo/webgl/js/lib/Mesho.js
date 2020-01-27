@@ -85,7 +85,20 @@ const Mesho = {
 		}       
 		return edges;
 	}  
-	, axis: function() {
+	, normalize: function( mesh ) {
+    	let faces = Mesho.triangulate( mesh.faces, mesh.perFace );
+    	let normals = Mesho.normals( faces, mesh.vertices );
+
+		return Mesho.uniqVertices( 
+			faces
+			, mesh.vertices
+			, normals 
+		);
+	}
+	, axis: function( vertexName, colorName ) {
+		vertexName = Utilo.idk( vertexName, 'aPosition' );
+		colorName = Utilo.idk( colorName, 'aColor' );
+
 		let vertices = [];
 		let faces = [];
 		let colors = [];
@@ -100,7 +113,12 @@ const Mesho = {
 				faces.push( faces.length );
 			}
 		}
-		return { vertices:vertices, faces:faces, colors:colors };
+
+		let attributes = {};
+		attributes[ vertexName ] = vertices;
+		attributes[ colorName ] = colors;
+
+		return { vertices:vertices, faces:faces, colors:colors, attributes:attributes };
 	}
 };
 

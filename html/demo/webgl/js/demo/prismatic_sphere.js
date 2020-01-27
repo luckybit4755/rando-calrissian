@@ -1,5 +1,4 @@
 import Glo             from '../lib/Glo.js';
-import Matrixo         from '../lib/Matrixo.js';
 import Mesho           from '../lib/Mesho.js';
 import Mouseo          from '../lib/Mouseo.js';
 import Shadero         from '../lib/Shadero.js';
@@ -7,13 +6,14 @@ import TriangularPrism from '../lib/model/TriangularPrism.js';
 import Utilo           from '../lib/Utilo.js';
 import Vectoro         from '../lib/Vectoro.js';
 
-const prismatic_sphere = function() {
-	let canvas = Utilo.getByTag( 'canvas' );
+export default function() {
 
 	/* setup */
 
-	let gl = Glo.gl( canvas, {preserveDrawingBuffer:true} );
-	let program = Glo.program( gl, Shadero.lit.vertex, Shadero.lit.fragment );
+	let setup = Glo.demoSetup( Shadero.lit, 'uMatrix', { preserveDrawingBuffer:true } );
+
+	let gl = setup.gl;
+	let program = setup.program;
 	let textureProgram = Glo.program( gl, Shadero.texture.vertex, Shadero.texture.fragment );
 	
 	/* model object stuff */
@@ -26,6 +26,7 @@ const prismatic_sphere = function() {
 		console.log( [t.faces,t.vertices].map(v=>v.length).join( ' x ' ) );
 		return t;
 	}
+
 	let instance = onChange( TriangularPrism.instantiate() );
 
 	/* things about drawing */
@@ -39,31 +40,22 @@ const prismatic_sphere = function() {
 
 	/* event handlers */
 
-	let mouseControls = Mouseo.simpleControls( canvas );
+	let keyz = setupClickHandlers({
+			  fullscreen: false
+			, reset:  function() { onChange( instance = TriangularPrism.instantiate() ) }
+			, split:  function() { onChange( instance.subdivide() ) }
+			, look:   function() { look++ }
+			, mirror: function() { mirror++ }
+		});
 
-	let keyz = {};
-	document.onkeydown = function( e ) { if ( e.key in keyz ) { keyz[ e.key ]() } }
-
-	keyz.f = Utilo.getByContents( 'fullscreen' ).onclick = function() { 
-		Utilo.fullscreen( canvas ); 
-	};
-
-	keyz[ ' ' ] = keyz.s = Utilo.getByContents( 'split' ).onclick = function() {
-		onChange( instance.subdivide() );
-	};
-
-	keyz.r = Utilo.getByContents( 'reset' ).onclick = function() {
-		onChange( instance = TriangularPrism.instantiate() );
-	};
-
-	keyz.l = Utilo.getByContents( 'look' ).onclick = function() { look++; };
-
-	keyz.m = Utilo.getByContents( 'mirror' ).onclick = function() { mirror++; };
-
+	keyz[ ' ' ] = keyz.s;
+		
 	keyz.e = function() { 
 		let c = [1,1,1].map(v=>Math.random());
 		inverted = colors.map( (v, i) => c[ i % 3 ] );
 	}
+
+	document.onkeydown = function( e ) { if ( e.key in keyz ) { keyz[ e.key ]() } }
 
 	/* draw loop */
 
@@ -73,16 +65,13 @@ const prismatic_sphere = function() {
 		/* draw the triangular prism */
 
 		gl.useProgram( program );
-
-		mouseControls.idle( 3000, 0.03 );
-		let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
-		Glo.matrix( gl, program, 'uMatrix', m );
+		setup.mouseLoop();
 
 		Glo.data( gl, program, 'aPosition', instance.vertices );
 
 		switch ( look % 3 ) {
 			case 0:
-				/* faces and edges */
+				/* faces (and edges) */
 				Glo.data( gl, program, 'aColor', colors );
 				Glo.draw( gl, instance.faces );
 			case 1:
@@ -99,11 +88,11 @@ const prismatic_sphere = function() {
 		/* draw the texture image */
 
 		if ( texture_ready ) {
-			drawTexture( gl, textureProgram, mouseControls, mirror );
+			drawTexture( gl, textureProgram, setup.mouseControls, mirror );
 		}
 
-		canvas.toBlob(function(blob) {
-			document.body.style.background = 'url(' + canvas.toDataURL('image/png') + ')';
+		setup.canvas.toBlob(function(blob) {
+			document.body.style.background = 'url(' + setup.canvas.toDataURL('image/png') + ')';
 			let url = URL.createObjectURL( blob );
 			image.onload = function() {
 				Glo.textureSetup( gl, program, image );
@@ -118,6 +107,18 @@ const prismatic_sphere = function() {
 	};
 	draw();
 };
+
+const setupClickHandlers = function( clickHandlers ) {
+	let keyz = {};
+	for ( let name in clickHandlers ) {
+		let target = Utilo.getByContents( name );
+		if ( clickHandlers[ name ] ) {
+			target.onclick = clickHandlers[ name ] 
+		}
+		keyz[ name[ 0 ] ] = target.onclick;
+	}
+	return keyz;
+}
 
 const drawTexture = function( gl, textureProgram, mouseControls, mirror ) {
 	mirror = mirror % 5;
@@ -147,7 +148,6 @@ const drawTexture = function( gl, textureProgram, mouseControls, mirror ) {
 			Glo.data( gl, textureProgram, 'aTexture', [ 0,0,  1,0,  0,1,  1,1 ], 2);
 			break;
 		default:
-			// noop is interesting somehow..
 			c = 0.5 + ( 1 + c );
 			s = 0.5 + ( 1 + s );
 			let ic = 1 - c;
@@ -157,5 +157,3 @@ const drawTexture = function( gl, textureProgram, mouseControls, mirror ) {
 	}
 	Glo.draw( gl, [ 0, 1, 2,	1, 3, 2 ] );
 };
-
-prismatic_sphere();

@@ -1,29 +1,16 @@
-import Constantso  from '../lib/Constantso.js';
 import Glo         from '../lib/Glo.js';
-import Matrixo     from '../lib/Matrixo.js';
 import Mesho       from '../lib/Mesho.js';
-import Mouseo      from '../lib/Mouseo.js';
 import Quaterniono from '../lib/Quaterniono.js';
 import Shadero     from '../lib/Shadero.js';
 import Utilo       from '../lib/Utilo.js';
 import Vectoro     from '../lib/Vectoro.js';
 
-const rando = function() { return Math.random(); }
-
-const slerp_arm = function() {
-	/* little dom fun */
-
-	let canvas = Utilo.getByTag( 'canvas' );
-	let mouseControls = Mouseo.simpleControls( canvas );
-	Utilo.getByContents( 'fullscreen' ).onclick = function() { Utilo.fullscreen( canvas ); };
+export default function() {
+	let setup = Glo.demoSetup( Shadero.lit );
 
 	/* setup */
 
-	let gl = Glo.gl( canvas );
-	let program = Glo.program( gl, Shadero.lit.vertex, Shadero.lit.fragment );
-
 	let limb = new Limb( 0.44, 5 );
-	//console.log( JSON.stringify( limb,(k,v)=>Utilo.floatless(v),'\t' ) );
 
 	/* drawing loop */
 
@@ -34,24 +21,24 @@ const slerp_arm = function() {
 
 	let root = Quaterniono.set( 0,0,0 );
 	let axis = Mesho.axis();
+	axis.type = setup.gl.LINES;
 
 	let draw = function() {
-		Glo.clear( gl );
-
-		//mouseControls.idle( 5000, 0.03 );
-		let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
-		Glo.matrix( gl, program, 'uMatrix', m );
+		setup.mouseLoop();
 
 		let faces = [];
 		let vertices = [0,0,0];
+
 		limb.slerp( root, t, vertices, faces, 0 );
 
 		let colors = vertices.map((v,i)=>i%3?t:1-t);
 
-		if ( false ) {
-			let msg = JSON.stringify( vertices,(k,v)=>Utilo.floatless(v) );
-			console.log( Utilo.floatless( t ) + ': ' + msg );
-		}
+	    let mesh = { attributes:{ aPosition: vertices, aColor: colors }, faces:faces, type:setup.gl.LINES }
+
+		Glo.drawMesh( setup.gl, setup.program, mesh );
+		Glo.drawMesh( setup.gl, setup.program, axis );
+
+		///
 
 		t += t_velocity;
 		let tClass = t < 0 ? 0 : ( t > 1 ? 1 : 33);
@@ -60,19 +47,12 @@ const slerp_arm = function() {
 			case 1: t = 1; t_velocity = -t_velocity_start; break;
 			default: t_velocity *= t_acceleration;
 		}
-
-		Glo.data( gl, program, 'aPosition', vertices );
-		Glo.data( gl, program, 'aColor', colors );
-		Glo.draw( gl, faces, gl.LINES );
-
-		Glo.data( gl, program, 'aPosition', axis.vertices );
-		Glo.data( gl, program, 'aColor', axis.colors );
-		Glo.draw( gl, axis.faces, gl.LINES );
-
-		setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
 	};
-	draw();
+
+	Utilo.frame( draw, 60 ).start();
 };
+
+const rando = function() { return Math.random(); }
 
 const Limb = function( length, depth, children ) {
 	this.init = function( length, depth, children ) {
@@ -96,7 +76,6 @@ const Limb = function( length, depth, children ) {
 		for ( let i = 0 ; i < children ; i++ ) {
 			let limb = new Limb( nextLength, nextDepth, nextChildren );
 			this.limbs.push( limb );
-			//break;
 		};
 	};
 	this.rando = function() {
@@ -109,6 +88,7 @@ const Limb = function( length, depth, children ) {
 	this.slerp = function( last, t, vertices, faces, parentIndex ) {
 		let slerped = Quaterniono.slerp( this.start, this.stop, t );
 		//slerped = Quaterniono.interpolateLinearly( this.start, this.stop, t );
+
 		let rotated = Quaterniono.rotatePoint( slerped, this.idk );
 		let next = Quaterniono.add( last, rotated );
 
@@ -130,4 +110,3 @@ const Limb = function( length, depth, children ) {
 	this.init( length, depth, children );
 };
 
-slerp_arm();

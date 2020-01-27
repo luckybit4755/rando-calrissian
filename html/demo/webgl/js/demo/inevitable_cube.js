@@ -8,13 +8,8 @@ import Vectoro from '../lib/Vectoro.js';
 const SQRT_3 = Math.sqrt( 3 );
 const INVERSE_SQRT_3 = 1 / SQRT_3;
 
-const inevitable_cube = function() {
-	let canvas = Utilo.getByTag( 'canvas' );
-	let mouseControls = Mouseo.simpleControls( canvas );
-
-	let gl = Glo.gl( canvas );
-
-	let program = Glo.program( gl, Shadero.simple.vertex, Shadero.simple.fragment );
+export default function() {
+	let setup = Glo.demoSetup( Shadero.simple );
 
 	let cube = makeCube();
 
@@ -23,32 +18,31 @@ const inevitable_cube = function() {
 		return ( v + INVERSE_SQRT_3 ) / ( INVERSE_SQRT_3 * 2 );
 	} );
 
+	let mesh = {
+		attributes: { aPosition:cube.vertices, aColor:colors }
+		, faces:cube.triangles
+	};
+
+	let edgeMesh = {
+		attributes: { aPosition:cube.vertices, aColor:cyans }
+		, faces:cube.edges
+		, type:setup.gl.LINES
+	};
+
+	let normalMesh = {
+		attributes: { aPosition:cube.centroids, aColor:cube.centroid_colors }
+		, faces:cube.centroid_lines
+		, type:setup.gl.LINES
+	};
+
 	let draw = function() {
-		Glo.clear( gl );
+		setup.mouseLoop();
+		Glo.drawMesh( setup.gl, setup.program, mesh );
+		Glo.drawMesh( setup.gl, setup.program, edgeMesh );
+		Glo.drawMesh( setup.gl, setup.program, normalMesh );
+	};
 
-		mouseControls.idle( 5000, 0.03 );
-		let m = Matrixo.multiply( mouseControls.matrix(), Matrixo.scale( 0.66 ) );
-		Glo.matrix( gl, program, 'uMatrix', m );
-
-		// triangles
-		Glo.data( gl, program, 'aPosition', cube.vertices );
-		Glo.data( gl, program, 'aColor', colors );
-		Glo.draw( gl, cube.triangles );
-
-		// edges
-		// this is interesting: https://mattdesl.svbtle.com/drawing-lines-is-hard
-		Glo.data( gl, program, 'aColor', cyans );
-		Glo.draw( gl, cube.edges, gl.LINES );
-
-		// draw the normals
-		Glo.data( gl, program, 'aPosition', cube.centroids );
-		Glo.data( gl, program, 'aColor', cube.centroid_colors );
-		Glo.draw( gl, cube.centroid_lines, gl.LINES );
-
-		setTimeout( function() { requestAnimationFrame( draw ) }, 50 );
-	}
-
-	draw();
+	Utilo.frame( draw, 60 ).start();
 };
 
 const v3po = function( v ) {
@@ -109,7 +103,6 @@ const makeCube = function() {
 			let tmp = indices[ 3 ];
 			indices[ 3 ] = indices[ 2 ];
 			indices[ 2 ] = tmp;
-
 
 			// use the normal so the faces point the 
 			// right direction
@@ -173,5 +166,3 @@ const makeCube = function() {
 
 	return cube;
 };
-			
-inevitable_cube();

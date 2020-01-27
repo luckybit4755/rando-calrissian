@@ -105,9 +105,7 @@ const Shadero = {
 
 			attribute vec4  aPosition;
 			varying   vec4  vPosition;
-
-			attribute vec4  aColor;
-			varying   vec4  vColor;
+			varying   vec4  vVertex;
 
 			attribute vec4  aNormal; // short for "Abby Normal"
 			varying   vec4  vNormal;
@@ -117,15 +115,15 @@ const Shadero = {
 			void main() {
 				   gl_Position = uMatrix * aPosition;
 				   vPosition = gl_Position;
-				   vColor = aColor;
+				   vVertex = aPosition;
 				   vNormal = uMatrix * aNormal; 
 			}
 		`
 		, fragment:`
 			precision mediump float;
 
-			varying vec4 vColor; 
 			varying vec4 vPosition; 
+			varying vec4 vVertex; 
 			varying vec4 vNormal;
 
 			float lightStrength = 6.0;
@@ -144,14 +142,21 @@ const Shadero = {
 				lightDistance /= lightStrength;
 				lightDistance *= lightDistance;
 
-				//vec4 color = vec4(1.0,1.0,1.0,1.0);
-				//vec4 color = vColor;
+				lightValue /= lightDistance;
+
+				// disable lighting
+				// lightValue = 1.0;
+
+				////
+
 				vec4 color = textureCube(
                     uCubeSampler
-                    , vec3( -vPosition.x, vPosition.y, vPosition.z )
+                    , vec3( -vVertex.x, vVertex.y, vVertex.z )
                 );
 
-				gl_FragColor = lightValue * color / lightDistance + 0.033 * color;
+				float minimumBrightness = 0.003;
+
+				gl_FragColor = ( lightValue * color ) + ( minimumBrightness * color );
 			}
 		`
 	}

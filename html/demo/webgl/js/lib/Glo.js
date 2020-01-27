@@ -1,4 +1,6 @@
-import Utilo from './Utilo.js';
+import Matrixo from './Matrixo.js';
+import Mouseo  from './Mouseo.js';
+import Utilo   from './Utilo.js';
 
 const Glo = {
 	gl: function( canvas, flags ) {
@@ -105,7 +107,6 @@ const Glo = {
 		if ( !image.glo_texture ) {
 			image.glo_texture = gl.createTexture();
 		}
-		gl.useProgram( program );
 		gl.bindTexture( gl.TEXTURE_2D, image.glo_texture );
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image );
@@ -132,26 +133,32 @@ const Glo = {
 		
 		return texture;
 	}
-	, cubemap: function( gl, program, name, texture, image, gl_cube_map_face_id ) {
+	, cubemapImage: function( gl, program, name, texture, image, gl_cube_map_face_id ) {
 		gl.bindTexture( gl.TEXTURE_CUBE_MAP, texture );
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
 
 		gl.texImage2D( gl_cube_map_face_id, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image );
+	}
+	, cubemap: function( gl, program, name, images ) {
+		let texture = Glo.cubemapSetup( gl );
+		for ( let i = 0 ; i < images.length ; i++ ) {
+			let image = images[ i ];
+			let face = Glo.cubefaceByIndex( gl, i );
+			Glo.cubemapImage( gl, program, name, texture, image, face );
+		}
 
 		let shader_uCubeSampler = gl.getUniformLocation( program, name );
 		gl.uniform1i( shader_uCubeSampler, 0 ); // 0???
-	}
+		return texture;
+    }   
+
 	, cubefaceByIndex: function( gl, index ) {
-		return [
-			gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-			gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-			gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-			gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-			gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-			gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
-		][ index ];
+		return Object.values( Glo.cubemapIndices( gl ) )[ index ];
 	}
 	, cubefaceByName: function( gl, name ) {
+		return Glo.cubemapIndices( gl )[ name ];
+	}
+	, cubemapIndices: function( gl ) {
 		return {
 			posx: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
 			negx: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -159,7 +166,48 @@ const Glo = {
 			negy: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
 			posz: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
 			negz: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
-		}[ name ];
+		};
+	}
+	, drawMesh: function( gl, program, mesh ) {
+		let type = ( 'type' in mesh ) ? mesh.type : gl.TRIANGLES;
+
+		if ( !( 'attributes' in mesh ) ) {
+			throw 'missing "attributes" value in mesh object';
+		}
+
+		for ( let name in mesh.attributes ) {
+			let data = mesh.attributes[ name ];
+			Glo.data( gl, program, name, data );
+		}
+
+		Glo.draw( gl, mesh.faces, type );
+	}
+	, demoSetup: function( shaders, matrixName, flags ) {
+		matrixName = Utilo.idk( matrixName, 'uMatrix' );
+		flags = Utilo.idk( flags, {} );
+
+		let canvas = Utilo.getByTag( 'canvas' );
+
+    	Utilo.getByContents( 'fullscreen' ).onclick = function() { Utilo.fullscreen( canvas ); };
+    	let mouseControls = Mouseo.simpleControls( canvas );
+
+    	let gl = Glo.gl( canvas, flags );
+    	let program = Glo.program( gl, shaders.vertex, shaders.fragment );
+
+		let setup = { canvas: canvas, gl:gl, program:program, mouseControls:mouseControls };
+
+		setup.mouseLoop = function( matrix ) {
+			Glo.clear( gl );
+
+			matrix = Utilo.idk( matrix, Matrixo.scale( 0.55 ) );
+
+			mouseControls.idle( 5000, 0.03 );
+
+        	let m = Matrixo.multiply( setup.mouseControls.matrix(), matrix );
+        	Glo.matrix( gl, program, matrixName, m );
+		}
+
+		return setup;
 	}
 };
 
