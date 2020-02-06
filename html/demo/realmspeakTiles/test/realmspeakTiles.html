@@ -1,0 +1,164 @@
+<HTML>
+	<HEAD>
+		<TITLE>realmspeakTiles</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans-serif;
+			}
+			canvas { display:block; }
+		</style>
+
+		<script type="text/javascript" src="tiles.js"></script>
+
+		<script type="text/javascript">
+			const DIRECTIONS = { NE:{x:100,y:0}, N:{x:50,y:0}, NW:{x:0,y:0}, SW:{x:0,y:100}, S:{x:50,y:100}, SE:{x:100,y:100} };
+
+			const load = function( name, type, context ) {
+				let tile = tiles[ name ][ type ];
+
+				let image = new Image();
+				image.onload = function() {
+					context.fillStyle = context.strokeStyle = '#003300';
+					context.fillRect( 0, 0, context.w, context.h );
+					context.drawImage( image, 0, 0 );
+
+					context.lineWidth = 2;
+
+					context.font = '24px Arial';
+					context.fillStyle = context.strokeStyle = 'yellow';
+					context.lol.circle( tile.offroad );
+					context.lol.text( tile.offroad, 'offroad' );
+
+					context.fillStyle = context.strokeStyle = 'cyan';
+					for ( let id in tile.clearings ) {
+						let clearing = tile.clearings[ id ];
+						context.lol.circle( clearing );
+						context.lol.text( clearing, 'c.' + id );
+					}
+
+					context.lineWidth = 6;
+
+					for ( let i = 0 ; i < tile.paths.length ; i++ ) {
+						let path = tile.paths[ i ];
+						switch( path.type ) {
+							case 'hidden': context.strokeStyle = '#AAAAAA'; break;
+							case 'secret': context.strokeStyle = 'black'; break;
+							default: context.strokeStyle = '#00FF00'; break;
+						}
+						for ( let j = 0 ; j < path.clearings.length - 1 ; j++ ) {
+							let c1 = tile.clearings[ path.clearings[ j + 0 ] ];
+							let c2 = tile.clearings[ path.clearings[ j + 1 ] ];
+							context.lol.line( c1, c2 );
+						}
+					}
+
+
+					context.lineWidth = 2;
+					context.strokeStyle = 'red';
+
+					for ( let direction in tile.exits ) {
+						let id = tile.exits[ direction ];
+						let clearing = tile.clearings[ id ];
+						context.lol.line( clearing, DIRECTIONS[ direction ] );
+					}
+				};
+				image.src = tile.image;
+			};
+
+			const setup = function() {
+				const bod = document.body;
+
+				/* jack around the canvas and context */
+
+				let canvas = nude( 'canvas' );
+				let w = 497;
+				let h = 431;
+				canvas.setAttribute( 'width', w );
+				canvas.setAttribute( 'height', h );
+				bod.appendChild( canvas );
+
+				let context = canvas.getContext( '2d' );
+				context.w = w;
+				context.h = h;
+
+				// dirty trix
+				
+				context.lol = {
+					toLocal:function( point ) {
+						return { x: point.x / 100 * w, y: point.y / 100 * h };
+					}
+					, circle: function( point, radius ) {
+						radius = radius || 44;
+						context.beginPath();
+						point = this.toLocal( point );
+						context.arc( point.x, point.y, radius, 0, 2 * Math.PI );
+						context.stroke();
+					}
+					, text: function( point, text ) {
+						point = this.toLocal( point );
+						context.fillText( text, point.x, point.y );
+					}
+					, line:function( point1, point2 ) {
+						context.beginPath();
+						point1 = this.toLocal( point1 );
+						point2 = this.toLocal( point2 );
+						context.moveTo( point1.x, point1.y );
+						context.lineTo( point2.x, point2.y );
+						context.stroke();
+					}
+					, x: function( p, length ) {
+						let l2 = length / 2;
+						this.line( { x:p.x - l2, y:y      }, { x:x + l2, y:y      } );
+						this.line( { x:p.x,      y:y - l2 }, { x:x     , y:y + l2 } );
+					}
+				};
+
+				/* populate the dropdowns */
+
+				let nameToLoad = false;
+				let typeToLoad = false;
+
+				let nameSelect = bod.appendChild( nude( 'select' ) );
+				let typeSelect = bod.appendChild( nude( 'select' ) );
+
+				for ( let name in tiles ) {
+					nameToLoad = nameToLoad || name;
+					nameSelect.appendChild( nude( 'option', name ) );
+
+					if ( !typeToLoad ) {
+						for ( k in tiles[ name ] ) {
+							/* this is too apriori */
+							if ( 'type' !== k ) {
+								typeToLoad = typeToLoad || k;
+								typeSelect.appendChild( nude( 'option', k ) );
+							}
+						}
+					}
+				}
+
+				nameSelect.onchange = function( c ) { 
+					nameToLoad = c.target.value; 
+					load( nameToLoad, typeToLoad, context ) 
+				};
+				typeSelect.onchange = function( c ) { 
+					typeToLoad = c.target.value; 
+					load( nameToLoad, typeToLoad, context ) 
+				};
+
+				load( nameToLoad, typeToLoad, context ) 
+			};
+
+			/* nud(ocument)e(lement) */
+			const nude = function( type, text ) {
+				let e = document.createElement( type );
+				if ( text ) e.appendChild( document.createTextNode( text ) );
+				return e;
+			};
+
+			window.onload = setup;
+		</script>
+	</HEAD>
+	<BODY>
+	</BODY>
+</HTML>
