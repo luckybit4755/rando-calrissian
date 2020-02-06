@@ -22,7 +22,7 @@
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
-				for ( let i = 0 ; i < 33 && unplaced.length ; i++ ) {
+				for ( let i = 0 ; i < 999 && unplaced.length ; i++ ) {
 					unplaced = shuffle( unplaced );
 
 					let pick = randomPick( placed );
@@ -36,7 +36,12 @@
 					}
 
 					shuffle( exits );
-					console.log( 'try to place something near ' + pick.name + ' via ' + exits.join( ', ' ) );
+					console.log( 
+						  'try to place something near ' 
+						+ pick.name 
+						+ ' @( ' + [pick.tileX,pick.tileY].join( ',' ) + ')' 
+						+ ' via ' + exits.join( ', ' ) 
+					);
 
 					let foundOne = false; 
 
@@ -49,29 +54,48 @@
 							let maybe = unplaced[ j ];
 							let to = tiles[ maybe ].normal.exits;
 							if ( !( opposing in to ) ) {
-								console.log( '-- ' + maybe + ' tile has no exits headed that way' );
+								// this is pretty tmi...
+								//console.log( '-- ' + maybe + ' tile has no exits headed that way' );
 								continue;
 							}
 
-							let x = pick.x + DIRECTIONS[ exit ].dx;
-							let y = pick.y + DIRECTIONS[ exit ].dy;
+							let x = pick.tileX + egz( DIRECTIONS[ exit ].dx );
+							let y = pick.tileY + egz( DIRECTIONS[ exit ].dy );
 
-							console.log( '-- could be ' + maybe + ' in ' + [x,y] );
-							// TODO: check there is nothing here and no exit conflicts
+							console.log( '-- could be ' + maybe + ' @(' + [x,y] + ') from ' + exit + ' to ' + opposing );
 
-							foundOne = true;
-							if ( !foundOne ) continue;
+							foundOne = canPlace( maybe, x, y, placed );;
+							if ( !foundOne ) {
+								console.log( '>> rejecting ' + maybe );
+								continue;
+							}
 
-							placed.push( addTile( maybe, pick, exit ) );
-							remove( unplaced, maybe );
+							let picked = addTile( maybe, pick, exit );
+							placed.push( picked );
+							unplaced = remove( unplaced, maybe );
+
+							console.log( '-> added ' + maybe + ' as #' + placed.length + ' pick' );
+							console.log( '> ' +
+								pick.name + '@' 
+							+ [pick.tileX,pick.tileY].join( ',' ) + ' -> ' + exit 
+							+ ' -> ' + opposing + ' <- ' + maybe + '@' + [picked.tileX,picked.tileY].join( ',' )
+
+							);
+							console.log( '-----------------------------------------------------------------------------' );
+
 							break;
 						}
 					}
 
-					break;
+//					break;
 				}
 
-				console.log( JSON.stringify( placed ) );
+				showBoard( placed );
+				console.log( 'unplaced: ' + unplaced.length );
+			};
+
+			const showBoard = function( placed ) {
+				//console.log( JSON.stringify( placed ) );
 
 				let w = 497;
                 let h = 431;
@@ -87,7 +111,6 @@
 				for ( let i = 0 ; i < placed.length ; i++ ) {
 					let fun = placed[ i ];
 					let tile = tiles[ fun.name ];
-					console.log( fun.name + ' -> ' + tile.normal.image );
 
 					let img = document.createElement( 'img' );
 					img.src = tile.normal.image;
@@ -96,8 +119,53 @@
 					document.body.appendChild( img );
 				};
 			};
+						
+			const canPlace = function( maybe, tileX, tileY, placed ) {
+				let ok = true;
+
+				let tile = tiles[ maybe ].normal;
+
+				// make sure nothing else is already here (oopsie!)
+				for ( let i = 0 ; i < placed.length && ok ; i++ ) {
+					if ( tileX == placed[ i ].tileX && tileY == placed[ i ].tileY ) {
+						console.log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + [tileX,tileY] );
+						ok = false; 
+					}
+				}
+
+				for ( let direction in DIRECTIONS ) {
+					let otherX = tileX + egz( DIRECTIONS[ direction ].dx );
+					let otherY = tileY + egz( DIRECTIONS[ direction ].dy );
+					let other = false;
+
+					let tileExit  = ( direction in tile.exits  ) ? 'exit' : 'non-exit';
+					let tmi1 = [maybe,direction,tileExit].join( '.' );
+
+					for ( let i = 0 ; i < placed.length && !other ; i++ ) {
+						if ( otherX ==  placed[ i ].tileX && otherY == placed[ i ].tileY ) {
+							other = placed[ i ];
+						}
+					}
+
+					if ( !other ) {
+						console.log( '---- nothing to check ' + tmi1 + ' -> ' + [otherX,otherY].join( '.' ) );
+						continue;
+					}
+
+					let opposing = DIRECTIONS[ direction ].opposing;
+					let otherExit = ( opposing  in other.exits ) ? 'exit' : 'non-exit';
+					let tmi2 = [other.name,opposing,otherExit].join( '.' );
+
+					ok = ( tileExit == otherExit );
+					console.log( '---- check ' + tmi1 + ' vs ' + tmi2 + ' -> ' + ok );
+					if ( !ok ) break;
+				}
+
+				return ok;
+			};
 
 			const egz = function( v ) {
+				return v;
 				return v < -0.33 ? -1 : ( v > +0.33 ? +1 : 0 );
 			}
 
@@ -124,8 +192,11 @@
 						? which.name
 						: false
 					);
+					
+					// TODO: see if any other exits need to be hooked up....
 				}
-				console.log( JSON.stringify( tile ) );
+				console.log( '--> ' + JSON.stringify( tile ) );
+
 				return tile;
 			};
 
