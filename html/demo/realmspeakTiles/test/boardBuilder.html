@@ -55,7 +55,6 @@
 
 					for ( let e = 0 ; e < exits.length && !foundOne; e++ ) {
 						let exit = exits[ e ];
-
 						let opposing = DIRECTIONS[ exit ].opposing;
 
 						// useless information
@@ -64,7 +63,10 @@
 
 						for ( let j = 0 ; j < unplaced.length ; j++ ) {
 							let maybe = unplaced[ j ];
-							let to = tiles[ maybe ].normal.exits;
+							orientation = Math.floor( 33 * Math.random() ) % 6;
+							//snit
+
+							let to = rotateExits( tiles[ maybe ].normal.exits, orientation );
 							if ( !( opposing in to ) ) {
 								// this is pretty tmi...
 								//console.log( '-- ' + maybe + ' tile has no exits headed that way' );
@@ -76,13 +78,13 @@
 
 							console.log( '-- could be ' + maybe + ' @(' + [x,y] + ') going ' + exit + ' to the ' + opposing );
 
-							foundOne = canPlace( maybe, x, y, placed );;
+							foundOne = canPlace( maybe, x, y, to, placed );;
 							if ( !foundOne ) {
 								console.log( '>> rejecting ' + maybe );
 								continue;
 							}
 
-							let picked = addTile( maybe, 0, pick, exit );
+							let picked = addTile( maybe, orientation, pick, exit );
 							placed.push( picked );
 							unplaced = remove( unplaced, maybe );
 
@@ -143,10 +145,8 @@
 				};
 			};
 						
-			const canPlace = function( maybe, x, y, placed ) {
+			const canPlace = function( maybe, x, y, exits, placed ) {
 				let ok = true;
-
-				let tile = tiles[ maybe ].normal;
 
 				// make sure nothing else is already here (oopsie!)
 				for ( let i = 0 ; i < placed.length && ok ; i++ ) {
@@ -161,7 +161,7 @@
 					let otherY = y + DIRECTIONS[ direction ].dy;
 					let other = false;
 
-					let tileExit  = ( direction in tile.exits  ) ? 'exit' : 'non-exit';
+					let tileExit  = ( direction in exits  ) ? 'exit' : 'non-exit';
 					let tmi1 = [maybe,direction,tileExit].join( '.' );
 
 					for ( let i = 0 ; i < placed.length && !other ; i++ ) {
@@ -203,8 +203,7 @@
 				}
 
 				for ( let k in tiles[ name ].normal.exits ) {
-					let r = ( DIRECTIONS[ k ].index + orientation ) % 6;
-					let o = Object.keys( DIRECTIONS )[ r ];
+					k = rotateDirection( k, orientation );
 
 					// for sanity check :-P
 					//console.log( k + '+' + orientation + ' -> ' + r + ' -> ' + o );
@@ -221,6 +220,23 @@
 
 				return tile;
 			};
+	
+			const rotateDirection = function( direction, orientation ) {
+				let rotated = ( DIRECTIONS[ direction ].index + orientation ) % 6;
+				let rotateDirection = Object.keys( DIRECTIONS )[ rotated ];
+
+				// for sanity check :-P
+				//console.log( direction + '+' + orientation + ' -> ' + rotated + ' -> ' + rotateDirection );
+				return rotateDirection;
+			};
+
+			const rotateExits = function( exits, orientation ) {
+				let rotated = {};
+				for ( let direction in exits ) {
+					rotated[ rotateDirection( direction, orientation ) ] = exits[ direction ];
+				}
+				return rotated;
+			}
 
 			const shuffle = function( a ) {
 				return a.sort((x,y)=>Math.random()-Math.random());
