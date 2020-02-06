@@ -10,6 +10,12 @@
 				display:block;
 				position:absolute;
 			}
+			.r0 { transform: rotate( -0deg ); }
+			.r1 { transform: rotate( -60deg ); }
+			.r2 { transform: rotate( -120deg ); }
+			.r3 { transform: rotate( -180deg ); }
+			.r4 { transform: rotate( -240deg ); }
+			.r5 { transform: rotate( -300deg ); }
 		</style>
 
 		<script type="text/javascript" src="tiles.js"></script>
@@ -18,7 +24,8 @@
 		<script type="text/javascript">
 			const boardBuilder = function() {
 				let start = "Borderland";
-				let placed = [ addTile( start ) ];
+				let orientation = Math.floor( 33 * Math.random() ) % 6;
+				let placed = [ addTile( start, orientation ) ];
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
@@ -48,6 +55,7 @@
 
 					for ( let e = 0 ; e < exits.length && !foundOne; e++ ) {
 						let exit = exits[ e ];
+
 						let opposing = DIRECTIONS[ exit ].opposing;
 
 						// useless information
@@ -74,7 +82,7 @@
 								continue;
 							}
 
-							let picked = addTile( maybe, pick, exit );
+							let picked = addTile( maybe, 0, pick, exit );
 							placed.push( picked );
 							unplaced = remove( unplaced, maybe );
 
@@ -130,6 +138,7 @@
 					img.style.left = w * ( -minx + fun.x ) + 'px';
 					img.style.width = w + 'px';
 					img.style.height = h + 'px';
+					img.setAttribute( 'class',  'r' + fun.orientation );
 					document.body.appendChild( img );
 				};
 			};
@@ -178,9 +187,9 @@
 				return ok;
 			};
 
-			const addTile = function( name, which, from ) {
+			const addTile = function( name, orientation, which, from ) {
 				// TODO: handle orientation properly
-				let tile = {name:name, x:0, y:0, orientation:0, exits:{}};
+				let tile = {name:name, x:0, y:0, orientation:orientation, exits:{}};
 
 				if ( from && which ) {
 					tile.x = which.x + DIRECTIONS[ from ].dx;
@@ -194,6 +203,12 @@
 				}
 
 				for ( let k in tiles[ name ].normal.exits ) {
+					let r = ( DIRECTIONS[ k ].index + orientation ) % 6;
+					let o = Object.keys( DIRECTIONS )[ r ];
+
+					// for sanity check :-P
+					//console.log( k + '+' + orientation + ' -> ' + r + ' -> ' + o );
+
 					tile.exits[ k ] = (
 						( which && from && k == DIRECTIONS[ from ].opposing ) 
 						? which.name
