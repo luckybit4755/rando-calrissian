@@ -6,7 +6,7 @@
 
 // screen coordinates / tile coordinates are annoying..
 
-const DX = 0.74;
+const DX = 0.75;
 const DY = 0.50;
 
 const DIRECTIONS = {

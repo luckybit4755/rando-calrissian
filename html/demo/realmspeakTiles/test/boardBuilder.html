@@ -22,7 +22,7 @@
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
-				for ( let i = 0 ; i < 999 && unplaced.length ; i++ ) {
+				for ( let i = 0 ; i < 101 && unplaced.length ; i++ ) {
 					unplaced = shuffle( unplaced );
 
 					let pick = randomPick( placed );
@@ -31,15 +31,16 @@
 						if ( !pick.exits[ k ] ) exits.push( k );
 					}
 					if ( 0 == exits.length ) {
-						console.log( pick.name + ' has no available exits, moving on...' );
+						//console.log( pick.name + ' has no available exits, moving on...' );
+						i--; // don't count this attempt
 						continue;
 					}
 
 					shuffle( exits );
 					console.log( 
-						  'try to place something near ' 
+						  i+ '> try to place something near ' 
 						+ pick.name 
-						+ ' @( ' + [pick.tileX,pick.tileY].join( ',' ) + ')' 
+						+ ' @( ' + [pick.x,pick.y].join( ',' ) + ')' 
 						+ ' via ' + exits.join( ', ' ) 
 					);
 
@@ -48,7 +49,10 @@
 					for ( let e = 0 ; e < exits.length && !foundOne; e++ ) {
 						let exit = exits[ e ];
 						let opposing = DIRECTIONS[ exit ].opposing;
-						console.log( '- ' + exit + ' leads to ' + opposing );
+
+						// useless information
+						//console.log( '- ' + exit + ' leads to ' + opposing );
+						console.log( '- ' + exit + ' vs ' + unplaced.join( ',' ) );
 
 						for ( let j = 0 ; j < unplaced.length ; j++ ) {
 							let maybe = unplaced[ j ];
@@ -59,10 +63,10 @@
 								continue;
 							}
 
-							let x = pick.tileX + egz( DIRECTIONS[ exit ].dx );
-							let y = pick.tileY + egz( DIRECTIONS[ exit ].dy );
+							let x = pick.x + DIRECTIONS[ exit ].dx;
+							let y = pick.y + DIRECTIONS[ exit ].dy;
 
-							console.log( '-- could be ' + maybe + ' @(' + [x,y] + ') from ' + exit + ' to ' + opposing );
+							console.log( '-- could be ' + maybe + ' @(' + [x,y] + ') going ' + exit + ' to the ' + opposing );
 
 							foundOne = canPlace( maybe, x, y, placed );;
 							if ( !foundOne ) {
@@ -77,21 +81,29 @@
 							console.log( '-> added ' + maybe + ' as #' + placed.length + ' pick' );
 							console.log( '> ' +
 								pick.name + '@' 
-							+ [pick.tileX,pick.tileY].join( ',' ) + ' -> ' + exit 
-							+ ' -> ' + opposing + ' <- ' + maybe + '@' + [picked.tileX,picked.tileY].join( ',' )
+							+ [pick.x,pick.y].join( ',' ) + ' -> ' + exit 
+							+ ' -> ' + opposing + ' <- ' + maybe + '@' + [picked.x,picked.y].join( ',' )
 
 							);
 							console.log( '-----------------------------------------------------------------------------' );
 
 							break;
 						}
+						foundOne = false; // maybe this will lead to denser maps?
 					}
-
-//					break;
 				}
 
 				showBoard( placed );
-				console.log( 'unplaced: ' + unplaced.length );
+
+				let nfo = document.createElement( 'div' );
+				nfo.style.top = '1em';
+				nfo.style.left = '1em';
+				nfo.style.position = 'absolute';
+				nfo.style.zIndex = -33;
+				nfo.style.background = 'white';
+
+				nfo.appendChild( document.createTextNode( 'unplaced: ' + unplaced.length + ': ' + unplaced.join( ', ' ) ) );
+				document.body.appendChild( nfo );
 			};
 
 			const showBoard = function( placed ) {
@@ -116,33 +128,35 @@
 					img.src = tile.normal.image;
 					img.style.top  = h * ( -miny + fun.y ) + 'px';
 					img.style.left = w * ( -minx + fun.x ) + 'px';
+					img.style.width = w + 'px';
+					img.style.height = h + 'px';
 					document.body.appendChild( img );
 				};
 			};
 						
-			const canPlace = function( maybe, tileX, tileY, placed ) {
+			const canPlace = function( maybe, x, y, placed ) {
 				let ok = true;
 
 				let tile = tiles[ maybe ].normal;
 
 				// make sure nothing else is already here (oopsie!)
 				for ( let i = 0 ; i < placed.length && ok ; i++ ) {
-					if ( tileX == placed[ i ].tileX && tileY == placed[ i ].tileY ) {
-						console.log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + [tileX,tileY] );
+					if ( x == placed[ i ].x && y == placed[ i ].y ) {
+						console.log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + [x,y] );
 						ok = false; 
 					}
 				}
 
 				for ( let direction in DIRECTIONS ) {
-					let otherX = tileX + egz( DIRECTIONS[ direction ].dx );
-					let otherY = tileY + egz( DIRECTIONS[ direction ].dy );
+					let otherX = x + DIRECTIONS[ direction ].dx;
+					let otherY = y + DIRECTIONS[ direction ].dy;
 					let other = false;
 
 					let tileExit  = ( direction in tile.exits  ) ? 'exit' : 'non-exit';
 					let tmi1 = [maybe,direction,tileExit].join( '.' );
 
 					for ( let i = 0 ; i < placed.length && !other ; i++ ) {
-						if ( otherX ==  placed[ i ].tileX && otherY == placed[ i ].tileY ) {
+						if ( otherX ==  placed[ i ].x && otherY == placed[ i ].y ) {
 							other = placed[ i ];
 						}
 					}
@@ -164,20 +178,13 @@
 				return ok;
 			};
 
-			const egz = function( v ) {
-				return v;
-				return v < -0.33 ? -1 : ( v > +0.33 ? +1 : 0 );
-			}
-
 			const addTile = function( name, which, from ) {
 				// TODO: handle orientation properly
-				let tile = {name:name, x:0, y:0, tileX:0, tileY:0, orientation:0, exits:{}};
+				let tile = {name:name, x:0, y:0, orientation:0, exits:{}};
 
 				if ( from && which ) {
 					tile.x = which.x + DIRECTIONS[ from ].dx;
 					tile.y = which.y + DIRECTIONS[ from ].dy;
-					tile.tileX = which.tileX + egz( DIRECTIONS[ from ].dx );
-					tile.tileY = which.tileY + egz( DIRECTIONS[ from ].dy );
 
 					if ( which.exits[ from ] ) {
 						throw which.name + '.' + from + ' leads to ' + which.exits[ from ] + ' already';
