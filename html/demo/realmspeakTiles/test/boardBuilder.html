@@ -24,7 +24,7 @@
 		<script type="text/javascript">
 			const boardBuilder = function() {
 				let start = "Borderland";
-				let orientation = Math.floor( 33 * Math.random() ) % 6;
+				let orientation = randomOrientation();
 				let placed = [ addTile( start, orientation ) ];
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
@@ -63,8 +63,7 @@
 
 						for ( let j = 0 ; j < unplaced.length ; j++ ) {
 							let maybe = unplaced[ j ];
-							orientation = Math.floor( 33 * Math.random() ) % 6;
-							//snit
+							orientation = randomOrientation();
 
 							let to = rotateExits( tiles[ maybe ].normal.exits, orientation );
 							if ( !( opposing in to ) ) {
@@ -114,6 +113,10 @@
 
 				nfo.appendChild( document.createTextNode( 'unplaced: ' + unplaced.length + ': ' + unplaced.join( ', ' ) ) );
 				document.body.appendChild( nfo );
+			};
+
+			const randomOrientation = function() {
+				return Math.floor( 33 * Math.random() ) % 6;
 			};
 
 			const showBoard = function( placed ) {
