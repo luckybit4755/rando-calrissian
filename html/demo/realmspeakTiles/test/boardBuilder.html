@@ -1,0 +1,149 @@
+<HTML>
+	<HEAD>
+		<TITLE>boardBuilder</TITLE>
+
+		<style>
+			body {
+				font-family: Comic Sans MS, sans;
+			}
+			img {
+				display:block;
+				position:absolute;
+			}
+		</style>
+
+		<script type="text/javascript" src="tiles.js"></script>
+		<script type="text/javascript" src="directions.js"></script>
+
+		<script type="text/javascript">
+			const boardBuilder = function() {
+				let start = "Borderland";
+				let placed = [ addTile( start ) ];
+
+				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
+
+				for ( let i = 0 ; i < 33 && unplaced.length ; i++ ) {
+					unplaced = shuffle( unplaced );
+
+					let pick = randomPick( placed );
+					let exits = [];
+					for ( let k in pick.exits ) {
+						if ( !pick.exits[ k ] ) exits.push( k );
+					}
+					if ( 0 == exits.length ) {
+						console.log( pick.name + ' has no available exits, moving on...' );
+						continue;
+					}
+
+					shuffle( exits );
+					console.log( 'try to place something near ' + pick.name + ' via ' + exits.join( ', ' ) );
+
+					let foundOne = false; 
+
+					for ( let e = 0 ; e < exits.length && !foundOne; e++ ) {
+						let exit = exits[ e ];
+						let opposing = DIRECTIONS[ exit ].opposing;
+						console.log( '- ' + exit + ' leads to ' + opposing );
+
+						for ( let j = 0 ; j < unplaced.length ; j++ ) {
+							let maybe = unplaced[ j ];
+							let to = tiles[ maybe ].normal.exits;
+							if ( !( opposing in to ) ) {
+								console.log( '-- ' + maybe + ' tile has no exits headed that way' );
+								continue;
+							}
+
+							let x = pick.x + DIRECTIONS[ exit ].dx;
+							let y = pick.y + DIRECTIONS[ exit ].dy;
+
+							console.log( '-- could be ' + maybe + ' in ' + [x,y] );
+							// TODO: check there is nothing here and no exit conflicts
+
+							foundOne = true;
+							if ( !foundOne ) continue;
+
+							placed.push( addTile( maybe, pick, exit ) );
+							remove( unplaced, maybe );
+							break;
+						}
+					}
+
+					break;
+				}
+
+				console.log( JSON.stringify( placed ) );
+
+				let w = 497;
+                let h = 431;
+
+				let minx = 0;
+				let miny = 0;
+				for ( let i = 0 ; i < placed.length ; i++ ) {
+					if ( placed[ i ].x < minx ) minx = placed[ i ].x;
+					if ( placed[ i ].y < miny ) miny = placed[ i ].y;
+				}
+				console.log( [minx,miny].join( ', ' ) );
+
+				for ( let i = 0 ; i < placed.length ; i++ ) {
+					let fun = placed[ i ];
+					let tile = tiles[ fun.name ];
+					console.log( fun.name + ' -> ' + tile.normal.image );
+
+					let img = document.createElement( 'img' );
+					img.src = tile.normal.image;
+					img.style.top  = h * ( -miny + fun.y ) + 'px';
+					img.style.left = w * ( -minx + fun.x ) + 'px';
+					document.body.appendChild( img );
+				};
+			};
+
+			const egz = function( v ) {
+				return v < -0.33 ? -1 : ( v > +0.33 ? +1 : 0 );
+			}
+
+			const addTile = function( name, which, from ) {
+				// TODO: handle orientation properly
+				let tile = {name:name, x:0, y:0, tileX:0, tileY:0, orientation:0, exits:{}};
+
+				if ( from && which ) {
+					tile.x = which.x + DIRECTIONS[ from ].dx;
+					tile.y = which.y + DIRECTIONS[ from ].dy;
+					tile.tileX = which.tileX + egz( DIRECTIONS[ from ].dx );
+					tile.tileY = which.tileY + egz( DIRECTIONS[ from ].dy );
+
+					if ( which.exits[ from ] ) {
+						throw which.name + '.' + from + ' leads to ' + which.exits[ from ] + ' already';
+					} else {
+						which.exits[ from ] = name;
+					}
+				}
+
+				for ( let k in tiles[ name ].normal.exits ) {
+					tile.exits[ k ] = (
+						( which && from && k == DIRECTIONS[ from ].opposing ) 
+						? which.name
+						: false
+					);
+				}
+				console.log( JSON.stringify( tile ) );
+				return tile;
+			};
+
+			const shuffle = function( a ) {
+				return a.sort((x,y)=>Math.random()-Math.random());
+			}
+			
+			const remove = function( a, value ) {
+				return a.filter(v=>value!=v);
+			}
+
+			const randomPick = function( a ) {
+				return a[ Math.floor( Math.random() * a.length ) ];
+			};
+
+			window.onload = boardBuilder;
+		</script>
+	</HEAD>
+	<BODY>
+	</BODY>
+</HTML>
