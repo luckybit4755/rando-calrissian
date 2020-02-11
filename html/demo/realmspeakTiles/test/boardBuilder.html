@@ -34,6 +34,39 @@
 			let whozLogs = {};
 
 			const boardBuilder = function() {
+				let board = false;
+			
+				let maxTries = 300;	
+				let attempt = 0;
+
+				for ( attempt = 0 ; attempt < maxTries ; attempt++ ) {
+					board = buildBoard();
+					if ( !Object.keys( board.unreachable ).length && !board.unplaced.length ) {
+						break;
+					} else {
+						board = false;
+					}
+				}
+
+				if ( !board ) {
+					document.body.innerHTML = 'completely failed to build a board after ' + attempt + ' tries, sorry';
+					return;
+				}
+
+				showBoard( board.placed );
+
+				let nfo = document.createElement( 'pre' );
+				nfo.style.top = '1em';
+				nfo.style.left = '1em';
+				nfo.style.position = 'absolute';
+				nfo.style.zIndex = 66;
+				nfo.style.background = 'white';
+				nfo.appendChild( document.createTextNode( 'built a fully connected board after ' + attempt + ' tries' ) );
+
+				document.body.appendChild( nfo );
+			};
+
+			const buildBoard = function() {
 				let start = "Borderland";
 				let orientation = randomOrientation();
 				let placed = [ addTile( start, orientation ) ];
@@ -126,17 +159,9 @@
 					}
 				}
 
-				showBoard( placed );
+				let unreachable = traceOut( placed );
 
-				let nfo = document.createElement( 'div' );
-				nfo.style.top = '1em';
-				nfo.style.left = '1em';
-				nfo.style.position = 'absolute';
-				nfo.style.zIndex = -33;
-				nfo.style.background = 'white';
-
-				nfo.appendChild( document.createTextNode( 'unplaced: ' + unplaced.length + ': ' + unplaced.join( ', ' ) ) );
-				document.body.appendChild( nfo );
+				return { placed:placed, unreachable:unreachable, unplaced:unplaced };
 			};
 
 			const randomOrientation = function() {
@@ -166,21 +191,21 @@
 				let hq = h * ( 0.57 + 0.00 )
 
 				let radius = 170;
-				radius = 0; // cheesy way to turn off debugging
+				//radius = 0; // cheesy way to turn off debugging
 
 				let green = '#0F0';
 
 				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let fun = placed[ i ];
-					let at = Hexactions.toScreen( fun.at, wq, hq );
+					let hex = placed[ i ];
+					let at = Hexactions.toScreen( hex.at, wq, hq );
 					at.x += minx;
 					at.y += miny;
 
-					let tile = tiles[ fun.name ];
+					let tile = tiles[ hex.name ];
 
 					let img = document.createElement( 'img' );
 					img.src = tile.normal.image;
-					img.setAttribute( 'class',  'r' + fun.orientation );
+					img.setAttribute( 'class',  'r' + hex.orientation );
 					document.body.appendChild( positionElement( img, at, w, h ) );
 
 					if ( !radius ) continue;
@@ -190,26 +215,48 @@
 					let context = tmi.getContext( '2d' );
 					tmi.onclick = function() {
 						console.log( '--------------------------------------------' );
-						console.log( whozLogs[ fun.name ].join( '\n' ) );
-						console.log( 'ok: ' + fun.name );
+						console.log( whozLogs[ hex.name ].join( '\n' ) );
+						console.log( 'ok: ' + hex.name );
 					}
 
 					context.font = '24px Arial';
 					context.fillStyle = 'white';
 					let lw = 8;
+					let lh = 24;
 
-					let msg = '#' + i + ':' + fun.name + ': ' + ptToTxt( fun.at );
+					let msg = '#' + i + ':' + hex.name + ': ' + ptToTxt( hex.at );
 					let x = w / 2 - lw * msg.length;
-					let y = h / 2 + ( Math.random() - Math.random() ) * 32;
+					let y = h / 2;
 					context.fillText( msg, x, y );
 
-					for ( direction in fun.exits ) {
-						let to = fun.exits[ direction ];
+					context.font = '24px Arial';
+					let clearings = Object.keys( tiles[ hex.name ].normal.clearings );
+					for( let j = 0 ; j < clearings.length ; j++ ) {
+						let clearing = clearings[ j ];
+						let distance = hex.distances[ clearing ];
+						if ( distance < 0 ) {
+							context.fillStyle =  '#FDD';
+							distance = '!'
+						} else {
+							context.fillStyle = green;
+						}
+						msg = clearing + ':' + distance ;
+
+						context.fillText( msg, x, y + lh );
+						x += 5 * lw;
+					}
+
+					// below here is the stuff I used to debug the exit vs non-exit stuff
+					if ( !false ) continue;
+
+
+					for ( direction in hex.exits ) {
+						let to = hex.exits[ direction ];
 						let angle = Hexactions.angle( direction );
 						let x = w / 2 + radius * Math.cos( angle ); 
 						let y = h / 2 - radius * Math.sin( angle ); 
 							
-						let nAt = Hexactions.offset( fun.at, direction );
+						let nAt = Hexactions.offset( hex.at, direction );
 						let msg = direction + ': '+ ptToTxt( nAt );
 
 						if ( to ) { 
@@ -277,7 +324,6 @@
 			};
 
 			const findTileAt = function( placed, otherAt ) {
-//alert( otherAt.x ) throw otherAt.x;
 				for ( let i = 0 ; i < placed.length ; i++ ) {
 					let there = placed[ i ];
 					if ( otherAt.x == there.at.x && otherAt.y == there.at.y ) {
@@ -343,26 +389,138 @@
 
 				return tile;
 			};
-	
-			const rotateDirection = function( direction, orientation ) {
-				return Hexactions.rotate( direction, orientation );
+
+			const traceOut = function( placed ) {
+				let names = {};
+				for ( let i = 0 ; i < placed.length ; i++ ) {
+					let hex = placed[ i ];
+					names[ hex.name ] = hex;
+					hex.distances = {};
+					for ( let clearing in tiles[ hex.name ].normal.clearings ) {
+						hex.distances[ clearing ] = 'Borderland' === hex.name ? 0 : -1;
+					}
+					hex.entrances = rotateExits( tiles[ hex.name ].normal.exits, hex.orientation );
+				}
+
+				let visited = [ 'Borderland' ];
+
+				for ( let sanity = 999 ; sanity > 0 ; sanity-- ) {
+					let nu = {};
+					for ( let i = 0 ; i < visited.length ; i++ ) {
+						let name = visited[ i ];
+						let hex = names[ name ];
+
+						for ( let exit in hex.exits ) {
+							let clearing = hex.entrances[ exit ];
+							let distance = hex.distances[ clearing ];
+							if ( distance < 0 ) continue;
+
+							log( name + '.' + exit + ' -> ' + clearing + ' distance is  '+ distance );
+							distance++;
+
+							let neighbor = hex.exits[ exit ];
+							if ( !neighbor ) continue;
+
+							let opposite = Hexactions.opposite( exit );
+							neighbor = names[ neighbor ];
+
+							let neighborClearing = neighbor.entrances[ opposite ];
+							let connected = connectClearings( neighborClearing, tiles[ neighbor.name ].normal.paths );
+
+							log( 'check ' + neighbor.name + ' to the ' + exit + ' -> ' + opposite + ' clearing ' + neighborClearing + ' connected to ' + Object.keys( connected ) );
+
+							let yeah = false;
+							for( let c in connected ) {
+								let d = neighbor.distances[ c ];
+								if ( d < 0 || distance < d ) {
+									log( '- update ' + neighbor.name + '[' + c + '] from ' + d + ' to ' + distance );
+									yeah = neighbor.distances[ c ] = distance;
+								}
+							}
+							if ( yeah ) {
+								nu[ neighbor.name ] = true;
+							}
+						}
+
+						log( 'new blood:' + Object.keys( nu ) );
+					}
+
+					visited = Object.keys( nu );
+					if ( 0 == visited.length ) {
+						log( 'all out of love' );
+						break;
+					}
+				}
+
+				let unreachable = {};
+
+				for ( let i = 0 ; i < placed.length ; i++ ) {
+					let hex = placed[ i ];
+					let unreached = [];
+					for ( let clearing in hex.distances ) {
+						let distance = hex.distances[ clearing ];
+						if ( distance < 0 ) {
+							unreached.push( clearing );
+						}
+					}
+					if ( unreached.length ) {
+						unreachable[ hex.name ] = unreached;
+					}
+				}
+
+				return unreachable;
 			};
 
+			const connectClearings = function( start, paths ) {
+				let connected = {};
+				connected[ start ] = true;
+
+				// another scaredy-cat loop
+				for( let qqq = 0 ; qqq < 333 ; qqq++ ) {
+					let addedClearing = false;
+					for( let j = 0 ; j < paths.length ; j++ ) {
+						let path = paths[ j ].clearings;
+						let addEm = false;
+						for ( let p = 0 ; p < path.length && !addEm ; p++ ) {
+							let c = path[ p ];
+							if( c in connected ) {
+								//console.log( 'ho '+ c );
+								addEm = true;
+							}
+						}
+						if ( addEm ) {
+							for ( let p = 0 ; p < path.length ; p++ ) {
+								let c = path[ p ];
+								if( c in connected ) {
+									//console.log( c + ' is already there' );
+								} else {
+									//console.log( c + ' is new ' );
+									connected[ c ] = true;
+									addedClearing = true;
+								}
+							}
+						}
+					}
+					if ( !addedClearing ) break;
+				}
+				return connected;
+			}
+	
 			const rotateExits = function( exits, orientation ) {
 				let rotated = {};
 				for ( let direction in exits ) {
-					rotated[ rotateDirection( direction, orientation ) ] = exits[ direction ];
+					rotated[ Hexactions.rotate( direction, orientation ) ] = exits[ direction ];
 				}
 				return rotated;
-			}
+			};
 
 			const shuffle = function( a ) {
 				return a.sort((x,y)=>Math.random()-Math.random());
-			}
+			};
 			
 			const remove = function( a, value ) {
 				return a.filter(v=>value!=v);
-			}
+			};
 
 			const randomPick = function( a ) {
 				return a[ Math.floor( Math.random() * a.length ) ];
@@ -373,9 +531,11 @@
 			};
 
 			const log = function( x ) {
+				return;
 				console.log( x );
 				themLogs.push( x );
 			};
+
 			const saveLog = function( whoz ) {
 				whozLogs[ whoz ] = themLogs;
 				themLogs = [];
