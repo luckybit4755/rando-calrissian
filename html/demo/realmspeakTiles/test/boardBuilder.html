@@ -4,7 +4,9 @@
 
 		<style>
 			body {
-				font-family: Comic Sans MS, sans;
+				font-family: sans-serif;
+				xbackground:url('oddq-hex.png');
+				overflow:scroll;
 			}
 			img {
 				display:block;
@@ -16,12 +18,21 @@
 			.r3 { transform: rotate( -180deg ); }
 			.r4 { transform: rotate( -240deg ); }
 			.r5 { transform: rotate( -300deg ); }
+			canvas {
+				position:absolute;
+				z-index:33;
+				color:yellow;
+			}
 		</style>
 
 		<script type="text/javascript" src="tiles.js"></script>
 		<script type="text/javascript" src="directions.js"></script>
 
 		<script type="text/javascript">
+			/* this is a bit squirrely */
+			let themLogs = [];
+			let whozLogs = {};
+
 			const boardBuilder = function() {
 				let start = "Borderland";
 				let orientation = randomOrientation();
@@ -29,72 +40,85 @@
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
-				for ( let i = 0 ; i < 101 && unplaced.length ; i++ ) {
+				for ( let i = 0 ; i < 99 && unplaced.length ; i++ ) {
+					let origin = randomPick( placed );
+
 					unplaced = shuffle( unplaced );
 
-					let pick = randomPick( placed );
 					let exits = [];
-					for ( let k in pick.exits ) {
-						if ( !pick.exits[ k ] ) exits.push( k );
+					for ( let exit in origin.exits ) {
+						if ( !origin.exits[ exit ] ) {
+							let neighborAt = findTileAt( placed, Hexactions.offset( origin.at, exit ) );
+							if ( neighborAt ) {
+								//throw 'ERROR: tile collision ' + neighborAt.name;
+								origin.exits[ exit ] = neighborAt.name; // ????
+								continue;
+							}
+
+							exits.push( exit );
+						}
 					}
 					if ( 0 == exits.length ) {
-						//console.log( pick.name + ' has no available exits, moving on...' );
+						//log( origin.name + ' has no available exits, moving on...' );
 						i--; // don't count this attempt
 						continue;
 					}
-
 					shuffle( exits );
-					console.log( 
-						  i+ '> try to place something near ' 
-						+ pick.name 
-						+ ' @( ' + [pick.x,pick.y].join( ',' ) + ')' 
-						+ ' via ' + exits.join( ', ' ) 
-					);
 
 					let foundOne = false; 
 
 					for ( let e = 0 ; e < exits.length && !foundOne; e++ ) {
 						let exit = exits[ e ];
-						let opposing = DIRECTIONS[ exit ].opposing;
+						let point = Hexactions.offset( origin.at, exit );
+						let opposite = Hexactions.opposite( exit );
 
-						// useless information
-						//console.log( '- ' + exit + ' leads to ' + opposing );
-						console.log( '- ' + exit + ' vs ' + unplaced.join( ',' ) );
+						log( 
+							'start.%1> %2 @ %3 + %4 -> %5 <- %6 from %7'
+							.replace( /%1/, i )
+							.replace( /%2/, origin.name )
+							.replace( /%3/, ptToTxt( origin.at ) )
+							.replace( /%4/, exit )
+							.replace( /%5/, ptToTxt( point ) )
+							.replace( /%6/, opposite )
+							.replace( /%7/, unplaced.join( ',' )  )
+						);
+
 
 						for ( let j = 0 ; j < unplaced.length ; j++ ) {
 							let maybe = unplaced[ j ];
 							orientation = randomOrientation();
 
 							let to = rotateExits( tiles[ maybe ].normal.exits, orientation );
-							if ( !( opposing in to ) ) {
+							if ( !( opposite in to ) ) {
 								// this is pretty tmi...
-								//console.log( '-- ' + maybe + ' tile has no exits headed that way' );
+								//log( '-- ' + maybe + ' tile has no exits headed ' + opposite );
 								continue;
 							}
 
-							let x = pick.x + DIRECTIONS[ exit ].dx;
-							let y = pick.y + DIRECTIONS[ exit ].dy;
+							log( '-- could be ' + maybe + ' @(' + ptToTxt ( point ) + ') going ' + exit + ' to the ' + opposite );
 
-							console.log( '-- could be ' + maybe + ' @(' + [x,y] + ') going ' + exit + ' to the ' + opposing );
-
-							foundOne = canPlace( maybe, x, y, to, placed );;
+							foundOne = canPlace( maybe, point, to, placed );;
 							if ( !foundOne ) {
-								console.log( '>> rejecting ' + maybe );
+								log( '>> rejecting ' + maybe );
 								continue;
 							}
 
-							let picked = addTile( maybe, orientation, pick, exit );
-							placed.push( picked );
+							let toAdd = addTile( maybe, orientation, origin, exit, placed );
+							placed.push( toAdd );
 							unplaced = remove( unplaced, maybe );
 
-							console.log( '-> added ' + maybe + ' as #' + placed.length + ' pick' );
-							console.log( '> ' +
-								pick.name + '@' 
-							+ [pick.x,pick.y].join( ',' ) + ' -> ' + exit 
-							+ ' -> ' + opposing + ' <- ' + maybe + '@' + [picked.x,picked.y].join( ',' )
-
-							);
-							console.log( '-----------------------------------------------------------------------------' );
+							log(
+								'- added %1 as tile #%2 @ %3 %4 connected to %5 from %6 at %7'
+								.replace( /%1/, maybe )
+								.replace( /%2/, placed.length )
+								.replace( /%3/, ptToTxt( toAdd.at ) )
+								.replace( /%4/, opposite )
+								.replace( /%5/, exit )
+								.replace( /%6/, origin.name )
+								.replace( /%7/, ptToTxt( origin.at ) )
+							)
+							log( '-----------------------------------------------------------------------------' );
+							saveLog( maybe );
 
 							break;
 						}
@@ -119,8 +143,9 @@
 				return Math.floor( 33 * Math.random() ) % 6;
 			};
 
+			// aka drawBoard
 			const showBoard = function( placed ) {
-				//console.log( JSON.stringify( placed ) );
+				//log( JSON.stringify( placed, false, '\t' ) );
 
 				let w = 497;
                 let h = 431;
@@ -128,109 +153,199 @@
 				let minx = 0;
 				let miny = 0;
 				for ( let i = 0 ; i < placed.length ; i++ ) {
-					if ( placed[ i ].x < minx ) minx = placed[ i ].x;
-					if ( placed[ i ].y < miny ) miny = placed[ i ].y;
+					let at = placed[ i ].at;
+					if ( at.x < minx ) minx = at.x;
+					if ( at.y < miny ) miny = at.y;
 				}
-				console.log( [minx,miny].join( ', ' ) );
+				minx *= -w;
+				miny *= -h;
+				log( [minx,miny].join( ', ' ) );
+			
+				// this is a bit wack...	
+				let wq = w * ( 0.49 + 0.00 )
+				let hq = h * ( 0.57 + 0.00 )
+
+				let radius = 170;
+				radius = 0; // cheesy way to turn off debugging
+
+				let green = '#0F0';
 
 				for ( let i = 0 ; i < placed.length ; i++ ) {
 					let fun = placed[ i ];
+					let at = Hexactions.toScreen( fun.at, wq, hq );
+					at.x += minx;
+					at.y += miny;
+
 					let tile = tiles[ fun.name ];
 
 					let img = document.createElement( 'img' );
 					img.src = tile.normal.image;
-					img.style.top  = h * ( -miny + fun.y ) + 'px';
-					img.style.left = w * ( -minx + fun.x ) + 'px';
-					img.style.width = w + 'px';
-					img.style.height = h + 'px';
 					img.setAttribute( 'class',  'r' + fun.orientation );
-					document.body.appendChild( img );
+					document.body.appendChild( positionElement( img, at, w, h ) );
+
+					if ( !radius ) continue;
+
+					let tmi = document.createElement( 'canvas' );
+					document.body.appendChild( positionElement( tmi, at, w, h ) );
+					let context = tmi.getContext( '2d' );
+					tmi.onclick = function() {
+						console.log( '--------------------------------------------' );
+						console.log( whozLogs[ fun.name ].join( '\n' ) );
+						console.log( 'ok: ' + fun.name );
+					}
+
+					context.font = '24px Arial';
+					context.fillStyle = 'white';
+					let lw = 8;
+
+					let msg = '#' + i + ':' + fun.name + ': ' + ptToTxt( fun.at );
+					let x = w / 2 - lw * msg.length;
+					let y = h / 2 + ( Math.random() - Math.random() ) * 32;
+					context.fillText( msg, x, y );
+
+					for ( direction in fun.exits ) {
+						let to = fun.exits[ direction ];
+						let angle = Hexactions.angle( direction );
+						let x = w / 2 + radius * Math.cos( angle ); 
+						let y = h / 2 - radius * Math.sin( angle ); 
+							
+						let nAt = Hexactions.offset( fun.at, direction );
+						let msg = direction + ': '+ ptToTxt( nAt );
+
+						if ( to ) { 
+							context.fillStyle = 'cyan';
+							context.fillText( msg, x, y );
+							context.fillText( to, x, y + 32 );
+						} else {
+							context.fillStyle = green;
+							context.fillText( msg, x, y );
+						}
+						
+					}
+
 				};
 			};
+
+			const positionElement = function( element, at, w, h ) {
+				element.width = w;
+				element.height = h;
+				element.style.left   = at.x + 'px';
+				element.style.top    = at.y + 'px';
+				element.style.width  = w + 'px';
+				element.style.height = h + 'px';
+				return element;
+			};
 						
-			const canPlace = function( maybe, x, y, exits, placed ) {
+			const canPlace = function( maybe, point, exits, placed ) {
 				let ok = true;
 
 				// make sure nothing else is already here (oopsie!)
 				for ( let i = 0 ; i < placed.length && ok ; i++ ) {
-					if ( x == placed[ i ].x && y == placed[ i ].y ) {
-						console.log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + [x,y] );
+					if ( point.x == placed[ i ].at.x && point.y == placed[ i ].at.y ) {
+						log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + point );
 						ok = false; 
 					}
 				}
 
 				for ( let direction in DIRECTIONS ) {
-					let otherX = x + DIRECTIONS[ direction ].dx;
-					let otherY = y + DIRECTIONS[ direction ].dy;
-					let other = false;
+					let dilection = direction;
+					if ( 1 == dilection.length ) dilection += '_';
 
-					let tileExit  = ( direction in exits  ) ? 'exit' : 'non-exit';
-					let tmi1 = [maybe,direction,tileExit].join( '.' );
+					let tileExit  = ( direction in exits ) ? 'isa-exit' : 'non-exit';
+					let tmi1 = [maybe,dilection,tileExit].join( '.' );
 
-					for ( let i = 0 ; i < placed.length && !other ; i++ ) {
-						if ( otherX ==  placed[ i ].x && otherY == placed[ i ].y ) {
-							other = placed[ i ];
-						}
-					}
+					let otherAt = Hexactions.offset( point, direction );
+					let other = findTileAt( placed, otherAt );
 
 					if ( !other ) {
-						console.log( '---- nothing to check ' + tmi1 + ' -> ' + [otherX,otherY].join( '.' ) );
+						log( '---- deserted ' + tmi1 + ' -> ' + ptToTxt( otherAt ) );
 						continue;
 					}
 
-					let opposing = DIRECTIONS[ direction ].opposing;
-					let otherExit = ( opposing  in other.exits ) ? 'exit' : 'non-exit';
-					let tmi2 = [other.name,opposing,otherExit].join( '.' );
+					let opposite = Hexactions.opposite( direction );
+					let otherExit = ( opposite  in other.exits ) ? 'isa-exit' : 'non-exit';
+					let tmi2 = [other.name,opposite,otherExit].join( '.' );
 
 					ok = ( tileExit == otherExit );
-					console.log( '---- check ' + tmi1 + ' vs ' + tmi2 + ' -> ' + ok );
+					log( '---' + ( ok ? '- matching ' : '> conflict ' ) + tmi1 + ' vs ' + tmi2 );
 					if ( !ok ) break;
 				}
+
+				log( '-- no conflicts detected for ' + maybe + ' @ ' + ptToTxt( point ) );
 
 				return ok;
 			};
 
-			const addTile = function( name, orientation, which, from ) {
-				// TODO: handle orientation properly
-				let tile = {name:name, x:0, y:0, orientation:orientation, exits:{}};
+			const findTileAt = function( placed, otherAt ) {
+//alert( otherAt.x ) throw otherAt.x;
+				for ( let i = 0 ; i < placed.length ; i++ ) {
+					let there = placed[ i ];
+					if ( otherAt.x == there.at.x && otherAt.y == there.at.y ) {
+						return there;
+					}
+				}
+				return false;
+			};
 
-				if ( from && which ) {
-					tile.x = which.x + DIRECTIONS[ from ].dx;
-					tile.y = which.y + DIRECTIONS[ from ].dy;
+			const addTile = function( name, orientation, tileFrom, directionFrom, placed ) {
+				log( 
+					'-- adding %1 from %2.%3'
+					.replace( /%1/, name )
+					.replace( /%2/, tileFrom ? tileFrom.name : 'na' )
+					.replace( /%3/, directionFrom || 'na' )
+				);
 
-					if ( which.exits[ from ] ) {
-						throw which.name + '.' + from + ' leads to ' + which.exits[ from ] + ' already';
+				let n = 0;
+				let tile = {name:name, at:{x:n,y:n}, orientation:orientation, exits:{}};
+
+				if ( directionFrom && tileFrom ) {
+					tile.at = Hexactions.offset( tileFrom.at, directionFrom );
+					if ( tileFrom.exits[ directionFrom ] ) {
+						throw tileFrom.name + '.' + directionFrom + ' leads to ' + tileFrom.exits[ directionFrom ] + ' already';
 					} else {
-						which.exits[ from ] = name;
+						tileFrom.exits[ directionFrom ] = name;
 					}
 				}
 
-				for ( let k in tiles[ name ].normal.exits ) {
-					k = rotateDirection( k, orientation );
+				let rotatedExits = rotateExits( tiles[ name ].normal.exits, orientation );
+				for ( let exit in rotatedExits ) {
+					if ( !tileFrom ) {
+						log( '--- no from tile, must be Borderland' );
+						tile.exits[ exit ] = false;
+						continue;
+					}
 
-					// for sanity check :-P
-					//console.log( k + '+' + orientation + ' -> ' + r + ' -> ' + o );
+					let value = false;
+					if ( exit == Hexactions.opposite( directionFrom ) ) {
+						value = tileFrom.name;
+						log( '--- from ' + exit + ' is ' + tileFrom.name );
+					} else {
+						let neighborAt = Hexactions.offset( tile.at, exit );
+						let neighbor = findTileAt( placed, neighborAt );
+						if ( neighbor ) {
+							value = neighbor.name;
+							log( '--- neighbor exists ' + exit + ' at ' + ptToTxt( neighborAt ) + ' ' + value );
+							let opposite = Hexactions.opposite( exit );
+							if( neighbor.exits[ opposite ] && name != neighbor.exits[ opposite ] ) { 
+								log( '--> WARNING: ' + value + ' already has a neighbor at ' + opposite + ': ' + neighbor.exits[ opposite ] );
+							} else {
+								neighbor.exits[ opposite ] = name;
+								log( '--- update: ' + value + '.' + opposite + ' to be ' + name );
+							}
+						} else {
+							log( '--- no neighbor to ' + exit + ' at ' + ptToTxt( neighborAt ) );
+						}
+					}
 
-					tile.exits[ k ] = (
-						( which && from && k == DIRECTIONS[ from ].opposing ) 
-						? which.name
-						: false
-					);
-					
-					// TODO: see if any other exits need to be hooked up....
+					tile.exits[ exit ] = value;
 				}
-				console.log( '--> ' + JSON.stringify( tile ) );
+				log( '-- ' + JSON.stringify( tile ) );
 
 				return tile;
 			};
 	
 			const rotateDirection = function( direction, orientation ) {
-				let rotated = ( DIRECTIONS[ direction ].index + orientation ) % 6;
-				let rotateDirection = Object.keys( DIRECTIONS )[ rotated ];
-
-				// for sanity check :-P
-				//console.log( direction + '+' + orientation + ' -> ' + rotated + ' -> ' + rotateDirection );
-				return rotateDirection;
+				return Hexactions.rotate( direction, orientation );
 			};
 
 			const rotateExits = function( exits, orientation ) {
@@ -251,6 +366,19 @@
 
 			const randomPick = function( a ) {
 				return a[ Math.floor( Math.random() * a.length ) ];
+			};
+
+			const ptToTxt = function( p ) {
+				return p.x + ',' + p.y;
+			};
+
+			const log = function( x ) {
+				console.log( x );
+				themLogs.push( x );
+			};
+			const saveLog = function( whoz ) {
+				whozLogs[ whoz ] = themLogs;
+				themLogs = [];
 			};
 
 			window.onload = boardBuilder;

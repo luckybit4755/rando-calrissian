@@ -1,0 +1,35 @@
+From https://www.redblobgames.com/grids/hexagons/#neighbors section on "Offset coordinates"
+
+var oddq_directions = [
+    [[+1,  0], [+1, -1], [ 0, -1],
+     [-1, -1], [-1,  0], [ 0, +1]],
+    [[+1, +1], [+1,  0], [ 0, -1],
+     [-1,  0], [-1, +1], [ 0, +1]],
+]
+
+so...
+	// even columns, all rows
+	[+1,  0] // SE
+	[+1, -1] // NE 
+	[ 0, -1] // N_
+	[-1, -1] // NW
+	[-1,  0] // SW
+	[ 0, +1] // S_
+
+    // odd columns, all row
+	[+1, +1] // SE
+	[+1,  0] // NE
+	[ 0, -1] // N_
+	[-1,  0] // NW
+	[-1, +1] // SW
+	[ 0, +1] // S_
+
+finally:
+	SE.offsets: [[+1,  0] , [+1, +1]]
+	NE.offsets: [[+1, -1] , [+1,  0]]
+	N_.offsets: [[ 0, -1] , [ 0, -1]]
+	NW.offsets: [[-1, -1] , [-1,  0]]
+	SW.offsets: [[-1,  0] , [-1, +1]]
+	S_.offsets: [[ 0, +1] , [ 0, +1]]
+
+
