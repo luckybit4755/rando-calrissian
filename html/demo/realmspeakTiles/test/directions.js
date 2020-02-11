@@ -12,7 +12,7 @@ const DIRECTIONS = {
 const Hexactions = {
 	labels: Object.keys( DIRECTIONS )
 	, directionAt: function( index ) {
-		return this.labels[ index % 6 ];
+		return this.labels[ ( 66 + index ) % 6 ];
 	}
 	, indexOf: function( direction ) {
 		return this.labels.indexOf( direction );
