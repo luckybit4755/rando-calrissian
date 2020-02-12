@@ -22,6 +22,7 @@
 				position:absolute;
 				z-index:33;
 				color:yellow;
+				user-select: none;
 			}
 		</style>
 
@@ -32,6 +33,8 @@
 			/* this is a bit squirrely */
 			let themLogs = [];
 			let whozLogs = {};
+
+			const GREEN = '#0F0';
 
 			const boardBuilder = function() {
 				let board = false;
@@ -74,7 +77,8 @@
 			const buildBoard = function() {
 				let start = "Borderland";
 				let orientation = randomOrientation();
-				let placed = [ addHex( start, orientation ) ];
+				let placed = {};
+				placed[ start ] = addHex( start, orientation );
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
@@ -141,13 +145,13 @@
 							}
 
 							let toAdd = addHex( maybe, orientation, origin, exit, placed );
-							placed.push( toAdd );
+							placed[ maybe ] = toAdd;
 							unplaced = remove( unplaced, maybe );
 
 							log(
 								'- added %1 as tile #%2 @ %3 %4 connected to %5 from %6 at %7'
 								.replace( /%1/, maybe )
-								.replace( /%2/, placed.length )
+								.replace( /%2/, Object.keys( placed ).length )
 								.replace( /%3/, ptToTxt( toAdd.at ) )
 								.replace( /%4/, opposite )
 								.replace( /%5/, exit )
@@ -173,7 +177,6 @@
 			};
 
 
-const green = '#0F0';
 			const showBoard = function( placed ) {
 				//log( JSON.stringify( placed, false, '\t' ) );
 
@@ -182,8 +185,8 @@ const green = '#0F0';
 
 				let minx = 0;
 				let miny = 0;
-				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let at = placed[ i ].at;
+				for( let name in placed ) {
+					let at = placed[ name ].at;
 					if ( at.x < minx ) minx = at.x;
 					if ( at.y < miny ) miny = at.y;
 				}
@@ -198,8 +201,9 @@ const green = '#0F0';
 				let radius = 170;
 				//radius = 0; // cheesy way to turn off debugging
 
-				for ( let i = 0 ; i < placed.length ; i++ ) {
-					showHex( placed, i, placed[ i ], w, h, minx, miny, wq, hq, radius );
+				let i = 0;
+				for( let name in placed ) {
+					showHex( placed, i++, placed[ name ], w, h, minx, miny, wq, hq, radius );
 				}
 			};
 
@@ -220,7 +224,7 @@ const green = '#0F0';
 				let tmi = document.createElement( 'canvas' );
 				document.body.appendChild( positionElement( tmi, at, w, h ) );
 
-				hexClicker( tmi, hex.name, hex.clearings, w, h );
+				hexClicker( tmi, hex, hex.name, hex.clearings, w, h, placed );
 				
 				let context = tmi.getContext( '2d' );
 
@@ -244,7 +248,7 @@ const green = '#0F0';
 						context.fillStyle = 'red';
 						distance = '!'
 					} else {
-						context.fillStyle = green;
+						context.fillStyle = GREEN;
 					}
 
 					msg = clearing + ':' + distance ;
@@ -271,17 +275,17 @@ const green = '#0F0';
 						context.fillText( msg, x, y );
 						context.fillText( to, x, y + 32 );
 					} else {
-						context.fillStyle = green;
+						context.fillStyle = GREEN;
 						context.fillText( msg, x, y );
 					}
 				}
 			};
 
-			const hexClicker = function( target, name, clearings, w, h ) {
+			const hexClicker = function( target, hex, name, clearings, w, h, placed ) {
 				let nfo = document.getElementById( 'nfo' );
 				target.onclick = function( e ) {
 					console.log( '--------------------------------------------' );
-					console.log( whozLogs[ name ].join( '\n' ) );
+					//console.log( whozLogs[ name ].join( '\n' ) );
 					console.log( 'ok: ' + name );
 					console.log( '--------------------------------------------' );
 
@@ -290,6 +294,7 @@ const green = '#0F0';
 
 					console.log( mx + ',' + my );
 					for ( let clearing in clearings ) {
+						clearing = parseInt( clearing );
 						let at = clearings[ clearing ];
 						let x = w / 2 + at.x * w;
 						let y = h / 2 - at.y * h;
@@ -298,7 +303,51 @@ const green = '#0F0';
 						let dy = my - y;
 						let d2 = dx * dx + dy * dy;
 						if( d2 < 33 * 33 ) {
-							nfo.innerHTML = name + '.' + clearing;
+							let tile = tiles[ name ].normal;
+
+							// TODO: store this? 
+							let connected = {};
+							for ( let i = 0 ; i < tile.paths.length ; i++ ) {
+								let path = tile.paths[ i ].clearings;
+								if ( -1 == path.indexOf( clearing ) ) {
+									continue;
+								}
+								for ( let j = 0 ; j < path.length ; j++ ) {
+									let c = path[ j ];
+									if ( c != clearing ) {
+										connected[ c ] = c;
+									}
+								}
+							}
+							let msg = name + '.' + clearing + ' -> ' + Object.keys( connected );
+
+
+							for ( let direction in tile.exits ) {
+								if ( clearing != tile.exits[ direction ] ) continue;
+
+								let exit = Hexactions.rotate( direction, hex.orientation );
+
+								let otherName= hex.exits[ exit ];
+								if ( !otherName ) {
+									msg += '\n - no exit to the ' + exit;
+									continue;
+								}
+
+								let otherHex = placed[ otherName ];
+
+								let otherExit = Hexactions.opposite( exit );
+								let otherExitRotated = Hexactions.rotate( otherExit, -otherHex.orientation );
+								let otherClearing = tiles[ otherName ].normal.exits[ otherExitRotated ];
+
+								msg += '\n - ' + exit + ' to ' + otherName + '.' + otherExitRotated + ' -> ' + otherClearing;
+							}
+
+							console.log( nfo.innerHTML = msg );
+
+
+
+
+
 							break;
 						}
 					}
@@ -319,9 +368,10 @@ const green = '#0F0';
 				let ok = true;
 
 				// make sure nothing else is already here (oopsie!)
-				for ( let i = 0 ; i < placed.length && ok ; i++ ) {
-					if ( point.x == placed[ i ].at.x && point.y == placed[ i ].at.y ) {
-						log( '>>> ' + maybe + ' would overlay ' + placed[ i ].name + ' at ' + point );
+				for( let name in placed ) {
+					let other = placed[ name ];
+					if ( point.x == other.at.x && point.y == other.at.y ) {
+						log( '>>> ' + maybe + ' would overlay ' + other.name + ' at ' + point );
 						ok = false; 
 					}
 				}
@@ -356,8 +406,8 @@ const green = '#0F0';
 			};
 
 			const findHexAt = function( placed, otherAt ) {
-				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let there = placed[ i ];
+				for ( let name in placed ) {
+					let there = placed[ name ];
 					if ( otherAt.x == there.at.x && otherAt.y == there.at.y ) {
 						return there;
 					}
@@ -443,13 +493,13 @@ const green = '#0F0';
 				}
 				log( '-- ' + JSON.stringify( hex ) );
 
-				return hex;;
+				return hex;
 			};
 
 			const traceOut = function( placed ) {
 				let names = {};
-				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let hex = placed[ i ];
+				for ( let name in placed ) {
+					let hex = placed[ name ];
 					names[ hex.name ] = hex;
 					hex.distances = {};
 					for ( let clearing in tiles[ hex.name ].normal.clearings ) {
@@ -505,8 +555,8 @@ const green = '#0F0';
 
 				let unreachable = {};
 
-				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let hex = placed[ i ];
+				for ( let name in placed ) {
+					let hex = placed[ name ];
 					let unreached = [];
 					for ( let clearing in hex.distances ) {
 						let distance = hex.distances[ clearing ];
@@ -596,7 +646,9 @@ const green = '#0F0';
 				return a.filter(v=>value!=v);
 			};
 
-			const randomPick = function( a ) {
+			const randomPick = function( o ) {
+				let name = shuffle( Object.keys( o ) )[ 0 ];
+				return o[ name ];
 				return a[ Math.floor( Math.random() * a.length ) ];
 			};
 
