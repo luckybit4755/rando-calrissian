@@ -44,11 +44,12 @@
 					if ( !Object.keys( board.unreachable ).length && !board.unplaced.length ) {
 						break;
 					} else {
+if ( 1 == maxTries ) break;
 						board = false;
 					}
 				}
 
-				if ( !board ) {
+				if ( 1 != maxTries && !board ) {
 					document.body.innerHTML = 'completely failed to build a board after ' + attempt + ' tries, sorry';
 					return;
 				}
@@ -61,7 +62,9 @@
 				nfo.style.position = 'absolute';
 				nfo.style.zIndex = 66;
 				nfo.style.background = 'white';
-				nfo.appendChild( document.createTextNode( 'built a fully connected board after ' + attempt + ' tries' ) );
+				nfo.appendChild( document.createTextNode( 
+					'built a fully connected board after ' + attempt + ' tries' 
+				) );
 
 				document.body.appendChild( nfo );
 			};
@@ -221,13 +224,13 @@
 
 					context.font = '24px Arial';
 					context.fillStyle = 'white';
-					let lw = 8;
+					let lw = 6;
 					let lh = 24;
 
 					let msg = '#' + i + ':' + hex.name + ': ' + ptToTxt( hex.at );
 					let x = w / 2 - lw * msg.length;
 					let y = h / 2;
-					context.fillText( msg, x, y );
+					context.fillText( msg, x, 44 );
 
 					context.font = '24px Arial';
 					let clearings = Object.keys( tiles[ hex.name ].normal.clearings );
@@ -240,15 +243,26 @@
 						} else {
 							context.fillStyle = green;
 						}
-						msg = clearing + ':' + distance ;
 
-						context.fillText( msg, x, y + lh );
+						msg = clearing + ':' + distance ;
+						//context.fillText( msg, x, y + lh );
 						x += 5 * lw;
+
+						let point = tiles[ hex.name ].normal.clearings[ clearing ];
+						point.x = point.x / 100 - 0.5;
+						point.y = point.y / 100 - 0.5;
+						let length = Math.sqrt( ( point.x * point.x ) + ( point.y * point.y ) );
+
+						let angle = Math.atan2( -point.y, point.x );
+						angle += hex.orientation * Math.PI / 3;
+
+						x = w / 2 + Math.cos( angle ) * length * w;
+						y = h / 2 - Math.sin( angle ) * length * h;
+						context.fillText( msg, x, y );
 					}
 
 					// below here is the stuff I used to debug the exit vs non-exit stuff
 					if ( !false ) continue;
-
 
 					for ( direction in hex.exits ) {
 						let to = hex.exits[ direction ];
@@ -267,9 +281,7 @@
 							context.fillStyle = green;
 							context.fillText( msg, x, y );
 						}
-						
 					}
-
 				};
 			};
 
@@ -424,22 +436,17 @@
 							let opposite = Hexactions.opposite( exit );
 							neighbor = names[ neighbor ];
 
-							let neighborClearing = neighbor.entrances[ opposite ];
-							let connected = connectClearings( neighborClearing, tiles[ neighbor.name ].normal.paths );
+							log( 'try to update ' + neighbor.name + ' from ' + name + ':' + JSON.stringify( neighbor.distances ) );
 
-							log( 'check ' + neighbor.name + ' to the ' + exit + ' -> ' + opposite + ' clearing ' + neighborClearing + ' connected to ' + Object.keys( connected ) );
+							let start = neighbor.entrances[ opposite ];
+							let paths = tiles[ neighbor.name ].normal.paths;
+							let updated = connectClearings( start, distance, neighbor.distances, paths );
 
-							let yeah = false;
-							for( let c in connected ) {
-								let d = neighbor.distances[ c ];
-								if ( d < 0 || distance < d ) {
-									log( '- update ' + neighbor.name + '[' + c + '] from ' + d + ' to ' + distance );
-									yeah = neighbor.distances[ c ] = distance;
-								}
-							}
-							if ( yeah ) {
+							if ( updated ) {
 								nu[ neighbor.name ] = true;
+								log( neighbor.distances );
 							}
+							log( 'dfq: ' + updated + ' so ' + Object.keys( nu ) );
 						}
 
 						log( 'new blood:' + Object.keys( nu ) );
@@ -471,39 +478,62 @@
 				return unreachable;
 			};
 
-			const connectClearings = function( start, paths ) {
+			const closer = function( current, distance ) {
+				return ( current < 0 || distance < current ) ? distance : current;
+			};
+			const updateDistance = function( clearing, distances, distance ) {
+				let b4 = distances[ clearing ];
+				distances[ clearing ] = closer( b4, distance );
+				return b4 != distances[ clearing ];
+			};
+
+			// this is still not right...
+			const connectClearings = function( start, distance, distances, paths ) {
+				let updated = updateDistance( start, distances, distance );
 				let connected = {};
-				connected[ start ] = true;
+				connected[ start ] = distances[ start ];
+
+				log( 'update ' + start + ' to ' + distances[ start ] + ' using ' + distance );
 
 				// another scaredy-cat loop
 				for( let qqq = 0 ; qqq < 333 ; qqq++ ) {
 					let addedClearing = false;
 					for( let j = 0 ; j < paths.length ; j++ ) {
 						let path = paths[ j ].clearings;
+						log( '- check ' + path );
+
+						let addClearings = false;
 						let addEm = false;
+						
 						for ( let p = 0 ; p < path.length && !addEm ; p++ ) {
 							let c = path[ p ];
 							if( c in connected ) {
-								//console.log( 'ho '+ c );
-								addEm = true;
+								log( '- hit on ' + c + ' at distance:' + distance );
+								addEm = connected[ c ] + 1;
+								break;
 							}
 						}
-						if ( addEm ) {
-							for ( let p = 0 ; p < path.length ; p++ ) {
-								let c = path[ p ];
-								if( c in connected ) {
-									//console.log( c + ' is already there' );
-								} else {
-									//console.log( c + ' is new ' );
-									connected[ c ] = true;
-									addedClearing = true;
-								}
-							}
+						if ( !addEm ) continue;
+
+						for ( let p = 0 ; p < path.length ; p++ ) {
+							let c = path[ p ];
+							if ( c in connected ) continue;
+
+							log( '-- so add ' + c + ' at ' + addEm );
+							addedClearing = true;
+							updated = updateDistance( c, distances, addEm ) || updated;
+							log( '-- so  ' + c + ' is now ' + distances[ c ] );
+							connected[ c ] = distances[ c ];
 						}
 					}
-					if ( !addedClearing ) break;
+					if ( !addedClearing ) {
+						log( 'done and updated is ' + updated );
+						break;
+					}
 				}
-				return connected;
+
+				log( '----' );
+				return updated;
 			}
 	
 			const rotateExits = function( exits, orientation ) {
