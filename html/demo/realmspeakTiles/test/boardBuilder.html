@@ -44,35 +44,37 @@
 					if ( !Object.keys( board.unreachable ).length && !board.unplaced.length ) {
 						break;
 					} else {
-if ( 1 == maxTries ) break;
+						if ( 1 == maxTries ) break;
 						board = false;
 					}
 				}
 
-				if ( 1 != maxTries && !board ) {
-					document.body.innerHTML = 'completely failed to build a board after ' + attempt + ' tries, sorry';
-					return;
-				}
-
-				showBoard( board.placed );
-
 				let nfo = document.createElement( 'pre' );
+				nfo.id = 'nfo';
 				nfo.style.top = '1em';
 				nfo.style.left = '1em';
 				nfo.style.position = 'absolute';
 				nfo.style.zIndex = 66;
 				nfo.style.background = 'white';
+				document.body.appendChild( nfo );
+
+				if ( 1 != maxTries && !board ) {
+					return nfo.appendChild( document.createTextNode( 
+						'completely failed to build a board after ' + attempt + ' tries, sorry'
+					));
+				}
+
 				nfo.appendChild( document.createTextNode( 
 					'built a fully connected board after ' + attempt + ' tries' 
 				) );
 
-				document.body.appendChild( nfo );
+				showBoard( board.placed );
 			};
 
 			const buildBoard = function() {
 				let start = "Borderland";
 				let orientation = randomOrientation();
-				let placed = [ addTile( start, orientation ) ];
+				let placed = [ addHex( start, orientation ) ];
 
 				let unplaced = shuffle( remove( Object.keys( tiles ), start ) );
 
@@ -84,7 +86,7 @@ if ( 1 == maxTries ) break;
 					let exits = [];
 					for ( let exit in origin.exits ) {
 						if ( !origin.exits[ exit ] ) {
-							let neighborAt = findTileAt( placed, Hexactions.offset( origin.at, exit ) );
+							let neighborAt = findHexAt( placed, Hexactions.offset( origin.at, exit ) );
 							if ( neighborAt ) {
 								//throw 'ERROR: tile collision ' + neighborAt.name;
 								origin.exits[ exit ] = neighborAt.name; // ????
@@ -119,7 +121,6 @@ if ( 1 == maxTries ) break;
 							.replace( /%7/, unplaced.join( ',' )  )
 						);
 
-
 						for ( let j = 0 ; j < unplaced.length ; j++ ) {
 							let maybe = unplaced[ j ];
 							orientation = randomOrientation();
@@ -139,7 +140,7 @@ if ( 1 == maxTries ) break;
 								continue;
 							}
 
-							let toAdd = addTile( maybe, orientation, origin, exit, placed );
+							let toAdd = addHex( maybe, orientation, origin, exit, placed );
 							placed.push( toAdd );
 							unplaced = remove( unplaced, maybe );
 
@@ -171,7 +172,8 @@ if ( 1 == maxTries ) break;
 				return Math.floor( 33 * Math.random() ) % 6;
 			};
 
-			// aka drawBoard
+
+const green = '#0F0';
 			const showBoard = function( placed ) {
 				//log( JSON.stringify( placed, false, '\t' ) );
 
@@ -196,94 +198,112 @@ if ( 1 == maxTries ) break;
 				let radius = 170;
 				//radius = 0; // cheesy way to turn off debugging
 
-				let green = '#0F0';
-
 				for ( let i = 0 ; i < placed.length ; i++ ) {
-					let hex = placed[ i ];
-					let at = Hexactions.toScreen( hex.at, wq, hq );
-					at.x += minx;
-					at.y += miny;
+					showHex( placed, i, placed[ i ], w, h, minx, miny, wq, hq, radius );
+				}
+			};
 
-					let tile = tiles[ hex.name ];
+			const showHex = function( placed, when, hex, w, h, minx, miny, wq, hq, radius ) {
+				let at = Hexactions.toScreen( hex.at, wq, hq );
+				at.x += minx;
+				at.y += miny;
 
-					let img = document.createElement( 'img' );
-					img.src = tile.normal.image;
-					img.setAttribute( 'class',  'r' + hex.orientation );
-					document.body.appendChild( positionElement( img, at, w, h ) );
+				let tile = tiles[ hex.name ];
 
-					if ( !radius ) continue;
+				let img = document.createElement( 'img' );
+				img.src = tile.normal.image;
+				img.setAttribute( 'class',  'r' + hex.orientation );
+				document.body.appendChild( positionElement( img, at, w, h ) );
 
-					let tmi = document.createElement( 'canvas' );
-					document.body.appendChild( positionElement( tmi, at, w, h ) );
-					let context = tmi.getContext( '2d' );
-					tmi.onclick = function() {
-						console.log( '--------------------------------------------' );
-						console.log( whozLogs[ hex.name ].join( '\n' ) );
-						console.log( 'ok: ' + hex.name );
+				if ( !radius ) return;
+
+				let tmi = document.createElement( 'canvas' );
+				document.body.appendChild( positionElement( tmi, at, w, h ) );
+
+				hexClicker( tmi, hex.name, hex.clearings, w, h );
+				
+				let context = tmi.getContext( '2d' );
+
+				context.font = '24px Arial';
+				context.fillStyle = 'white';
+				let lw = 6;
+				let lh = 24;
+
+				let msg = '#' + when + ':' + hex.name + ': ' + ptToTxt( hex.at );
+				let x = w / 2 - lw * msg.length;
+				let y = h / 2;
+				context.fillText( msg, x, 44 );
+
+				context.font = '24px Arial';
+
+				for ( let clearing in hex.clearings ) {
+					let point = hex.clearings[ clearing ];
+					let distance = hex.distances[ clearing ];
+
+					if ( distance < 0 ) {
+						context.fillStyle = 'red';
+						distance = '!'
+					} else {
+						context.fillStyle = green;
 					}
 
-					context.font = '24px Arial';
-					context.fillStyle = 'white';
-					let lw = 6;
-					let lh = 24;
+					msg = clearing + ':' + distance ;
 
-					let msg = '#' + i + ':' + hex.name + ': ' + ptToTxt( hex.at );
-					let x = w / 2 - lw * msg.length;
-					let y = h / 2;
-					context.fillText( msg, x, 44 );
+					x = w / 2 + point.x * w;
+					y = h / 2 - point.y * h;
+					context.fillText( msg, x, y );
+				};
 
-					context.font = '24px Arial';
-					let clearings = Object.keys( tiles[ hex.name ].normal.clearings );
-					for( let j = 0 ; j < clearings.length ; j++ ) {
-						let clearing = clearings[ j ];
-						let distance = hex.distances[ clearing ];
-						if ( distance < 0 ) {
-							context.fillStyle =  '#FDD';
-							distance = '!'
-						} else {
-							context.fillStyle = green;
-						}
+				// below here is the stuff I used to debug the exit vs non-exit stuff
+				if ( !false ) return;
 
-						msg = clearing + ':' + distance ;
-						//context.fillText( msg, x, y + lh );
-						x += 5 * lw;
+				for ( direction in hex.exits ) {
+					let to = hex.exits[ direction ];
+					let angle = Hexactions.angle( direction );
+					let x = w / 2 + radius * Math.cos( angle ); 
+					let y = h / 2 - radius * Math.sin( angle ); 
+						
+					let nAt = Hexactions.offset( hex.at, direction );
+					let msg = direction + ': '+ ptToTxt( nAt );
 
-						let point = tiles[ hex.name ].normal.clearings[ clearing ];
-						point.x = point.x / 100 - 0.5;
-						point.y = point.y / 100 - 0.5;
-						let length = Math.sqrt( ( point.x * point.x ) + ( point.y * point.y ) );
-
-						let angle = Math.atan2( -point.y, point.x );
-						angle += hex.orientation * Math.PI / 3;
-
-						x = w / 2 + Math.cos( angle ) * length * w;
-						y = h / 2 - Math.sin( angle ) * length * h;
+					if ( to ) { 
+						context.fillStyle = 'cyan';
+						context.fillText( msg, x, y );
+						context.fillText( to, x, y + 32 );
+					} else {
+						context.fillStyle = green;
 						context.fillText( msg, x, y );
 					}
+				}
+			};
 
-					// below here is the stuff I used to debug the exit vs non-exit stuff
-					if ( !false ) continue;
+			const hexClicker = function( target, name, clearings, w, h ) {
+				let nfo = document.getElementById( 'nfo' );
+				target.onclick = function( e ) {
+					console.log( '--------------------------------------------' );
+					console.log( whozLogs[ name ].join( '\n' ) );
+					console.log( 'ok: ' + name );
+					console.log( '--------------------------------------------' );
 
-					for ( direction in hex.exits ) {
-						let to = hex.exits[ direction ];
-						let angle = Hexactions.angle( direction );
-						let x = w / 2 + radius * Math.cos( angle ); 
-						let y = h / 2 - radius * Math.sin( angle ); 
-							
-						let nAt = Hexactions.offset( hex.at, direction );
-						let msg = direction + ': '+ ptToTxt( nAt );
+					let mx = e.offsetX;
+					let my = e.offsetY;
 
-						if ( to ) { 
-							context.fillStyle = 'cyan';
-							context.fillText( msg, x, y );
-							context.fillText( to, x, y + 32 );
-						} else {
-							context.fillStyle = green;
-							context.fillText( msg, x, y );
+					console.log( mx + ',' + my );
+					for ( let clearing in clearings ) {
+						let at = clearings[ clearing ];
+						let x = w / 2 + at.x * w;
+						let y = h / 2 - at.y * h;
+
+						let dx = mx - x;
+						let dy = my - y;
+						let d2 = dx * dx + dy * dy;
+						if( d2 < 33 * 33 ) {
+							nfo.innerHTML = name + '.' + clearing;
+							break;
 						}
 					}
-				};
-			};
+				}
+			}
 
 			const positionElement = function( element, at, w, h ) {
 				element.width = w;
@@ -314,7 +334,7 @@ if ( 1 == maxTries ) break;
 					let tmi1 = [maybe,dilection,tileExit].join( '.' );
 
 					let otherAt = Hexactions.offset( point, direction );
-					let other = findTileAt( placed, otherAt );
+					let other = findHexAt( placed, otherAt );
 
 					if ( !other ) {
 						log( '---- deserted ' + tmi1 + ' -> ' + ptToTxt( otherAt ) );
@@ -335,7 +355,7 @@ if ( 1 == maxTries ) break;
 				return ok;
 			};
 
-			const findTileAt = function( placed, otherAt ) {
+			const findHexAt = function( placed, otherAt ) {
 				for ( let i = 0 ; i < placed.length ; i++ ) {
 					let there = placed[ i ];
 					if ( otherAt.x == there.at.x && otherAt.y == there.at.y ) {
@@ -345,41 +365,41 @@ if ( 1 == maxTries ) break;
 				return false;
 			};
 
-			const addTile = function( name, orientation, tileFrom, directionFrom, placed ) {
+			const addHex = function( name, orientation, hexFrom, directionFrom, placed ) {
 				log( 
 					'-- adding %1 from %2.%3'
 					.replace( /%1/, name )
-					.replace( /%2/, tileFrom ? tileFrom.name : 'na' )
+					.replace( /%2/, hexFrom ? hexFrom.name : 'na' )
 					.replace( /%3/, directionFrom || 'na' )
 				);
 
 				let n = 0;
-				let tile = {name:name, at:{x:n,y:n}, orientation:orientation, exits:{}};
+				let hex = {name:name, at:{x:n,y:n}, orientation:orientation, exits:{}, clearings:{}};
 
-				if ( directionFrom && tileFrom ) {
-					tile.at = Hexactions.offset( tileFrom.at, directionFrom );
-					if ( tileFrom.exits[ directionFrom ] ) {
-						throw tileFrom.name + '.' + directionFrom + ' leads to ' + tileFrom.exits[ directionFrom ] + ' already';
+				if ( directionFrom && hexFrom ) {
+					hex.at = Hexactions.offset( hexFrom.at, directionFrom );
+					if ( hexFrom.exits[ directionFrom ] ) {
+						throw hexFrom.name + '.' + directionFrom + ' leads to ' + hexFrom.exits[ directionFrom ] + ' already';
 					} else {
-						tileFrom.exits[ directionFrom ] = name;
+						hexFrom.exits[ directionFrom ] = name;
 					}
 				}
 
 				let rotatedExits = rotateExits( tiles[ name ].normal.exits, orientation );
 				for ( let exit in rotatedExits ) {
-					if ( !tileFrom ) {
-						log( '--- no from tile, must be Borderland' );
-						tile.exits[ exit ] = false;
+					if ( !hexFrom ) {
+						log( '--- no from hex, must be Borderland' );
+						hex.exits[ exit ] = false;
 						continue;
 					}
 
 					let value = false;
 					if ( exit == Hexactions.opposite( directionFrom ) ) {
-						value = tileFrom.name;
-						log( '--- from ' + exit + ' is ' + tileFrom.name );
+						value = hexFrom.name;
+						log( '--- from ' + exit + ' is ' + hexFrom.name );
 					} else {
-						let neighborAt = Hexactions.offset( tile.at, exit );
-						let neighbor = findTileAt( placed, neighborAt );
+						let neighborAt = Hexactions.offset( hex.at, exit );
+						let neighbor = findHexAt( placed, neighborAt );
 						if ( neighbor ) {
 							value = neighbor.name;
 							log( '--- neighbor exists ' + exit + ' at ' + ptToTxt( neighborAt ) + ' ' + value );
@@ -395,11 +415,35 @@ if ( 1 == maxTries ) break;
 						}
 					}
 
-					tile.exits[ exit ] = value;
+					hex.exits[ exit ] = value;
 				}
-				log( '-- ' + JSON.stringify( tile ) );
 
-				return tile;
+				let clearings = tiles[ hex.name ].normal.clearings;
+
+				for( let clearing in clearings ) {
+					let tmp = clearings[ clearing ];
+					let x = tmp.x / 100 - 0.5;
+					let y = tmp.y / 100 - 0.5;
+					let length = Math.sqrt( ( x * x ) + ( y * y ) );
+
+					let angle = Math.atan2( -y, x );
+					angle += hex.orientation * Math.PI / 3;
+
+					/*
+
+						x = w / 2 + Math.cos( angle ) * length * w; 
+						y = h / 2 - Math.sin( angle ) * length * h; 
+					*/
+					hex.clearings[ clearing ] = {
+						x: Math.cos( angle ) * length,
+						y: Math.sin( angle ) * length,
+						angle:  angle,
+						length: length
+					}
+				}
+				log( '-- ' + JSON.stringify( hex ) );
+
+				return hex;;
 			};
 
 			const traceOut = function( placed ) {
