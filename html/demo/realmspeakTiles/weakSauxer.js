@@ -22,19 +22,13 @@ const weakSauxer = function() {
 		let xml = self.simplify( d );
 		fs.writeFile( 'ugly.xml', xml ,(e,d)=>{if(e) throw e});
 
-		let json = xml
-			.replace( />([^>]+)</g, '>"$1"<' )    // every value is quoted
-			.replace( /<\/[^>]+>/g, ']}' )        // each close xml tag becomes an array  and object close
-			.replace( /<([^>]+)>/g, '{"$1":[' )   // each open  xml tag becomes an object and array  open
-			.replace( /}{/g, '},{' )              // everything in a list is comma separated
-		fs.writeFile( 'ugly.json', JSON.stringify( json, false, '\t' ) ,(e,d)=>{if(e) throw e});
+		let json = self.toJson( xml );
+		fs.writeFile( 'ugly.json', json, (e,d)=>{if(e) throw e});
 
 		// moment of truth
 		let verified = JSON.parse( json );
 		json = JSON.stringify( verified, false, '\t' );
 		fs.writeFile( 'ugli.json', json, (e,d)=>{if(e) throw e});
-
-
 	}
 
 	self.simplify = function( xml ) {
@@ -73,6 +67,15 @@ const weakSauxer = function() {
 
 		return simple;
 	};
+
+	self.toJson = function( xml ) {
+		return xml
+			.replace( />([^>]+)</g, '>"$1"<' )    // every value is quoted
+			.replace( /<\/[^>]+>/g, ']}' )        // each close xml tag becomes an array  and object close
+			.replace( /<([^>]+)>/g, '{"$1":[' )   // each open  xml tag becomes an object and array  open
+			.replace( /}{/g, '},{' )              // everything in a list is comma separated
+		;
+	}
 };
 
 new weakSauxer().main( process.argv.slice( 2 ) );
