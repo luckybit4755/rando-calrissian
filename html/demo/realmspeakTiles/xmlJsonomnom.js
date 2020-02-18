@@ -1,7 +1,7 @@
 //#!/usr/bin/env node 
 
 const fs = require('fs');
-const xml2json = require('xml2json'); // npm install xml2json
+//const xml2json = require('xml2json'); // npm install xml2json
 
 const xmlJsonomnom = function() {
 	const self = this;
@@ -15,17 +15,17 @@ const xmlJsonomnom = function() {
         fs.readFile(args[ 0 ], 'utf-8', (e,d)=>self.parseFile(e,d) );
     };
 
-    self.parseFile = function( e, xml ) {
+    self.parseFile = function( e, json ) {
         if ( e ) throw e;
 
-		let original = JSON.parse( xml2json.toJson( xml ) );
+		let original = JSON.parse( json );//xml2json.toJson( xml ) );
 
 		let steps = [
 			, self.specialCase
-			, self.nomnomnom
-			, self.deNullIt
-			, self.flatIron
-			, self.arrayIt
+			//, self.nomnomnom
+			//, self.deNullIt
+			//, self.flatIron
+			//, self.arrayIt
 		];
 
 		let now = original;
@@ -44,20 +44,46 @@ const xmlJsonomnom = function() {
 		if ( !self.isObject( elo ) || self.isString( elo ) ) return elo;
 
 		for ( let k in elo ) {
+			let ko = k;
 			let v = elo[ k ];
 
-			switch( k ) {
-				case 'AttributeBlock':
-					v = self.special_AttributeBlock( v );
-					break;
+			// FIXME: not working?
+			let n = self.isNumber( v );
+			if ( n ) {
+				v = n;
 			}
 
-			let ko = k;
+			switch( k ) {
+				case 'attack_speed':        ko = 'speed_attack'; break;
+				case 'attack_speed_new':    ko = 'speed_attack_new'; break;
+				case 'attack_speed_target': ko = 'speed_attack_target'; break;
+				case 'chit_speed':          ko = 'speed_chit'; break;
+				case 'chit_speed_inc':      ko = 'speed_chit_increase'; break;
+				case 'final_chit_speed':    ko = 'speed_chit_final'; break;
+				case 'fly_speed':           ko = 'speed_fly'; break;
+				case 'move_speed':          ko = 'speed_move'; break;
+				case 'move_speed_change':   ko = 'speed_move_change'; break;
+				case 'AttributeBlock': 
+					v = self.special_AttributeBlock( v ); 
+					ko = 'attributesX'; 
+					break;
+/*
+				// "attributeList": { "keyName": "extra_actions", "attributeVal": { "N0": "P" } } 
+				case 'attributeList':
+					v = self.special_attributeList( v );
+					ko = 'attriboX'
+					let nu = {};
+					for ( let i = 0 ; i < v.length ; i++ ) {
+						//kkattributeList
+					}
+					break;
+*/
+			}
 
+			elo[ ko ] = self.specialCase( v );
 			if ( ko !== k ) {
 				delete elo[ k ];
 			}
-			elo[ ko ] = self.specialCase( v );
 
 		}
 		return elo;
@@ -164,6 +190,16 @@ const xmlJsonomnom = function() {
 		return self.nomObject( nu );
 	};
 
+	self.nestTest = function( k ) {
+		return ( false
+			|| /_[0-9]+_/.test( k ) 
+			|| /^icon_/.test( k )
+			|| /^speed_/.test( k )
+			|| /^(level|optional)_[0-9]/.test( k )
+			|| /_xy$/.test( k )
+		);
+	};
+
 	self.nomObject = function( elo ) {
 		self.log( '> self.nomObject:' + Object.keys( elo ).slice( 0, 33 ) );
 
@@ -174,7 +210,7 @@ const xmlJsonomnom = function() {
 		for ( let k in elo ) {
 			let value = elo[ k ];
 
-			let nestling = /_[0-9]+_/.test( k );
+			let nestling = self.nestTest( k );
 			if ( !nestling ) {
 				self.log( 'terminate in ' + k );
 				nu[ k ] = self.nomnomnom( value );
@@ -307,10 +343,23 @@ const xmlJsonomnom = function() {
 	};
 
 	self.isNumber = function( v ) {
-		return !isNaN( v ) || v == ( '' + parseInt( v ) );
+		if ( !isNaN( v ) ) return v;
+		let tmp = parseFloat( v );
+		if ( v == ( '' + tmp ) ) return tmp;
+
+		tmp = parseInt( v );
+		if ( v == ( '' + tmp ) ) return tmp;
+		return false;
 	};
 
+	self.unflattable = function( k ) {
+		return (
+			/^(destroyed|light|unalerted)$/.test( k )
+		)
+	}
+
 	self.flatIron = function ( elo, parentKey ) {
+		return elo;
 		let nu = {};
 
 		let keys =  Object.keys( elo );
@@ -325,11 +374,16 @@ const xmlJsonomnom = function() {
 		for( let k in elo ) {
 			let v = elo[ k ];
 
-			if ( self.isObject( v ) ) {
+			if ( self.isObject( v ) && !Array.isArray( v ) ) {
 
 				// gross special case here for numeric keys :-(
-				if ( self.isShallow( v ) && !self.isNumber( k ) ) {
-					let flat = self.flattenObject( v );
+				let flatten = ( true
+					&& self.isShallow( v ) 
+					&& !self.isNumber( k )
+					&& !self.unflattable( k )
+				);
+				if ( flatten ) {
+					let flat = self.flattenObject( v, '-' );
 					flat.k = k + flat.k; // + '_'; // mark these as wack
 					nu[ flat.k ] = flat.v;
 					continue;
@@ -350,7 +404,7 @@ const xmlJsonomnom = function() {
 		for ( let k in elo ) {
 			let v = elo[ k ];
 			if ( self.isJunkValue( v ) ) {
-				delete elo[ k ];
+				elo[ k ] = true; // think these are supposed to be flags...
 			} else {
 				if ( self.isObject( v ) ) {
 					self.deNullIt( v );
@@ -384,8 +438,6 @@ const xmlJsonomnom = function() {
 			if ( gut ) wanted[ k ] = true;
 		}
 
-		console.log( 'wanted:' + Object.keys( wanted ) );
-		
 		return self.arrayEm( elo, wanted );
 	};
 
