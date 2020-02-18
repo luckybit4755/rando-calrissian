@@ -7,13 +7,28 @@ const fs = require( 'fs' );
  * It's no joke, but maybe I should see a professional, cuz 2020, I'm trying
  * to shallow parse XML like a lunatic o.O
  *
- * 
+ * The biggest issue I had with other converters was they decided on the arity 
+ * of elements in the local scope instead of the document scope. This lead to
+ * inconsistencies in the way elements were handled.
+ *
+ * Aside from the madness of using regular expressions to convert XML to JSON,
+ * the main purpose is to create a consistence implicit scheme in the output.
+ * This is attempted (and hopefully achieved) by considering elements at the
+ * same level of the document hierarchy and generalizing only with a complete
+ * view of the overall structure.
+ *
+ * @author Valerie Grafin von FunFun
  *
  */
 const weakSauxer = function() {
 	const self = this;
 
 	self.main = function( args ) {
+		//cheese
+		if ( 'test' === args[ 0 ] ) {
+			return self.test();
+		}
+
 		//fs.readFile( args[ 0 ], 'utf-8', self.convert );
 		fs.readFile( args[ 0 ], 'utf-8', (e,d)=>self.scrub(JSON.parse(d)) );
 	};
@@ -45,7 +60,7 @@ const weakSauxer = function() {
 		let lines = xml.split( '\n' );
 		for( let i = 0 ; i < lines.length ; i++ ) {
 			let line = lines[ i ].trim();
-			if ( debug ) console.log( '<| ' + line );
+			if ( debug ) console.error( '<| ' + line );
 
 			line = line
 				// consistent spacing
@@ -62,8 +77,8 @@ const weakSauxer = function() {
 				// remove extra spaces
 				.replace( /> +</g, '><' )
 
-			if ( debug ) console.log( '>| ' + d );
-			if ( debug ) console.log( '-----------------------------------------------------------------------------' );
+			if ( debug ) console.error( '>| ' + d );
+			if ( debug ) console.error( '-----------------------------------------------------------------------------' );
 			simple += line.trim();
 		}
 
@@ -82,35 +97,159 @@ const weakSauxer = function() {
 	}
 
 	/////////////
+
+	self.test = function() {
+		let tests = [
+			, [ self.anyNumber               , {a:"1"}                       , {a:1}             ] // 1
+			, [ self.anyNumber               , {a:["1"]}                     , {a:[1]}           ] // 2
+			, [ self.collapseArrays          , {a:[1]}                       , {a:1}             ] // 3
+			, [ self.collapseArrays          , {a:[]}                        , {a:"<<EMPTY>>"}   ] // 4
+			, [ self.collapseObjects         , {a:{b:1}}                     , {"a:b":1}           ] // 5
+			, [ self.collapseObjects         , {a:{b:1,c:2,d:3}}             , {"a:b":1,"a:c":2,"a:d":3} ] // 6
+			, [ self.collapseObjects         , {a:{b:1},c:{d:2,e:[3,4]}}     , null              ] // 7
+			, [ self.collapseArraysOfObjects , {z:[{a:1},{b:2},{b:3},{c:4}]} , null              ] // 8
+			, [ self.collapseArraysOfObjects , {z:[{a:1},{b:2},{c:3}]}       , {z:{a:1,b:2,c:3}} ] // 9
+		];
+
+		let debug = false;
+
+		for ( let i = 0 ; i < tests.length ; i++ ) {
+			if ( debug && i != debug ) continue;
+
+			let test = tests[ i ];
+			if ( !test ) continue;
+
+			let fn = test[ 0 ];
+			let b4 = test[ 1 ];
+			let l8 = test[ 2 ] || b4;
+
+			console.error( '-----------------------------------------------------------------------------' );
+			console.error( 'running test #' + i );
+
+			let out = Array.isArray( b4 ) ? b4.slice() : Object.assign( {}, b4 );
+			fn( out, debug );
+
+			console.error( '> b4: ' + self.s( b4 ) );
+			let exp = self.s( l8 );
+			let jsn = self.s( out );
+			console.error( '> l8: ' + exp );
+			console.error( '> to: ' + jsn );
+
+			let ok = ( exp == jsn );
+			console.error( ok ? 'SUCCESS' : 'ERROR!' );
+			if ( !ok ) break;
+		}
+
+		return ;
+	};
 	
 	self.scrub = function( elo ) {
-		self.anyNumber( elo );
-		self.collapseArrays( elo );
-		console.log( JSON.stringify( elo, false, '\t' ) );
+		
+		for ( let i = 0 ; i < 99; i++ ) {
+			let collapsed = 0;
+			collapsed += self.collapseArrays( elo );    // {a:[1]}           -> {a:1}
+			collapsed += self.collapseObjects( elo ); // {a:{b:1,c:2,d:3}} -> {b:1,c:2,d:3}
+			collapsed += self.collapseArraysOfObjects( elo );
+
+			if( !collapsed ) break;
+
+			console.error( i + '> collapsed:' + collapsed );
+		}
+
+		//self.typical( elo );
+		console.log( self.z( elo ) );// snit
 	};
 
+	self.typical = function( elo, hunt ) {
+		let pathic = {};
+		let pathed = {};
 
-	self.anyNumber = function( elo ) {
-		self.walk( elo, function( key, value, type, context, path ) {
+		self.walk( elo, function( key, value, type, path, parent ) {
+			path = self.removeArrayIndexes( path, '/<n>' );
+			if ( !path.length ) return;
+
+			type = type.toString().replace( /\(.*/, '' );
+			if ( path in pathed ) {
+				pathed[ path ].push( value );
+			} else {
+				pathed[ path ] = [ value ];
+			}
+			self.addValue( pathic, path, type );
+
+			if( hunt === path ) {
+				console.error( '-----------------------------------------------------------------------------' );
+				console.error( 'path info for :' + path + ' is ' + type );
+				console.error( self.z( value ) );
+				console.error( '-----------------------------------------------------------------------------' );
+			}
+		});
+
+		for ( let path in pathic ) {
+			let types = pathic[ path ];
+			let typeCount = Object.keys( types ).length;
+
+			let simple = ( 1 == typeCount );
+			if ( 2 == typeCount && ( 'array.empty' ) in types && ( 'array.single' in types ) ) {
+				simple = true;
+			}
+			if ( 2 == typeCount && ( 'string.number' ) in types && ( 'string.number' in types ) ) {
+				simple = true;
+			}
+
+			if ( ( 'array.multiple' in types ) || ( 'object.multiple' in types ) ) {
+				simple = false;
+			}
+
+
+			console.error( path + ' and ' + ( simple ? 'simple' : 'complicated' ) );
+
+			for ( let type in types ) {
+				let count = types[ type ];
+				console.error( '- ' + self.leftPad( ''+count, 5 ) + ' : ' + type );
+			}
+
+		}
+
+		//console.error( 'globally:' + JSON.stringify( global, false, '\t' ) );
+		//console.error( 'pathic:' + JSON.stringify( pathic, false, '\t' ) );
+	};
+
+	// result: {a:"1"} -> {a:1}
+	self.anyNumber = function( elo, debug ) {
+		self.walk( elo, function( key, value, type, path, parent ) {
 			// TODO: might need / want to do this based on path...
+			if ( debug ) {
+				console.error( 'anyNumber.check: ' + path + ' -> ' + self.s( value ) + ' is ' + type );
+			}
 			if ( type.is( 'string', 'number' ) ) {
 				// somehow, type.numerical is a string again???
-				context[ key ] = parseFloat( value );
+				parent[ key ] = parseFloat( value );
 			}
 		});
 	}
 
-	// cuz my conversion makes so many spurius arrays... 
-	// the first order of business is to elimate them
-	self.collapseArrays = function( elo ) {
+	// result: {a:[b]} -> {a:b}
+	// result: {a:[]} -> {a:B} where B is some gross / crazy value 
+	self.collapseArrays = function( elo, debug ) {
 		let collapsed = 0;
 
 		let allArrays = {};
 		let aTypes = {};
+		
+		let what = '<<>>';
 
-		self.walk( elo, function( key, value, type, context, path ) {
-			if ( 'array' !== type.major ) return;
-			path = self.removeArrayIndexes( path );
+		self.walk( elo, function( key, value, type, path ) {
+			if ( debug > 2 ) {
+				console.error( 'collapseArrays.check: ' + path + ' -> ' + self.s( value ) + ' is ' + type );
+			}
+
+			if ( 'array' !== type.major || value.length > 1 ) return;
+
+			if ( debug > 1 ) {
+				console.error( 'collapseArrays.target: ' + path + ' -> ' + self.s( value ) + ' is ' + type.minor );
+			}
+
+			path = self.removeArrayIndexes( path, what );
 			self.addToObject( self.getSubject( allArrays, path ), type.minor );
 
 			// sometimes a path may be mostly single valued but sometimes empty
@@ -122,6 +261,11 @@ const weakSauxer = function() {
 				self.addToObject( self.getSubject( aTypes, path ), firstType.toString() );
 			}
 		})
+		
+		if ( debug > 1) {
+			console.error( 'collapseArrays.allArrays: ' + self.s( allArrays ) );
+		}
+
 
 		let collapseable = {};
 
@@ -146,73 +290,241 @@ const weakSauxer = function() {
 					continue;
 				}
 			}
-			//console.log( self.pad( path, 77 ) + ' -> ' + type + ' cuz ' + JSON.stringify( counts ) );
+			if( debug ) {
+				console.error( 'collapseArrays.collapseable:'+self.pad( path, 44 ) + ' -> ' + type + ' cuz ' + JSON.stringify( counts ) );
+			}
 			collapseable[ path ] = type;
 		}
 
-		//console.log( JSON.stringify( collapseable, false, '\t' ) );
+		if ( debug ) {
+			console.error( '-----------------------------------------------------------------------------' );
+		}
 
-		self.walk( elo, function( key, value, type, context, path ) {
+		self.walk( elo, function( key, value, type, path, parent ) {
 			if ( 'array' !== type.major ) return;
-			path = self.removeArrayIndexes( path );
+			path = self.removeArrayIndexes( path, what );
+
 			if ( !( path in collapseable ) ) return;
 			let collapseType = collapseable[ path ];
 
-			if ( 'empty' == collapseType ) {
-				//console.log( 'e> ' + path + ': ' + JSON.stringify( context, false, '\t' ) );
-				// this is a little nuts...
-				delete context[ key ];
-				context[ key + '<C.E>' ] = '<<EMPTY>>';
-				collapsed++;
-				return;
+			switch( collapseType ) {
+				case 'empty':          value = '<<EMPTY>>'; break;
+				case 'string.string': value = '<<EMPTY_STRING>>'; break;
+				case 'single':         
+					value = value[ 0 ];
+					if ( '' == value ) value = '<<EMPTY_STRANG>>'; // weird...
 			}
 
-			if( 'single' == collapseType ) {
-				delete context[ key ];
-				context[ key + '<C.S>' ] = value[ 0 ];
-				collapsed++;
-				return;
+			parent[ key ] = value; // still not sure this is a good idea...
+
+			if ( debug ) {
+				console.error( 'collapseArrays.collapse:' + self.pad( path, 44 ) + ' -> ' + collapseType + ' -> ' + self.s( value ));
+
 			}
 
-			if ( 'string.string' == collapseType ) {
-				delete context[ key ];
-				context[ key + '<C.Z>' ] = value.length ? value[ 0 ] : '<<EMPTY_STRING>>';
-				collapsed++;
-				return;
-			}
-
-
-
+			collapsed++;
 		});
 
-		console.log( 'I collapsed ' + collapsed + ' arrays' );
+		console.error( 'I collapsed ' + collapsed + ' arrays' );
 		return collapsed;
 	};
 
-	self.walk = function( current, handler, path ) {
-		path = self.isUndefined( path ) ? '' : path;
+	self.s = function( o ) { return JSON.stringify( o ); };
+	self.z = function( o ) { return JSON.stringify( o, false, '\t' ); };
 
-		for ( let key in current ) {
-			let value = current[ key ];
-			let type = self.myType( value );
+	// result: {a:{b:c}} -> {a_b:c}
+	self.collapseObjects = function( elo, debug ) {
+		let collapsed = 0;
 
-			let p = path + '/' + key;
+		let what = '<<>>';
+		let shallow = {};
+		self.walk( elo, function( key, value, type, path ) {
+			// ignore the key, look at value is {"a":{"b":"c"}}
+			if ( 'object' !== type.major ) return;
+			let keys = Object.keys( value );
+			if ( 1 != keys.length ) return;
+			
+			let child = value[ keys[ 0 ] ];
+			let childType = self.myType( child );
+			if ( 'object' !== childType.major ) return;
 
-			if ( handler( key, value, type, current, p ) ) {
+			path = self.removeArrayIndexes( path, what );
+			path += '/' + keys[ 0 ] // hmm...
+
+			self.addToObject( self.getSubject( shallow, path ), type.minor );
+		});
+
+		if ( debug ) {
+			console.error( 'collapseObjects.shallow:' + self.z( shallow ) );
+		}
+
+		let toCollapse = {};
+		for ( let k in shallow ) {
+			let v = shallow[ k ];
+			if ( 1 == Object.keys( v ).length && 'single' in v ) {
+				toCollapse[ k ] = k;
+			}
+		}
+
+		if ( debug ) {
+			console.error( 'collapseObjects.toCollapse:' + self.z( shallow ) );
+		}
+
+		self.walk( elo, function( key, value, type, path ) {
+			path = self.removeArrayIndexes( path, what );
+            if ( 'object' !== type.major ) return;
+
+			let keys = Object.keys( value );
+			if ( 1 != keys.length ) return;
+			let childKey = keys[ 0 ];
+
+			path += '/' + childKey;
+			if ( !( path in toCollapse ) ) return;
+
+			let child = value[ childKey ];
+			let nu = {};
+			for ( let k in child ) {
+				nu[ childKey + ':' + k ] = child[ k ];
+			}
+			delete value[ childKey ];
+			Object.assign( value, nu );
+
+			collapsed++;
+		});
+
+		console.error( 'I collapsed ' + collapsed + ' objects' );
+		return collapsed;
+	};
+
+	// result: [{a:z},{b:y},{c:w}] -> {a:1,b:2,c:3} 
+	self.collapseArraysOfObjects = function( elo, debug ) {
+		let collapsed = 0;
+		let what = '<<>>';
+
+		let shallow = {};
+		self.walk( elo, function( key, value, type, path, parent ) {
+
+			if ( 'array' !== type.major ) return;
+			path = self.removeArrayIndexes( path, what );
+
+			let isShallow = true;
+			let seen = {};
+
+			for ( let i = 0 ; i < value.length && isShallow ; i++ ) {
+				let e = value[ i ];
+				let eType = self.myType( e ).major;
+				if ( false
+					|| ( 'object' != eType )
+					// allow for multiple non-collision objects may bust everything...|| ( 1 != Object.keys( e ).length )  // scary....
+				) {
+					isShallow = false;
+				}
+
+				for ( let k in e ) {
+					let v = e[ k ];
+					let t = self.myType( v );
+					if ( k in seen ) { // not sure we care...|| 'object' === t.major || 'array' === t.major ) {
+						isShallow = false;
+						break;
+					}
+					seen[ k ] = k;
+				}
+			}
+			if ( debug ) {
+				console.error( 'collapseObjects.shallow:' + self.pad( path, 44 ) + ' -> ' + isShallow );
+			}
+
+			self.addToObject( self.getSubject( shallow, path ), isShallow );
+		});
+
+		// make sure they are always shallow..
+		let toCollapse = {};
+		for ( let k in shallow ) {
+			let v = shallow[ k ];
+			if ( 1 == Object.keys( v ).length && true in v ) {
+				toCollapse[ k ] = k;
+				if ( debug ) {
+					console.error( 'collapseObjects.toCollapse:' + k );
+				}
+			}
+		}
+
+		self.walk( elo, function( key, value, type, path, parent ) {
+			path = self.removeArrayIndexes( path, what );
+			if ( !( path in toCollapse ) ) {
 				return;
 			}
 
-			if ( 'array' === type.major ) {
-				self.walk( value, handler, p + '/_' );
+			if ( debug ) {
+				console.error( '-----------------------------------------------------------------------------' );
+				console.error( '@' + path + ' has ' + value.length + ' elements' );
+				console.error( 'old: ' + JSON.stringify( value ).substr(0,99) );
 			}
-			if ( 'object' === type.major ) {
-				self.walk( value, handler, p );
+
+			let nu = {};
+			for ( let i = 0 ; i < value.length ; i++ ) {
+				let e = value[ i ];
+				for (let k in e ) {
+					let v = e[ k ];
+
+					
+
+					//k += '<C.OBJECT_ARRAY_E>';
+					if ( k in nu ) {
+						if ( 'array' === self.myType( nu[ k ] ).major ) {
+							nu[ k ].push( v );
+						} else {
+							nu[ k ] = [ nu[ k ], v ];
+						}
+					} else {
+						nu[ k ] = v;
+					}
+				}
 			}
-		}
+
+			parent[ key ] = nu;
+			collapsed++;
+			//return true;
+		});
+
+		console.error( 'I collapsed ' + collapsed + ' object arrays' );
+		return collapsed;
 	};
 
-	self.removeArrayIndexes = function( path ) {
-		return path.replace( new RegExp( '/_/[0-9]+', 'g' ), '' );
+	/////////////////////////////////////////////////////////////////////////////
+
+	self.walk = function( top, handler ) {
+		return self._walk( null, top, '', null, handler );
+	}
+
+	self._walk = function( key, value, path, parent, handler ) {
+		let type = self.myType( value );
+		if ( handler( key, value, type, path, parent ) ) {
+			return;
+		}
+
+		if ( 'array' === type.major ) {
+			path += '/_';
+		}
+
+		for ( let k in value ) {
+			let v = value[ k ];
+			let p = path + '/' + k;
+
+			let type = self.myType( v );
+			switch( type.major ) {
+				case 'array':  
+				case 'object': self._walk( k, v, p, value, handler );
+				default: handler( k, v, type, p, value ); 
+			}
+		}
+		return value;
+	};
+
+	self.removeArrayIndexes = function( path, what ) {
+		if ( !path ) return path; // root is annoying..
+		what = self.isUndefined( what ) ? '' : what;
+		return path.replace( new RegExp( '/_/[0-9]+', 'g' ), what );
 	};
 
 	///// lazy copy/pasta
@@ -334,11 +646,14 @@ const weakSauxer = function() {
 	};
 
 	// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
-	self.myType = function( value ) {
+	self.myType = function( value, shallow, tmi ) {
 		let type = {
 			  major:false
 			, minor:false
-			, toString:function(){ return this.major + '.' + this.minor }
+			, subType:false
+			, toString:function(){ 
+				return this.major + '.' + this.minor + ( this.subType ? ( '(' + this.subType + ')' ) : '' )
+			}
 			, is:function( major, minor ) { return this.major === major && this.minor === minor }
 		};
 
@@ -356,6 +671,31 @@ const weakSauxer = function() {
 			type.major = 'array';
 			type.count = value.length;
 			type.minor = self.countType( value.length );
+			if ( value.length > 1 ) {
+				let seen = {};
+				let uSimp = true;
+				for ( let i = 0 ; i < value.length && uSimp ; i++ ) {
+					let sv = value[ i ];
+					let svType = self.myType( sv, true );
+					if ( 'object' != svType.major ) {
+						uSimp = false;
+						break;
+					}
+					for ( let sk in sv ) {
+						if ( sk in seen ) {
+							uSimp = false;
+							break;
+						}
+						seen[ sk ] = true;
+					}
+				}
+				if ( uSimp ) {
+					type.minor += '-singlo';
+				}
+			}
+			if ( !shallow ) {
+				type.subType = self.subTypical( value );
+			}
 		}
 
 		if ( !type.major ) {
@@ -370,12 +710,27 @@ const weakSauxer = function() {
 				let keys = Object.keys( value );
 				type.count = keys.length;
 				type.minor = self.countType( keys.length );
-				// TODO: if multiple, see if all the keys are numeric and sequential... might be a jacked up "array"
+				if ( !shallow ) {
+					type.subType = self.subTypical( value );
+				}
 			}
 			// could still be: boolean, symbol or function
 		}
 		
 		return type;
+	};
+
+	self.subTypical = function( container ) {
+		let subType = false;
+		for ( let k in container ) {
+			let next = self.myType( container[ k ] );
+			if ( subType != next && subType !== false ) {
+				subType = 'mixed';
+				break;
+			}
+			subType = next;
+		}
+		return subType;
 	};
 
 	self.countType = function( n ) {
@@ -406,6 +761,10 @@ const weakSauxer = function() {
 		while ( s.length < count ) s = ' ' + s;
 		return s;
 	};
+
+	self.addValue = function( bucket, key, value ) {
+		self.addToObject( self.getSubject( bucket, key ), value );
+	}
 
 	self.getSubject = function( values, value ) {
 		return value in values ? values[ value ] : ( values[ value ] = {} );
