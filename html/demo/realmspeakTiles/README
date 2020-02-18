@@ -1,0 +1,29 @@
+The story so far...
+
+Started with MagicRealmData.xml from the realmspeak project
+
+First attempt to "do something" with the data was realmspeakTiles.js
+that used xml2json and hacky-slash to create realmspeakTiles.json
+that I was able to use to test/boardBuilder.html.
+
+The next attempt was also based on xml2json and tried to automate
+some of the observations I made while writing realmspeakTiles.js.
+Unfortunately, inconsistencies around when / where it made arrays
+instead of objects scuttled the efforts in xmlJsonomnom.js.
+
+Seeing the shortcomings of other xml to json converters, I rolled
+an extremely naive and optimistic weakSauxer.js to apply some of
+my own ideas on the process resulting in ugly.xml, ugly.json,
+ugli.json, and finally MagicRealmData.json.
+
+Next I'll take MagicRealmData.json and attempt to pull in tricks
+from weakSauxer and realmspeakTiles to create a clean json version
+of MagicRealmData.xml to use going forward. This is relma-magicaroni.js
+
+magica   169,000,000 results (0.80 seconds)
+magika     2,610,000 results (0.99 seconds) 
+magicka   52,200,000 results (0.55 seconds) 
+
+	magica
+	  macaroni
+
