@@ -1,8 +1,8 @@
 {
-	"game:file_version": "1.0",
-	"game:name": "Magic Realm",
-	"game:description": "Avalon Hill's Fantasy Game",
-	"game:objects": [
+	"version": "1.0",
+	"name": "Magic Realm",
+	"description": "Avalon Hill's Fantasy Game",
+	"objects": [
 		{
 			"id": 0,
 			"name": "T Flying Dragon",
@@ -36689,1599 +36689,2095 @@
 			}
 		}
 	],
-	"game:setups": [
-		{
-			"GameSetup": [
-				{
-					"name": "standard_game"
-				},
-				{
-					"Create:newPool": "TWT"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TWT",
-					"Extract:keyVals": "treasure_within_treasure"
-				},
-				{
-					"Create:newPool": "LARGE_TREASURES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "LARGE_TREASURES",
-					"Extract:keyVals": "treasure=large"
-				},
-				{
-					"Create:newPool": "SMALL_TREASURES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SMALL_TREASURES",
-					"Extract:keyVals": "treasure=small"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 238,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 239,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 241,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 243,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Move:from": "TWT",
-					"Move:to": "LARGE_TREASURES",
-					"Move:count": 6,
-					"Move:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 217,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 218,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 219,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 220,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 221,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 222,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 223,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 224,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 217,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 218,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 220,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 221,
-					"Add:count": 6,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 223,
-					"Add:count": 6,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 224,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 227,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 228,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 229,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 230,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 233,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 234,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 235,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 236,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 237,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 387,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "SPELL_I"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_I",
-					"Extract:keyVals": "spell=I"
-				},
-				{
-					"Create:newPool": "SPELL_II"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_II",
-					"Extract:keyVals": "spell=II"
-				},
-				{
-					"Create:newPool": "SPELL_III"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_III",
-					"Extract:keyVals": "spell=III"
-				},
-				{
-					"Create:newPool": "SPELL_IV"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_IV",
-					"Extract:keyVals": "spell=IV"
-				},
-				{
-					"Create:newPool": "SPELL_V"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_V",
-					"Extract:keyVals": "spell=V"
-				},
-				{
-					"Create:newPool": "SPELL_VI"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VI",
-					"Extract:keyVals": "spell=VI"
-				},
-				{
-					"Create:newPool": "SPELL_VII"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VII",
-					"Extract:keyVals": "spell=VII"
-				},
-				{
-					"Create:newPool": "SPELL_VIII"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VIII",
-					"Extract:keyVals": "spell=VIII"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 219,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 219,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 220,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 220,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 224,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 224,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 388,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 388,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 389,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 389,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 390,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 390,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 319,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 320,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 375,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 354,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 359,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 360,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 376,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 365,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 344,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 344,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 342,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 345,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 345,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 343,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 343,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 386,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "TREASURE_POOL"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TREASURE_POOL",
-					"Extract:keyVals": "sound"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TREASURE_POOL",
-					"Extract:keyVals": "treasure_location"
-				},
-				{
-					"Create:newPool": "V_TILES"
-				},
-				{
-					"Create:newPool": "W_TILES"
-				},
-				{
-					"Create:newPool": "M_TILES"
-				},
-				{
-					"Create:newPool": "C_TILES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "V_TILES",
-					"Extract:keyVals": "tile_type=V,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "W_TILES",
-					"Extract:keyVals": "tile_type=W,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "M_TILES",
-					"Extract:keyVals": "tile_type=M,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "C_TILES",
-					"Extract:keyVals": "tile_type=C,tile"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 225,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 226,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "CHITS"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=lost_castle"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "M_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=lost_city"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "C_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=V,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "V_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=W,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "W_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=M,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "M_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=C,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "C_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
+	"setups": {
+		"standard_game": [
+			{
+				"createPool": "TWT"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TWT",
+					"keyVals": "treasure_within_treasure"
 				}
-			]
-		},
-		{
-			"GameSetup": [
-				{
-					"name": "rw_expansion_1_setup"
-				},
-				{
-					"Create:newPool": "DEADPOOL"
-				},
-				{
-					"Create:newPool": "GENERATOR"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "GENERATOR",
-					"Extract:keyVals": "generator"
-				},
-				{
-					"Move:from": "GENERATOR",
-					"Move:to": "DEADPOOL",
-					"Move:count": 2,
-					"Move:transferType": "Random"
-				},
-				{
-					"Create:newPool": "TWT"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TWT",
-					"Extract:keyVals": "treasure_within_treasure,!traveler_item"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TWT",
-					"Extract:keyVals": "cannot_move"
-				},
-				{
-					"Create:newPool": "LARGE_TREASURES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "LARGE_TREASURES",
-					"Extract:keyVals": "treasure=large,!traveler_item"
-				},
-				{
-					"Create:newPool": "SMALL_TREASURES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SMALL_TREASURES",
-					"Extract:keyVals": "treasure=small,!traveler_item"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 238,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 239,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 241,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 243,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 720,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 720,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Move:from": "TWT",
-					"Move:to": "LARGE_TREASURES",
-					"Move:count": 9,
-					"Move:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 217,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 218,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 219,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 220,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 221,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 222,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 223,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 224,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 970,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 971,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 972,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LARGE_TREASURES",
-					"Add:targetObjectID": 973,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Distribute:from": "LARGE_TREASURES",
-					"Distribute:to": "GENERATOR",
-					"Distribute:count": 3,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 217,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 218,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 220,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 221,
-					"Add:count": 6,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 223,
-					"Add:count": 6,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 224,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 970,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 971,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 972,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 973,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 979,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 978,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 977,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Distribute:from": "SMALL_TREASURES",
-					"Distribute:to": "GENERATOR",
-					"Distribute:count": 4,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1006,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1007,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1008,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1009,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 227,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 228,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 229,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 230,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 233,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 234,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 235,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 236,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 237,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1040,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 1041,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SMALL_TREASURES",
-					"Add:targetObjectID": 387,
-					"Add:count": 3,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "SPELL_I"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_I",
-					"Extract:keyVals": "spell=I"
-				},
-				{
-					"Create:newPool": "SPELL_II"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_II",
-					"Extract:keyVals": "spell=II"
-				},
-				{
-					"Create:newPool": "SPELL_III"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_III",
-					"Extract:keyVals": "spell=III"
-				},
-				{
-					"Create:newPool": "SPELL_IV"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_IV",
-					"Extract:keyVals": "spell=IV"
-				},
-				{
-					"Create:newPool": "SPELL_V"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_V",
-					"Extract:keyVals": "spell=V"
-				},
-				{
-					"Create:newPool": "SPELL_VI"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VI",
-					"Extract:keyVals": "spell=VI"
-				},
-				{
-					"Create:newPool": "SPELL_VII"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VII",
-					"Extract:keyVals": "spell=VII"
-				},
-				{
-					"Create:newPool": "SPELL_VIII"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "SPELL_VIII",
-					"Extract:keyVals": "spell=VIII"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 219,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 219,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 220,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 220,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 224,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 224,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 388,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 388,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 389,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 389,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 390,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 390,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 319,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 320,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 375,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 354,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 359,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 360,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 376,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 365,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 344,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 344,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 342,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 345,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 345,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 343,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 343,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 386,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_V",
-					"Add:targetObjectID": 715,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_I",
-					"Add:targetObjectID": 715,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 718,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_III",
-					"Add:targetObjectID": 718,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VIII",
-					"Add:targetObjectID": 716,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VII",
-					"Add:targetObjectID": 719,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_VI",
-					"Add:targetObjectID": 717,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_II",
-					"Add:targetObjectID": 717,
-					"Add:count": 2,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "SPELL_IV",
-					"Add:targetObjectID": 1005,
-					"Add:count": 1,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "LEFTOVER_SPELLS"
-				},
-				{
-					"Extract:from": "SPELL_I",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_II",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_III",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_IV",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_V",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_VI",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_VII",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Extract:from": "SPELL_VIII",
-					"Extract:to": "LEFTOVER_SPELLS",
-					"Extract:keyVals": "spell"
-				},
-				{
-					"Add:from": "LEFTOVER_SPELLS",
-					"Add:targetObjectID": 706,
-					"Add:count": 4,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "LEFTOVER_SPELLS",
-					"Add:targetObjectID": 977,
-					"Add:count": 6,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "TRAVELER_POOL"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TRAVELER_POOL",
-					"Extract:keyVals": "traveler"
-				},
-				{
-					"Create:newPool": "TREASURE_POOL"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TREASURE_POOL",
-					"Extract:keyVals": "sound"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TREASURE_POOL",
-					"Extract:keyVals": "treasure_location"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "TREASURE_POOL",
-					"Extract:keyVals": "gate"
-				},
-				{
-					"Move:from": "TRAVELER_POOL",
-					"Move:to": "TREASURE_POOL",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Move:from": "GENERATOR",
-					"Move:to": "TREASURE_POOL",
-					"Move:count": 1,
-					"Move:transferType": "Random"
-				},
-				{
-					"Create:newPool": "MINOR_POOL"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "MINOR_POOL",
-					"Extract:keyVals": "minor_tl"
-				},
-				{
-					"Move:from": "TRAVELER_POOL",
-					"Move:to": "MINOR_POOL",
-					"Move:count": 8,
-					"Move:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "MINOR_POOL",
-					"Extract:keyVals": "gold"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "MINOR_POOL",
-					"Extract:keyVals": "guild"
-				},
-				{
-					"Create:newPool": "V_TILES"
-				},
-				{
-					"Create:newPool": "W_TILES"
-				},
-				{
-					"Create:newPool": "M_TILES"
-				},
-				{
-					"Create:newPool": "C_TILES"
-				},
-				{
-					"Create:newPool": "S_TILES"
-				},
-				{
-					"Create:newPool": "X_TILES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "V_TILES",
-					"Extract:keyVals": "tile_type=V,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "W_TILES",
-					"Extract:keyVals": "tile_type=W,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "M_TILES",
-					"Extract:keyVals": "tile_type=M,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "C_TILES",
-					"Extract:keyVals": "tile_type=C,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "S_TILES",
-					"Extract:keyVals": "tile_type=S,tile"
-				},
-				{
-					"Create:newPool": "ALL_X_TILES"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "ALL_X_TILES",
-					"Extract:keyVals": "tile_type=XC,tile"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "ALL_X_TILES",
-					"Extract:keyVals": "tile_type=XM,tile"
-				},
-				{
-					"Create:newPool": "X_TILES"
-				},
-				{
-					"Move:from": "ALL_X_TILES",
-					"Move:to": "X_TILES",
-					"Move:count": 5,
-					"Move:transferType": "Random"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 225,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 226,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 1010,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Add:from": "TREASURE_POOL",
-					"Add:targetObjectID": 1011,
-					"Add:count": 5,
-					"Add:transferType": "Random"
-				},
-				{
-					"Create:newPool": "CHITS"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=lost_castle"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "M_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=lost_city"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "C_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=necromancers_tower"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "X_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Move:from": "MINOR_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 10,
-					"Move:transferType": "Random"
-				},
-				{
-					"Move:from": "TREASURE_POOL",
-					"Move:to": "CHITS",
-					"Move:count": 4,
-					"Move:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "red_special=chaos_gate"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "M_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "C_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "X_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Distribute:from": "MINOR_POOL",
-					"Distribute:to": "V_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Distribute:from": "MINOR_POOL",
-					"Distribute:to": "W_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Distribute:from": "MINOR_POOL",
-					"Distribute:to": "S_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=V,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "V_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=W,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "W_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=M,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "M_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=C,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "C_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=S,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "S_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
-				},
-				{
-					"Extract:from": "ALL",
-					"Extract:to": "CHITS",
-					"Extract:keyVals": "tile_type=X,chit"
-				},
-				{
-					"Distribute:from": "CHITS",
-					"Distribute:to": "X_TILES",
-					"Distribute:count": 5,
-					"Distribute:transferType": "Random"
+			},
+			{
+				"createPool": "LARGE_TREASURES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "LARGE_TREASURES",
+					"keyVals": "treasure=large"
 				}
-			]
-		}
-	]
+			},
+			{
+				"createPool": "SMALL_TREASURES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SMALL_TREASURES",
+					"keyVals": "treasure=small"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 238,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 239,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 241,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 243,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"move": {
+					"from": "TWT",
+					"to": "LARGE_TREASURES",
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 217,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 218,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 219,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 220,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 221,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 222,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 223,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 224,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 217,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 218,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 220,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 221,
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 223,
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 224,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 227,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 228,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 229,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 230,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 233,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 234,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 235,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 236,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 237,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 387,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "SPELL_I"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_I",
+					"keyVals": "spell=I"
+				}
+			},
+			{
+				"createPool": "SPELL_II"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_II",
+					"keyVals": "spell=II"
+				}
+			},
+			{
+				"createPool": "SPELL_III"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_III",
+					"keyVals": "spell=III"
+				}
+			},
+			{
+				"createPool": "SPELL_IV"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_IV",
+					"keyVals": "spell=IV"
+				}
+			},
+			{
+				"createPool": "SPELL_V"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_V",
+					"keyVals": "spell=V"
+				}
+			},
+			{
+				"createPool": "SPELL_VI"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VI",
+					"keyVals": "spell=VI"
+				}
+			},
+			{
+				"createPool": "SPELL_VII"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VII",
+					"keyVals": "spell=VII"
+				}
+			},
+			{
+				"createPool": "SPELL_VIII"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VIII",
+					"keyVals": "spell=VIII"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 219,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 219,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 220,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 220,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 224,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 224,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 388,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 388,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 389,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 389,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 390,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 390,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 319,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 320,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 375,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 354,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 359,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 360,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 376,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 365,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 344,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 344,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 342,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 345,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 345,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 343,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 343,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 386,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "TREASURE_POOL"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TREASURE_POOL",
+					"keyVals": "sound"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TREASURE_POOL",
+					"keyVals": "treasure_location"
+				}
+			},
+			{
+				"createPool": "V_TILES"
+			},
+			{
+				"createPool": "W_TILES"
+			},
+			{
+				"createPool": "M_TILES"
+			},
+			{
+				"createPool": "C_TILES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "V_TILES",
+					"keyVals": "tile_type=V,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "W_TILES",
+					"keyVals": "tile_type=W,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "M_TILES",
+					"keyVals": "tile_type=M,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "C_TILES",
+					"keyVals": "tile_type=C,tile"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 225,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 226,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "CHITS"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=lost_castle"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "M_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=lost_city"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "C_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=V,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "V_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=W,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "W_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=M,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "M_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=C,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "C_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			}
+		],
+		"rw_expansion_1_setup": [
+			{
+				"createPool": "DEADPOOL"
+			},
+			{
+				"createPool": "GENERATOR"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "GENERATOR",
+					"keyVals": "generator"
+				}
+			},
+			{
+				"move": {
+					"from": "GENERATOR",
+					"to": "DEADPOOL",
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "TWT"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TWT",
+					"keyVals": "treasure_within_treasure,!traveler_item"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TWT",
+					"keyVals": "cannot_move"
+				}
+			},
+			{
+				"createPool": "LARGE_TREASURES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "LARGE_TREASURES",
+					"keyVals": "treasure=large,!traveler_item"
+				}
+			},
+			{
+				"createPool": "SMALL_TREASURES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SMALL_TREASURES",
+					"keyVals": "treasure=small,!traveler_item"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 238,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 239,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 241,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 243,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 720,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 720,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"move": {
+					"from": "TWT",
+					"to": "LARGE_TREASURES",
+					"count": 9,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 217,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 218,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 219,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 220,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 221,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 222,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 223,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 224,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 970,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 971,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 972,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LARGE_TREASURES",
+					"targetObjectID": 973,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "LARGE_TREASURES",
+					"to": "GENERATOR",
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 217,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 218,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 220,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 221,
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 223,
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 224,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 970,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 971,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 972,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 973,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 979,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 978,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 977,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "SMALL_TREASURES",
+					"to": "GENERATOR",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1006,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1007,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1008,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1009,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 227,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 228,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 229,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 230,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 233,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 234,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 235,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 236,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 237,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1040,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 1041,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SMALL_TREASURES",
+					"targetObjectID": 387,
+					"count": 3,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "SPELL_I"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_I",
+					"keyVals": "spell=I"
+				}
+			},
+			{
+				"createPool": "SPELL_II"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_II",
+					"keyVals": "spell=II"
+				}
+			},
+			{
+				"createPool": "SPELL_III"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_III",
+					"keyVals": "spell=III"
+				}
+			},
+			{
+				"createPool": "SPELL_IV"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_IV",
+					"keyVals": "spell=IV"
+				}
+			},
+			{
+				"createPool": "SPELL_V"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_V",
+					"keyVals": "spell=V"
+				}
+			},
+			{
+				"createPool": "SPELL_VI"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VI",
+					"keyVals": "spell=VI"
+				}
+			},
+			{
+				"createPool": "SPELL_VII"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VII",
+					"keyVals": "spell=VII"
+				}
+			},
+			{
+				"createPool": "SPELL_VIII"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "SPELL_VIII",
+					"keyVals": "spell=VIII"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 219,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 219,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 220,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 220,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 224,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 224,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 388,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 388,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 389,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 389,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 390,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 390,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 319,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 320,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 375,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 354,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 359,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 360,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 376,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 365,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 344,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 344,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 342,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 345,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 345,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 343,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 343,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 386,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_V",
+					"targetObjectID": 715,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_I",
+					"targetObjectID": 715,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 718,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_III",
+					"targetObjectID": 718,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VIII",
+					"targetObjectID": 716,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VII",
+					"targetObjectID": 719,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_VI",
+					"targetObjectID": 717,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_II",
+					"targetObjectID": 717,
+					"count": 2,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "SPELL_IV",
+					"targetObjectID": 1005,
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "LEFTOVER_SPELLS"
+			},
+			{
+				"extract": {
+					"from": "SPELL_I",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_II",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_III",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_IV",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_V",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_VI",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_VII",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"extract": {
+					"from": "SPELL_VIII",
+					"to": "LEFTOVER_SPELLS",
+					"keyVals": "spell"
+				}
+			},
+			{
+				"add": {
+					"from": "LEFTOVER_SPELLS",
+					"targetObjectID": 706,
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "LEFTOVER_SPELLS",
+					"targetObjectID": 977,
+					"count": 6,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "TRAVELER_POOL"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TRAVELER_POOL",
+					"keyVals": "traveler"
+				}
+			},
+			{
+				"createPool": "TREASURE_POOL"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TREASURE_POOL",
+					"keyVals": "sound"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TREASURE_POOL",
+					"keyVals": "treasure_location"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "TREASURE_POOL",
+					"keyVals": "gate"
+				}
+			},
+			{
+				"move": {
+					"from": "TRAVELER_POOL",
+					"to": "TREASURE_POOL",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"move": {
+					"from": "GENERATOR",
+					"to": "TREASURE_POOL",
+					"count": 1,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "MINOR_POOL"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "MINOR_POOL",
+					"keyVals": "minor_tl"
+				}
+			},
+			{
+				"move": {
+					"from": "TRAVELER_POOL",
+					"to": "MINOR_POOL",
+					"count": 8,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "MINOR_POOL",
+					"keyVals": "gold"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "MINOR_POOL",
+					"keyVals": "guild"
+				}
+			},
+			{
+				"createPool": "V_TILES"
+			},
+			{
+				"createPool": "W_TILES"
+			},
+			{
+				"createPool": "M_TILES"
+			},
+			{
+				"createPool": "C_TILES"
+			},
+			{
+				"createPool": "S_TILES"
+			},
+			{
+				"createPool": "X_TILES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "V_TILES",
+					"keyVals": "tile_type=V,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "W_TILES",
+					"keyVals": "tile_type=W,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "M_TILES",
+					"keyVals": "tile_type=M,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "C_TILES",
+					"keyVals": "tile_type=C,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "S_TILES",
+					"keyVals": "tile_type=S,tile"
+				}
+			},
+			{
+				"createPool": "ALL_X_TILES"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "ALL_X_TILES",
+					"keyVals": "tile_type=XC,tile"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "ALL_X_TILES",
+					"keyVals": "tile_type=XM,tile"
+				}
+			},
+			{
+				"createPool": "X_TILES"
+			},
+			{
+				"move": {
+					"from": "ALL_X_TILES",
+					"to": "X_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 225,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 226,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 1010,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"add": {
+					"from": "TREASURE_POOL",
+					"targetObjectID": 1011,
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"createPool": "CHITS"
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=lost_castle"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "M_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=lost_city"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "C_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=necromancers_tower"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "X_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"move": {
+					"from": "MINOR_POOL",
+					"to": "CHITS",
+					"count": 10,
+					"transferType": "Random"
+				}
+			},
+			{
+				"move": {
+					"from": "TREASURE_POOL",
+					"to": "CHITS",
+					"count": 4,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "red_special=chaos_gate"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "M_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "C_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "X_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "MINOR_POOL",
+					"to": "V_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "MINOR_POOL",
+					"to": "W_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"distribute": {
+					"from": "MINOR_POOL",
+					"to": "S_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=V,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "V_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=W,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "W_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=M,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "M_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=C,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "C_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=S,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "S_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			},
+			{
+				"extract": {
+					"from": "ALL",
+					"to": "CHITS",
+					"keyVals": "tile_type=X,chit"
+				}
+			},
+			{
+				"distribute": {
+					"from": "CHITS",
+					"to": "X_TILES",
+					"count": 5,
+					"transferType": "Random"
+				}
+			}
+		]
+	}
 }
