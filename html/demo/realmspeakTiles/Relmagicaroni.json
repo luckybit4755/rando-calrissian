@@ -10203,7 +10203,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.9,
 					"y": 81.5,
 					"length": 0.3165,
@@ -10212,39 +10212,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 27.2,
-							"y": 35.6,
-							"length": 0.2696,
-							"angle": 2.5782
-						}
+						"x": 27.2,
+						"y": 35.6,
+						"length": 0.2696,
+						"angle": 2.5782
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 26.4,
-							"y": 64.3,
-							"length": 0.2759,
-							"angle": -2.5969
-						}
+						"x": 26.4,
+						"y": 64.3,
+						"length": 0.2759,
+						"angle": -2.5969
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 62,
-							"y": 59.6,
-							"length": 0.1536,
-							"angle": -0.6748
-						}
+						"x": 62,
+						"y": 59.6,
+						"length": 0.1536,
+						"angle": -0.6748
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 49.5,
-							"y": 20.9,
-							"length": 0.291,
-							"angle": 1.5879
-						}
+						"x": 49.5,
+						"y": 20.9,
+						"length": 0.291,
+						"angle": 1.5879
 					}
 				},
 				"path": {
@@ -10298,7 +10290,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 48.3,
 					"y": 81.5,
 					"length": 0.3154,
@@ -10307,43 +10299,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 28.6,
-							"y": 35.8,
-							"length": 0.2568,
-							"angle": 2.5557
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28.6,
+						"y": 35.8,
+						"length": 0.2568,
+						"angle": 2.5557
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 28.4,
-							"y": 65.2,
-							"length": 0.2641,
-							"angle": -2.5284
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28.4,
+						"y": 65.2,
+						"length": 0.2641,
+						"angle": -2.5284
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 60.6,
-							"y": 57.3,
-							"length": 0.1287,
-							"angle": -0.6031
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 60.6,
+						"y": 57.3,
+						"length": 0.1287,
+						"angle": -0.6031
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 50.2,
-							"y": 20.2,
-							"length": 0.298,
-							"angle": 1.564
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 50.2,
+						"y": 20.2,
+						"length": 0.298,
+						"angle": 1.564
 					}
 				},
 				"path": {
@@ -10413,7 +10397,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 48.7,
 					"y": 80.6,
 					"length": 0.3062,
@@ -10422,39 +10406,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 75,
-							"y": 65,
-							"length": 0.2915,
-							"angle": -0.5405
-						}
+						"x": 75,
+						"y": 65,
+						"length": 0.2915,
+						"angle": -0.5405
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 27.4,
-							"y": 64.5,
-							"length": 0.2685,
-							"angle": -2.5712
-						}
+						"x": 27.4,
+						"y": 64.5,
+						"length": 0.2685,
+						"angle": -2.5712
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 37.9,
-							"y": 24.2,
-							"length": 0.2849,
-							"angle": 2.0093
-						}
+						"x": 37.9,
+						"y": 24.2,
+						"length": 0.2849,
+						"angle": 2.0093
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 74.1,
-							"y": 34.7,
-							"length": 0.2854,
-							"angle": 0.5656
-						}
+						"x": 74.1,
+						"y": 34.7,
+						"length": 0.2854,
+						"angle": 0.5656
 					}
 				},
 				"path": {
@@ -10514,7 +10490,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 41.7,
 					"y": 83.6,
 					"length": 0.346,
@@ -10523,43 +10499,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 61.6,
-							"y": 73.8,
-							"length": 0.2647,
-							"angle": -1.1173
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 61.6,
+						"y": 73.8,
+						"length": 0.2647,
+						"angle": -1.1173
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 27.2,
-							"y": 68,
-							"length": 0.2904,
-							"angle": -2.4734
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 27.2,
+						"y": 68,
+						"length": 0.2904,
+						"angle": -2.4734
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 38.5,
-							"y": 27.7,
-							"length": 0.2509,
-							"angle": 2.0469
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 38.5,
+						"y": 27.7,
+						"length": 0.2509,
+						"angle": 2.0469
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 73.9,
-							"y": 35.6,
-							"length": 0.279,
-							"angle": 0.5422
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 73.9,
+						"y": 35.6,
+						"length": 0.279,
+						"angle": 0.5422
 					}
 				},
 				"path": {
@@ -10635,7 +10603,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.4,
 					"y": 87.1,
 					"length": 0.371,
@@ -10644,39 +10612,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 50,
-							"y": 20,
-							"length": 0.3,
-							"angle": 1.5707
-						}
+						"x": 50,
+						"y": 20,
+						"length": 0.3,
+						"angle": 1.5707
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 27.8,
-							"y": 34.7,
-							"length": 0.2696,
-							"angle": 2.5381
-						}
+						"x": 27.8,
+						"y": 34.7,
+						"length": 0.2696,
+						"angle": 2.5381
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 50.4,
-							"y": 66.6,
-							"length": 0.166,
-							"angle": -1.5468
-						}
+						"x": 50.4,
+						"y": 66.6,
+						"length": 0.166,
+						"angle": -1.5468
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 72.9,
-							"y": 35.1,
-							"length": 0.2732,
-							"angle": 0.5768
-						}
+						"x": 72.9,
+						"y": 35.1,
+						"length": 0.2732,
+						"angle": 0.5768
 					}
 				},
 				"path": {
@@ -10736,7 +10696,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.6,
 					"y": 84.8,
 					"length": 0.348,
@@ -10745,43 +10705,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 50,
-							"y": 20.9,
-							"length": 0.291,
-							"angle": 1.5707
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 50,
+						"y": 20.9,
+						"length": 0.291,
+						"angle": 1.5707
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 28.6,
-							"y": 34.9,
-							"length": 0.2619,
-							"angle": 2.5271
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28.6,
+						"y": 34.9,
+						"length": 0.2619,
+						"angle": 2.5271
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 50,
-							"y": 65.5,
-							"length": 0.155,
-							"angle": -1.5708
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 50,
+						"y": 65.5,
+						"length": 0.155,
+						"angle": -1.5708
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 73.9,
-							"y": 34.2,
-							"length": 0.2865,
-							"angle": 0.5841
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 73.9,
+						"y": 34.2,
+						"length": 0.2865,
+						"angle": 0.5841
 					}
 				},
 				"path": {
@@ -10857,7 +10809,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 49.1,
 					"y": 80.8,
 					"length": 0.3081,
@@ -10866,39 +10818,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 73.3,
-							"y": 34.7,
-							"length": 0.2787,
-							"angle": 0.581
-						}
+						"x": 73.3,
+						"y": 34.7,
+						"length": 0.2787,
+						"angle": 0.581
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 52,
-							"y": 20,
-							"length": 0.3006,
-							"angle": 1.5042
-						}
+						"x": 52,
+						"y": 20,
+						"length": 0.3006,
+						"angle": 1.5042
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 38.3,
-							"y": 58.2,
-							"length": 0.1428,
-							"angle": -2.5303
-						}
+						"x": 38.3,
+						"y": 58.2,
+						"length": 0.1428,
+						"angle": -2.5303
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 75.2,
-							"y": 67.1,
-							"length": 0.3045,
-							"angle": -0.5962
-						}
+						"x": 75.2,
+						"y": 67.1,
+						"length": 0.3045,
+						"angle": -0.5962
 					}
 				},
 				"path": {
@@ -10952,7 +10896,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 49.1,
 					"y": 79.4,
 					"length": 0.2941,
@@ -10961,43 +10905,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 71.9,
-							"y": 35.4,
-							"length": 0.2632,
-							"angle": 0.588
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 71.9,
+						"y": 35.4,
+						"length": 0.2632,
+						"angle": 0.588
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 49.5,
-							"y": 18.8,
-							"length": 0.312,
-							"angle": 1.5868
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 49.5,
+						"y": 18.8,
+						"length": 0.312,
+						"angle": 1.5868
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 38.5,
-							"y": 57.3,
-							"length": 0.1362,
-							"angle": -2.576
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 38.5,
+						"y": 57.3,
+						"length": 0.1362,
+						"angle": -2.576
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 72.7,
-							"y": 65.2,
-							"length": 0.2731,
-							"angle": -0.5901
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 72.7,
+						"y": 65.2,
+						"length": 0.2731,
+						"angle": -0.5901
 					}
 				},
 				"path": {
@@ -11067,7 +11003,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 49.7,
 					"y": 80.1,
 					"length": 0.301,
@@ -11076,39 +11012,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 26.6,
-							"y": 66.4,
-							"length": 0.2857,
-							"angle": -2.5303
-						}
+						"x": 26.6,
+						"y": 66.4,
+						"length": 0.2857,
+						"angle": -2.5303
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 27.4,
-							"y": 35.4,
-							"length": 0.269,
-							"angle": 2.568
-						}
+						"x": 27.4,
+						"y": 35.4,
+						"length": 0.269,
+						"angle": 2.568
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 64.9,
-							"y": 24.2,
-							"length": 0.2979,
-							"angle": 1.047
-						}
+						"x": 64.9,
+						"y": 24.2,
+						"length": 0.2979,
+						"angle": 1.047
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 73.9,
-							"y": 66.6,
-							"length": 0.2909,
-							"angle": -0.6071
-						}
+						"x": 73.9,
+						"y": 66.6,
+						"length": 0.2909,
+						"angle": -0.6071
 					}
 				},
 				"path": {
@@ -11168,7 +11096,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 57.6,
 					"y": 82,
 					"length": 0.3289,
@@ -11177,43 +11105,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 38.1,
-							"y": 74.3,
-							"length": 0.2705,
-							"angle": -2.0262
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 38.1,
+						"y": 74.3,
+						"length": 0.2705,
+						"angle": -2.0262
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 28.2,
-							"y": 36.3,
-							"length": 0.2574,
-							"angle": 2.5805
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28.2,
+						"y": 36.3,
+						"length": 0.2574,
+						"angle": 2.5805
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 61.4,
-							"y": 29.6,
-							"length": 0.2336,
-							"angle": 1.0612
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 61.4,
+						"y": 29.6,
+						"length": 0.2336,
+						"angle": 1.0612
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 72.3,
-							"y": 66.6,
-							"length": 0.278,
-							"angle": -0.64
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 72.3,
+						"y": 66.6,
+						"length": 0.278,
+						"angle": -0.64
 					}
 				},
 				"path": {
@@ -11289,7 +11209,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.4,
 					"y": 85.7,
 					"length": 0.357,
@@ -11298,30 +11218,24 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 51.8,
-							"y": 65.2,
-							"length": 0.153,
-							"angle": -1.453
-						}
+						"x": 51.8,
+						"y": 65.2,
+						"length": 0.153,
+						"angle": -1.453
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 27.6,
-							"y": 34.9,
-							"length": 0.2701,
-							"angle": 2.5484
-						}
+						"x": 27.6,
+						"y": 34.9,
+						"length": 0.2701,
+						"angle": 2.5484
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 61.4,
-							"y": 30,
-							"length": 0.2302,
-							"angle": 1.0527
-						}
+						"x": 61.4,
+						"y": 30,
+						"length": 0.2302,
+						"angle": 1.0527
 					}
 				},
 				"path": {
@@ -11382,7 +11296,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 48.9,
 					"y": 86.2,
 					"length": 0.3621,
@@ -11391,33 +11305,27 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 52.8,
-							"y": 64.1,
-							"length": 0.1437,
-							"angle": -1.3748
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 52.8,
+						"y": 64.1,
+						"length": 0.1437,
+						"angle": -1.3748
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 27.8,
-							"y": 37,
-							"length": 0.2572,
-							"angle": 2.6118
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 27.8,
+						"y": 37,
+						"length": 0.2572,
+						"angle": 2.6118
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 63.5,
-							"y": 28.2,
-							"length": 0.2564,
-							"angle": 1.0163
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 63.5,
+						"y": 28.2,
+						"length": 0.2564,
+						"angle": 1.0163
 					}
 				},
 				"path": {
@@ -11500,7 +11408,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.3,
 					"y": 78.5,
 					"length": 0.2888,
@@ -11509,30 +11417,24 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 64.7,
-							"y": 28.2,
-							"length": 0.2629,
-							"angle": 0.9775
-						}
+						"x": 64.7,
+						"y": 28.2,
+						"length": 0.2629,
+						"angle": 0.9775
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 74.5,
-							"y": 64.3,
-							"length": 0.2836,
-							"angle": -0.5284
-						}
+						"x": 74.5,
+						"y": 64.3,
+						"length": 0.2836,
+						"angle": -0.5284
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 29.8,
-							"y": 51.2,
-							"length": 0.2023,
-							"angle": -3.0823
-						}
+						"x": 29.8,
+						"y": 51.2,
+						"length": 0.2023,
+						"angle": -3.0823
 					}
 				},
 				"path": {
@@ -11599,7 +11501,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 47.7,
 					"y": 80.1,
 					"length": 0.3018,
@@ -11608,33 +11510,27 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 65.3,
-							"y": 26.5,
-							"length": 0.2804,
-							"angle": 0.9936
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 65.3,
+						"y": 26.5,
+						"length": 0.2804,
+						"angle": 0.9936
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 75,
-							"y": 65.9,
-							"length": 0.2962,
-							"angle": -0.5665
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 75,
+						"y": 65.9,
+						"length": 0.2962,
+						"angle": -0.5665
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 25.8,
-							"y": 51.2,
-							"length": 0.2422,
-							"angle": -3.0921
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 25.8,
+						"y": 51.2,
+						"length": 0.2422,
+						"angle": -3.0921
 					}
 				},
 				"path": {
@@ -11717,7 +11613,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 24.5,
 					"y": 48.4,
 					"length": 0.2555,
@@ -11726,30 +11622,24 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 37.7,
-							"y": 26.1,
-							"length": 0.2687,
-							"angle": 2.046
-						}
+						"x": 37.7,
+						"y": 26.1,
+						"length": 0.2687,
+						"angle": 2.046
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 72.3,
-							"y": 32.6,
-							"length": 0.2828,
-							"angle": 0.6625
-						}
+						"x": 72.3,
+						"y": 32.6,
+						"length": 0.2828,
+						"angle": 0.6625
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 50.2,
-							"y": 66.2,
-							"length": 0.162,
-							"angle": -1.5585
-						}
+						"x": 50.2,
+						"y": 66.2,
+						"length": 0.162,
+						"angle": -1.5585
 					}
 				},
 				"path": {
@@ -11816,7 +11706,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 23.5,
 					"y": 46.6,
 					"length": 0.2671,
@@ -11825,33 +11715,27 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 37.9,
-							"y": 25.6,
-							"length": 0.2723,
-							"angle": 2.0311
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 37.9,
+						"y": 25.6,
+						"length": 0.2723,
+						"angle": 2.0311
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 71.7,
-							"y": 34.4,
-							"length": 0.2672,
-							"angle": 0.6232
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 71.7,
+						"y": 34.4,
+						"length": 0.2672,
+						"angle": 0.6232
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 49.5,
-							"y": 65,
-							"length": 0.15,
-							"angle": -1.6042
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 49.5,
+						"y": 65,
+						"length": 0.15,
+						"angle": -1.6042
 					}
 				},
 				"path": {
@@ -11934,7 +11818,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.8,
 					"y": 78.7,
 					"length": 0.2871,
@@ -11943,30 +11827,24 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 73.3,
-							"y": 48.4,
-							"length": 0.2335,
-							"angle": 0.0685
-						}
+						"x": 73.3,
+						"y": 48.4,
+						"length": 0.2335,
+						"angle": 0.0685
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 27,
-							"y": 66.4,
-							"length": 0.2824,
-							"angle": -2.5222
-						}
+						"x": 27,
+						"y": 66.4,
+						"length": 0.2824,
+						"angle": -2.5222
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 39.5,
-							"y": 26.5,
-							"length": 0.2573,
-							"angle": 1.9909
-						}
+						"x": 39.5,
+						"y": 26.5,
+						"length": 0.2573,
+						"angle": 1.9909
 					}
 				},
 				"path": {
@@ -12033,7 +11911,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 49.5,
 					"y": 79.2,
 					"length": 0.292,
@@ -12042,33 +11920,27 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 69.7,
-							"y": 51.2,
-							"length": 0.1973,
-							"angle": -0.0609
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 69.7,
+						"y": 51.2,
+						"length": 0.1973,
+						"angle": -0.0609
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 27.8,
-							"y": 65.9,
-							"length": 0.273,
-							"angle": -2.5201
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 27.8,
+						"y": 65.9,
+						"length": 0.273,
+						"angle": -2.5201
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 40.1,
-							"y": 28.6,
-							"length": 0.2357,
-							"angle": 2.004
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 40.1,
+						"y": 28.6,
+						"length": 0.2357,
+						"angle": 2.004
 					}
 				},
 				"path": {
@@ -12151,7 +12023,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 47.5,
 					"y": 72.7,
 					"length": 0.2283,
@@ -12160,30 +12032,24 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 23.9,
-							"y": 46.1,
-							"length": 0.2638,
-							"angle": 2.9932
-						}
+						"x": 23.9,
+						"y": 46.1,
+						"length": 0.2638,
+						"angle": 2.9932
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 47.3,
-							"y": 20.2,
-							"length": 0.2992,
-							"angle": 1.6611
-						}
+						"x": 47.3,
+						"y": 20.2,
+						"length": 0.2992,
+						"angle": 1.6611
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 73.5,
-							"y": 51,
-							"length": 0.2352,
-							"angle": -0.0426
-						}
+						"x": 73.5,
+						"y": 51,
+						"length": 0.2352,
+						"angle": -0.0426
 					}
 				},
 				"path": {
@@ -12250,7 +12116,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.6,
 					"y": 73.4,
 					"length": 0.234,
@@ -12259,33 +12125,27 @@
 				"clearing": {
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 28,
-							"y": 50.1,
-							"length": 0.22,
-							"angle": -3.1371
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 28,
+						"y": 50.1,
+						"length": 0.22,
+						"angle": -3.1371
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 50.8,
-							"y": 20.9,
-							"length": 0.2911,
-							"angle": 1.5433
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 50.8,
+						"y": 20.9,
+						"length": 0.2911,
+						"angle": 1.5433
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 71.3,
-							"y": 51,
-							"length": 0.2132,
-							"angle": -0.047
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 71.3,
+						"y": 51,
+						"length": 0.2132,
+						"angle": -0.047
 					}
 				},
 				"path": {
@@ -12362,7 +12222,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 58.6,
 					"y": 28.9,
 					"length": 0.2278,
@@ -12371,57 +12231,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 33.8,
-							"y": 26.8,
-							"length": 0.2829,
-							"angle": 2.1803
-						}
+						"x": 33.8,
+						"y": 26.8,
+						"length": 0.2829,
+						"angle": 2.1803
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 77.6,
-							"y": 51.5,
-							"length": 0.2764,
-							"angle": -0.0543
-						}
+						"x": 77.6,
+						"y": 51.5,
+						"length": 0.2764,
+						"angle": -0.0543
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 61.4,
-							"y": 81.5,
-							"length": 0.3349,
-							"angle": -1.2236
-						}
+						"x": 61.4,
+						"y": 81.5,
+						"length": 0.3349,
+						"angle": -1.2236
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 18.3,
-							"y": 52.2,
-							"length": 0.3177,
-							"angle": -3.0724
-						}
+						"x": 18.3,
+						"y": 52.2,
+						"length": 0.3177,
+						"angle": -3.0724
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 30,
-							"y": 76.2,
-							"length": 0.3296,
-							"angle": -2.2228
-						}
+						"x": 30,
+						"y": 76.2,
+						"length": 0.3296,
+						"angle": -2.2228
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 48.9,
-							"y": 57.5,
-							"length": 0.0758,
-							"angle": -1.7165
-						}
+						"x": 48.9,
+						"y": 57.5,
+						"length": 0.0758,
+						"angle": -1.7165
 					}
 				},
 				"path": {
@@ -12524,7 +12372,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 34.4,
 					"y": 20.2,
 					"length": 0.3363,
@@ -12533,63 +12381,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 43.9,
-							"y": 65.7,
-							"length": 0.1684,
-							"angle": -1.9414
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 43.9,
+						"y": 65.7,
+						"length": 0.1684,
+						"angle": -1.9414
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 49.1,
-							"y": 40.5,
-							"length": 0.0954,
-							"angle": 1.6652
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 49.1,
+						"y": 40.5,
+						"length": 0.0954,
+						"angle": 1.6652
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 64.7,
-							"y": 80.8,
-							"length": 0.3412,
-							"angle": -1.1255
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 64.7,
+						"y": 80.8,
+						"length": 0.3412,
+						"angle": -1.1255
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 24.3,
-							"y": 50.5,
-							"length": 0.257,
-							"angle": -3.1222
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 24.3,
+						"y": 50.5,
+						"length": 0.257,
+						"angle": -3.1222
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 66.7,
-							"y": 57.1,
-							"length": 0.1814,
-							"angle": -0.402
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 66.7,
+						"y": 57.1,
+						"length": 0.1814,
+						"angle": -0.402
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 66.7,
-							"y": 18.8,
-							"length": 0.3538,
-							"angle": 1.0793
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 66.7,
+						"y": 18.8,
+						"length": 0.3538,
+						"angle": 1.0793
 					}
 				},
 				"path": {
@@ -12719,7 +12555,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 19.9,
 					"y": 51.7,
 					"length": 0.3014,
@@ -12728,57 +12564,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 55.2,
-							"y": 73.1,
-							"length": 0.2367,
-							"angle": -1.3494
-						}
+						"x": 55.2,
+						"y": 73.1,
+						"length": 0.2367,
+						"angle": -1.3494
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 73.7,
-							"y": 37,
-							"length": 0.2703,
-							"angle": 0.5017
-						}
+						"x": 73.7,
+						"y": 37,
+						"length": 0.2703,
+						"angle": 0.5017
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 76.4,
-							"y": 64.5,
-							"length": 0.3011,
-							"angle": -0.5023
-						}
+						"x": 76.4,
+						"y": 64.5,
+						"length": 0.3011,
+						"angle": -0.5023
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 51,
-							"y": 50.3,
-							"length": 0.0104,
-							"angle": -0.2915
-						}
+						"x": 51,
+						"y": 50.3,
+						"length": 0.0104,
+						"angle": -0.2915
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 31.4,
-							"y": 29.3,
-							"length": 0.2782,
-							"angle": 2.3028
-						}
+						"x": 31.4,
+						"y": 29.3,
+						"length": 0.2782,
+						"angle": 2.3028
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 35.4,
-							"y": 82.7,
-							"length": 0.3581,
-							"angle": -1.9908
-						}
+						"x": 35.4,
+						"y": 82.7,
+						"length": 0.3581,
+						"angle": -1.9908
 					}
 				},
 				"path": {
@@ -12853,7 +12677,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 19.3,
 					"y": 53.3,
 					"length": 0.3087,
@@ -12862,63 +12686,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 56.4,
-							"y": 71,
-							"length": 0.2195,
-							"angle": -1.275
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 56.4,
+						"y": 71,
+						"length": 0.2195,
+						"angle": -1.275
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 73.1,
-							"y": 30.7,
-							"length": 0.301,
-							"angle": 0.696
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 73.1,
+						"y": 30.7,
+						"length": 0.301,
+						"angle": 0.696
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 79,
-							"y": 60.3,
-							"length": 0.3077,
-							"angle": -0.3413
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 79,
+						"y": 60.3,
+						"length": 0.3077,
+						"angle": -0.3413
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 50.2,
-							"y": 48.4,
-							"length": 0.0161,
-							"angle": 1.4464
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50.2,
+						"y": 48.4,
+						"length": 0.0161,
+						"angle": 1.4464
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 28.2,
-							"y": 31,
-							"length": 0.2891,
-							"angle": 2.4247
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 28.2,
+						"y": 31,
+						"length": 0.2891,
+						"angle": 2.4247
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 33,
-							"y": 81.8,
-							"length": 0.3605,
-							"angle": -2.0618
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 33,
+						"y": 81.8,
+						"length": 0.3605,
+						"angle": -2.0618
 					}
 				},
 				"path": {
@@ -12998,7 +12810,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 82.6,
 					"y": 53.8,
 					"length": 0.3282,
@@ -13007,57 +12819,45 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 46.7,
-							"y": 84.8,
-							"length": 0.3495,
-							"angle": -1.6654
-						}
+						"x": 46.7,
+						"y": 84.8,
+						"length": 0.3495,
+						"angle": -1.6654
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 50,
-							"y": 18.6,
-							"length": 0.3139,
-							"angle": 1.5707
-						}
+						"x": 50,
+						"y": 18.6,
+						"length": 0.3139,
+						"angle": 1.5707
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 34.4,
-							"y": 39.8,
-							"length": 0.1863,
-							"angle": 2.5625
-						}
+						"x": 34.4,
+						"y": 39.8,
+						"length": 0.1863,
+						"angle": 2.5625
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 64.7,
-							"y": 67.1,
-							"length": 0.2254,
-							"angle": -0.8608
-						}
+						"x": 64.7,
+						"y": 67.1,
+						"length": 0.2254,
+						"angle": -0.8608
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 66.3,
-							"y": 39.8,
-							"length": 0.1922,
-							"angle": 0.5591
-						}
+						"x": 66.3,
+						"y": 39.8,
+						"length": 0.1922,
+						"angle": 0.5591
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 32.4,
-							"y": 65.2,
-							"length": 0.2325,
-							"angle": -2.4293
-						}
+						"x": 32.4,
+						"y": 65.2,
+						"length": 0.2325,
+						"angle": -2.4293
 					}
 				},
 				"path": {
@@ -13104,7 +12904,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 75.6,
 					"y": 59.9,
 					"length": 0.2744,
@@ -13113,63 +12913,51 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 42.3,
-							"y": 82.9,
-							"length": 0.3378,
-							"angle": -1.8008
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 42.3,
+						"y": 82.9,
+						"length": 0.3378,
+						"angle": -1.8008
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 54.4,
-							"y": 21.9,
-							"length": 0.2844,
-							"angle": 1.4154
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 54.4,
+						"y": 21.9,
+						"length": 0.2844,
+						"angle": 1.4154
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 36.6,
-							"y": 35.1,
-							"length": 0.2003,
-							"angle": 2.3032
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 36.6,
+						"y": 35.1,
+						"length": 0.2003,
+						"angle": 2.3032
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 57.8,
-							"y": 66.2,
-							"length": 0.1797,
-							"angle": -1.1221
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 57.8,
+						"y": 66.2,
+						"length": 0.1797,
+						"angle": -1.1221
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 63.7,
-							"y": 44.5,
-							"length": 0.1476,
-							"angle": 0.3817
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 63.7,
+						"y": 44.5,
+						"length": 0.1476,
+						"angle": 0.3817
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 32.8,
-							"y": 63.8,
-							"length": 0.2205,
-							"angle": -2.4655
-						},
-						"magic": "RGP"
+						"magic": "RGP",
+						"x": 32.8,
+						"y": 63.8,
+						"length": 0.2205,
+						"angle": -2.4655
 					}
 				},
 				"path": {
@@ -13238,7 +13026,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 51,
 					"y": 43.1,
 					"length": 0.0697,
@@ -13247,57 +13035,45 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 34.6,
-							"y": 41.4,
-							"length": 0.1763,
-							"angle": 2.6322
-						}
+						"x": 34.6,
+						"y": 41.4,
+						"length": 0.1763,
+						"angle": 2.6322
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 24.3,
-							"y": 68.9,
-							"length": 0.319,
-							"angle": -2.5075
-						}
+						"x": 24.3,
+						"y": 68.9,
+						"length": 0.319,
+						"angle": -2.5075
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 49.3,
-							"y": 68,
-							"length": 0.1801,
-							"angle": -1.6097
-						}
+						"x": 49.3,
+						"y": 68,
+						"length": 0.1801,
+						"angle": -1.6097
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 51.6,
-							"y": 17,
-							"length": 0.3303,
-							"angle": 1.5223
-						}
+						"x": 51.6,
+						"y": 17,
+						"length": 0.3303,
+						"angle": 1.5223
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 76.8,
-							"y": 69.2,
-							"length": 0.3296,
-							"angle": -0.6217
-						}
+						"x": 76.8,
+						"y": 69.2,
+						"length": 0.3296,
+						"angle": -0.6217
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 70.7,
-							"y": 38.6,
-							"length": 0.2363,
-							"angle": 0.5033
-						}
+						"x": 70.7,
+						"y": 38.6,
+						"length": 0.2363,
+						"angle": 0.5033
 					}
 				},
 				"path": {
@@ -13361,7 +13137,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 52.6,
 					"y": 45.4,
 					"length": 0.0528,
@@ -13370,63 +13146,51 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 38.1,
-							"y": 42.6,
-							"length": 0.1401,
-							"angle": 2.5852
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 38.1,
+						"y": 42.6,
+						"length": 0.1401,
+						"angle": 2.5852
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 25,
-							"y": 65.7,
-							"length": 0.2952,
-							"angle": -2.5809
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 25,
+						"y": 65.7,
+						"length": 0.2952,
+						"angle": -2.5809
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 53.4,
-							"y": 66.8,
-							"length": 0.1714,
-							"angle": -1.3712
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 53.4,
+						"y": 66.8,
+						"length": 0.1714,
+						"angle": -1.3712
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 51.2,
-							"y": 18.6,
-							"length": 0.3142,
-							"angle": 1.5325
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 51.2,
+						"y": 18.6,
+						"length": 0.3142,
+						"angle": 1.5325
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 76.2,
-							"y": 68.2,
-							"length": 0.319,
-							"angle": -0.6072
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 76.2,
+						"y": 68.2,
+						"length": 0.319,
+						"angle": -0.6072
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 68.5,
-							"y": 42.4,
-							"length": 0.2,
-							"angle": 0.3897
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 68.5,
+						"y": 42.4,
+						"length": 0.2,
+						"angle": 0.3897
 					}
 				},
 				"path": {
@@ -13511,7 +13275,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 48.9,
 					"y": 82.2,
 					"length": 0.3221,
@@ -13520,57 +13284,45 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 27,
-							"y": 35.4,
-							"length": 0.2724,
-							"angle": 2.5759
-						}
+						"x": 27,
+						"y": 35.4,
+						"length": 0.2724,
+						"angle": 2.5759
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 27.4,
-							"y": 66.4,
-							"length": 0.2792,
-							"angle": -2.5139
-						}
+						"x": 27.4,
+						"y": 66.4,
+						"length": 0.2792,
+						"angle": -2.5139
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 49.5,
-							"y": 50.5,
-							"length": 0.007,
-							"angle": -2.3562
-						}
+						"x": 49.5,
+						"y": 50.5,
+						"length": 0.007,
+						"angle": -2.3562
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 74.1,
-							"y": 33.7,
-							"length": 0.2909,
-							"angle": 0.5946
-						}
+						"x": 74.1,
+						"y": 33.7,
+						"length": 0.2909,
+						"angle": 0.5946
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 73.9,
-							"y": 67.3,
-							"length": 0.295,
-							"angle": -0.6266
-						}
+						"x": 73.9,
+						"y": 67.3,
+						"length": 0.295,
+						"angle": -0.6266
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 50.8,
-							"y": 19.5,
-							"length": 0.3051,
-							"angle": 1.5445
-						}
+						"x": 50.8,
+						"y": 19.5,
+						"length": 0.3051,
+						"angle": 1.5445
 					}
 				},
 				"path": {
@@ -13633,7 +13385,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 50.2,
 					"y": 75,
 					"length": 0.25,
@@ -13642,63 +13394,51 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 26.4,
-							"y": 35.6,
-							"length": 0.2764,
-							"angle": 2.5937
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 26.4,
+						"y": 35.6,
+						"length": 0.2764,
+						"angle": 2.5937
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 25.8,
-							"y": 66.6,
-							"length": 0.2934,
-							"angle": -2.5404
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 25.8,
+						"y": 66.6,
+						"length": 0.2934,
+						"angle": -2.5404
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 49.3,
-							"y": 50.5,
-							"length": 0.0086,
-							"angle": -2.5214
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 49.3,
+						"y": 50.5,
+						"length": 0.0086,
+						"angle": -2.5214
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 73.1,
-							"y": 36.1,
-							"length": 0.2695,
-							"angle": 0.5416
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 73.1,
+						"y": 36.1,
+						"length": 0.2695,
+						"angle": 0.5416
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 72.7,
-							"y": 67.1,
-							"length": 0.2842,
-							"angle": -0.6457
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 72.7,
+						"y": 67.1,
+						"length": 0.2842,
+						"angle": -0.6457
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 50.2,
-							"y": 20.5,
-							"length": 0.295,
-							"angle": 1.564
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50.2,
+						"y": 20.5,
+						"length": 0.295,
+						"angle": 1.564
 					}
 				},
 				"path": {
@@ -13777,7 +13517,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 62,
 					"y": 75.9,
 					"length": 0.2854,
@@ -13786,57 +13526,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 34.4,
-							"y": 18.8,
-							"length": 0.3488,
-							"angle": 2.0344
-						}
+						"x": 34.4,
+						"y": 18.8,
+						"length": 0.3488,
+						"angle": 2.0344
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 77.6,
-							"y": 48.4,
-							"length": 0.2764,
-							"angle": 0.0579
-						}
+						"x": 77.6,
+						"y": 48.4,
+						"length": 0.2764,
+						"angle": 0.0579
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 63.9,
-							"y": 21.4,
-							"length": 0.3179,
-							"angle": 1.1184
-						}
+						"x": 63.9,
+						"y": 21.4,
+						"length": 0.3179,
+						"angle": 1.1184
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 33.2,
-							"y": 84.6,
-							"length": 0.3846,
-							"angle": -2.0229
-						}
+						"x": 33.2,
+						"y": 84.6,
+						"length": 0.3846,
+						"angle": -2.0229
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 37.5,
-							"y": 62.7,
-							"length": 0.1781,
-							"angle": -2.3483
-						}
+						"x": 37.5,
+						"y": 62.7,
+						"length": 0.1781,
+						"angle": -2.3483
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 46.1,
-							"y": 40.3,
-							"length": 0.1045,
-							"angle": 1.953
-						}
+						"x": 46.1,
+						"y": 40.3,
+						"length": 0.1045,
+						"angle": 1.953
 					}
 				},
 				"path": {
@@ -13951,7 +13679,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 61.4,
 					"y": 17.7,
 					"length": 0.3425,
@@ -13960,63 +13688,51 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 40.7,
-							"y": 15.1,
-							"length": 0.3611,
-							"angle": 1.8312
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 40.7,
+						"y": 15.1,
+						"length": 0.3611,
+						"angle": 1.8312
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 85.4,
-							"y": 50.1,
-							"length": 0.354,
-							"angle": -0.0029
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 85.4,
+						"y": 50.1,
+						"length": 0.354,
+						"angle": -0.0029
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 64.9,
-							"y": 45.4,
-							"length": 0.1559,
-							"angle": 0.2994
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 64.9,
+						"y": 45.4,
+						"length": 0.1559,
+						"angle": 0.2994
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 47.9,
-							"y": 74.1,
-							"length": 0.2419,
-							"angle": -1.6578
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 47.9,
+						"y": 74.1,
+						"length": 0.2419,
+						"angle": -1.6578
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 29.8,
-							"y": 60.3,
-							"length": 0.2267,
-							"angle": -2.6701
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 29.8,
+						"y": 60.3,
+						"length": 0.2267,
+						"angle": -2.6701
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 40.9,
-							"y": 42.4,
-							"length": 0.1185,
-							"angle": 2.4457
-						},
-						"magic": "RP"
+						"magic": "RP",
+						"x": 40.9,
+						"y": 42.4,
+						"length": 0.1185,
+						"angle": 2.4457
 					}
 				},
 				"path": {
@@ -14141,7 +13857,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 24.5,
 					"y": 62.4,
 					"length": 0.2835,
@@ -14150,57 +13866,45 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 68.9,
-							"y": 58.9,
-							"length": 0.2089,
-							"angle": -0.4401
-						}
+						"x": 68.9,
+						"y": 58.9,
+						"length": 0.2089,
+						"angle": -0.4401
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 49.5,
-							"y": 19.8,
-							"length": 0.302,
-							"angle": 1.5873
-						}
+						"x": 49.5,
+						"y": 19.8,
+						"length": 0.302,
+						"angle": 1.5873
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 72.7,
-							"y": 34.4,
-							"length": 0.2754,
-							"angle": 0.6021
-						}
+						"x": 72.7,
+						"y": 34.4,
+						"length": 0.2754,
+						"angle": 0.6021
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 43.5,
-							"y": 55.4,
-							"length": 0.0845,
-							"angle": -2.4484
-						}
+						"x": 43.5,
+						"y": 55.4,
+						"length": 0.0845,
+						"angle": -2.4484
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 50,
-							"y": 82,
-							"length": 0.3199,
-							"angle": -1.5708
-						}
+						"x": 50,
+						"y": 82,
+						"length": 0.3199,
+						"angle": -1.5708
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 26.2,
-							"y": 33.5,
-							"length": 0.2896,
-							"angle": 2.5353
-						}
+						"x": 26.2,
+						"y": 33.5,
+						"length": 0.2896,
+						"angle": 2.5353
 					}
 				},
 				"path": {
@@ -14253,7 +13957,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 27.8,
 					"y": 76.6,
 					"length": 0.3464,
@@ -14262,63 +13966,51 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 67.7,
-							"y": 62,
-							"length": 0.2138,
-							"angle": -0.5958
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 67.7,
+						"y": 62,
+						"length": 0.2138,
+						"angle": -0.5958
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 51.8,
-							"y": 17.7,
-							"length": 0.3235,
-							"angle": 1.5151
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 51.8,
+						"y": 17.7,
+						"length": 0.3235,
+						"angle": 1.5151
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 73.1,
-							"y": 34.9,
-							"length": 0.2759,
-							"angle": 0.5789
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 73.1,
+						"y": 34.9,
+						"length": 0.2759,
+						"angle": 0.5789
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 40.3,
-							"y": 58.9,
-							"length": 0.1316,
-							"angle": -2.3992
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 40.3,
+						"y": 58.9,
+						"length": 0.1316,
+						"angle": -2.3992
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 51.2,
-							"y": 82.7,
-							"length": 0.3272,
-							"angle": -1.5342
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 51.2,
+						"y": 82.7,
+						"length": 0.3272,
+						"angle": -1.5342
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 27.6,
-							"y": 34,
-							"length": 0.2752,
-							"angle": 2.5213
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 27.6,
+						"y": 34,
+						"length": 0.2752,
+						"angle": 2.5213
 					}
 				},
 				"path": {
@@ -14387,7 +14079,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 19.9,
 					"y": 52.9,
 					"length": 0.3023,
@@ -14396,57 +14088,45 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 31.2,
-							"y": 34.7,
-							"length": 0.2423,
-							"angle": 2.4584
-						}
+						"x": 31.2,
+						"y": 34.7,
+						"length": 0.2423,
+						"angle": 2.4584
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 64.5,
-							"y": 19.5,
-							"length": 0.3377,
-							"angle": 1.127
-						}
+						"x": 64.5,
+						"y": 19.5,
+						"length": 0.3377,
+						"angle": 1.127
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 75,
-							"y": 66.4,
-							"length": 0.2989,
-							"angle": -0.5806
-						}
+						"x": 75,
+						"y": 66.4,
+						"length": 0.2989,
+						"angle": -0.5806
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 46.9,
-							"y": 60.6,
-							"length": 0.1104,
-							"angle": -1.8554
-						}
+						"x": 46.9,
+						"y": 60.6,
+						"length": 0.1104,
+						"angle": -1.8554
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 29.6,
-							"y": 77.3,
-							"length": 0.3408,
-							"angle": -2.2126
-						}
+						"x": 29.6,
+						"y": 77.3,
+						"length": 0.3408,
+						"angle": -2.2126
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 66.3,
-							"y": 41.7,
-							"length": 0.1829,
-							"angle": 0.4709
-						}
+						"x": 66.3,
+						"y": 41.7,
+						"length": 0.1829,
+						"angle": 0.4709
 					}
 				},
 				"path": {
@@ -14538,7 +14218,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 35.4,
 					"y": 13.9,
 					"length": 0.3894,
@@ -14547,63 +14227,51 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 28,
-							"y": 34.9,
-							"length": 0.2668,
-							"angle": 2.54
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28,
+						"y": 34.9,
+						"length": 0.2668,
+						"angle": 2.54
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 63.9,
-							"y": 20.7,
-							"length": 0.3242,
-							"angle": 1.1278
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 63.9,
+						"y": 20.7,
+						"length": 0.3242,
+						"angle": 1.1278
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 72.9,
-							"y": 77.6,
-							"length": 0.3586,
-							"angle": -0.8783
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 72.9,
+						"y": 77.6,
+						"length": 0.3586,
+						"angle": -0.8783
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 45.9,
-							"y": 53.6,
-							"length": 0.0545,
-							"angle": -2.4211
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 45.9,
+						"y": 53.6,
+						"length": 0.0545,
+						"angle": -2.4211
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 31.6,
-							"y": 72,
-							"length": 0.2868,
-							"angle": -2.2674
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 31.6,
+						"y": 72,
+						"length": 0.2868,
+						"angle": -2.2674
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 68.1,
-							"y": 46.8,
-							"length": 0.1838,
-							"angle": 0.1749
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 68.1,
+						"y": 46.8,
+						"length": 0.1838,
+						"angle": 0.1749
 					}
 				},
 				"path": {
@@ -14716,7 +14384,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 43.7,
 					"y": 17.9,
 					"length": 0.3271,
@@ -14725,57 +14393,45 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 75,
-							"y": 68.5,
-							"length": 0.311,
-							"angle": -0.6371
-						}
+						"x": 75,
+						"y": 68.5,
+						"length": 0.311,
+						"angle": -0.6371
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 26.6,
-							"y": 65.7,
-							"length": 0.2817,
-							"angle": -2.5507
-						}
+						"x": 26.6,
+						"y": 65.7,
+						"length": 0.2817,
+						"angle": -2.5507
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 46.3,
-							"y": 51.7,
-							"length": 0.0407,
-							"angle": -2.711
-						}
+						"x": 46.3,
+						"y": 51.7,
+						"length": 0.0407,
+						"angle": -2.711
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 55.4,
-							"y": 82.7,
-							"length": 0.3314,
-							"angle": -1.4072
-						}
+						"x": 55.4,
+						"y": 82.7,
+						"length": 0.3314,
+						"angle": -1.4072
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 27.4,
-							"y": 35.4,
-							"length": 0.269,
-							"angle": 2.568
-						}
+						"x": 27.4,
+						"y": 35.4,
+						"length": 0.269,
+						"angle": 2.568
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 63.9,
-							"y": 20.2,
-							"length": 0.3288,
-							"angle": 1.1343
-						}
+						"x": 63.9,
+						"y": 20.2,
+						"length": 0.3288,
+						"angle": 1.1343
 					}
 				},
 				"path": {
@@ -14822,7 +14478,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 42.5,
 					"y": 13.2,
 					"length": 0.3755,
@@ -14831,63 +14487,51 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 71.7,
-							"y": 64.3,
-							"length": 0.2598,
-							"angle": -0.5827
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 71.7,
+						"y": 64.3,
+						"length": 0.2598,
+						"angle": -0.5827
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 25.6,
-							"y": 64.8,
-							"length": 0.2853,
-							"angle": -2.5964
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 25.6,
+						"y": 64.8,
+						"length": 0.2853,
+						"angle": -2.5964
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 52.8,
-							"y": 42.6,
-							"length": 0.0791,
-							"angle": 1.209
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 52.8,
+						"y": 42.6,
+						"length": 0.0791,
+						"angle": 1.209
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 50.2,
-							"y": 76.2,
-							"length": 0.262,
-							"angle": -1.5632
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50.2,
+						"y": 76.2,
+						"length": 0.262,
+						"angle": -1.5632
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 25.2,
-							"y": 33.5,
-							"length": 0.2978,
-							"angle": 2.5545
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 25.2,
+						"y": 33.5,
+						"length": 0.2978,
+						"angle": 2.5545
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 66.3,
-							"y": 17.2,
-							"length": 0.3662,
-							"angle": 1.1095
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 66.3,
+						"y": 17.2,
+						"length": 0.3662,
+						"angle": 1.1095
 					}
 				},
 				"path": {
@@ -14950,7 +14594,7 @@
 				"rw_expansion_1": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 22.9,
 					"y": 68.9,
 					"length": 0.3303,
@@ -14959,57 +14603,45 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 75.2,
-							"y": 33.5,
-							"length": 0.3012,
-							"angle": 0.5797
-						}
+						"x": 75.2,
+						"y": 33.5,
+						"length": 0.3012,
+						"angle": 0.5797
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 51,
-							"y": 16,
-							"length": 0.3401,
-							"angle": 1.5413
-						}
+						"x": 51,
+						"y": 16,
+						"length": 0.3401,
+						"angle": 1.5413
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 50.4,
-							"y": 42.6,
-							"length": 0.0741,
-							"angle": 1.5167
-						}
+						"x": 50.4,
+						"y": 42.6,
+						"length": 0.0741,
+						"angle": 1.5167
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 51.8,
-							"y": 83.6,
-							"length": 0.3364,
-							"angle": -1.5173
-						}
+						"x": 51.8,
+						"y": 83.6,
+						"length": 0.3364,
+						"angle": -1.5173
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 27.4,
-							"y": 34.7,
-							"length": 0.2729,
-							"angle": 2.5464
-						}
+						"x": 27.4,
+						"y": 34.7,
+						"length": 0.2729,
+						"angle": 2.5464
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 60.6,
-							"y": 63.6,
-							"length": 0.1724,
-							"angle": -0.9088
-						}
+						"x": 60.6,
+						"y": 63.6,
+						"length": 0.1724,
+						"angle": -0.9088
 					}
 				},
 				"path": {
@@ -15078,7 +14710,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 22.7,
 					"y": 70.6,
 					"length": 0.342,
@@ -15087,63 +14719,51 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 73.5,
-							"y": 33.1,
-							"length": 0.2894,
-							"angle": 0.6234
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 73.5,
+						"y": 33.1,
+						"length": 0.2894,
+						"angle": 0.6234
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 50.2,
-							"y": 19.8,
-							"length": 0.302,
-							"angle": 1.5641
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50.2,
+						"y": 19.8,
+						"length": 0.302,
+						"angle": 1.5641
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 47.1,
-							"y": 48,
-							"length": 0.0352,
-							"angle": 2.5378
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 47.1,
+						"y": 48,
+						"length": 0.0352,
+						"angle": 2.5378
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 50.4,
-							"y": 82,
-							"length": 0.32,
-							"angle": -1.5583
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50.4,
+						"y": 82,
+						"length": 0.32,
+						"angle": -1.5583
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 26.6,
-							"y": 34.4,
-							"length": 0.2812,
-							"angle": 2.5535
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 26.6,
+						"y": 34.4,
+						"length": 0.2812,
+						"angle": 2.5535
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 65.9,
-							"y": 64.3,
-							"length": 0.2138,
-							"angle": -0.7325
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 65.9,
+						"y": 64.3,
+						"length": 0.2138,
+						"angle": -0.7325
 					}
 				},
 				"path": {
@@ -27608,7 +27228,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 13.5,
 					"length": 0.3675,
@@ -27617,57 +27237,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 21.3,
-							"y": 30,
-							"length": 0.3498,
-							"angle": 2.5329
-						}
+						"x": 21.3,
+						"y": 30,
+						"length": 0.3498,
+						"angle": 2.5329
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 41.7,
-							"y": 37,
-							"length": 0.1542,
-							"angle": 2.139
-						}
+						"x": 41.7,
+						"y": 37,
+						"length": 0.1542,
+						"angle": 2.139
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 26.2,
-							"y": 64.8,
-							"length": 0.2802,
-							"angle": -2.5853
-						}
+						"x": 26.2,
+						"y": 64.8,
+						"length": 0.2802,
+						"angle": -2.5853
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 55.6,
-							"y": 63.1,
-							"length": 0.1424,
-							"angle": -1.1669
-						}
+						"x": 55.6,
+						"y": 63.1,
+						"length": 0.1424,
+						"angle": -1.1669
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 77.6,
-							"y": 67.5,
-							"length": 0.3268,
-							"angle": -0.5651
-						}
+						"x": 77.6,
+						"y": 67.5,
+						"length": 0.3268,
+						"angle": -0.5651
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 71.3,
-							"y": 33.5,
-							"length": 0.2694,
-							"angle": 0.659
-						}
+						"x": 71.3,
+						"y": 33.5,
+						"length": 0.2694,
+						"angle": 0.659
 					}
 				},
 				"path": {
@@ -27715,7 +27323,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 40.5,
 					"y": 12.1,
 					"length": 0.3907,
@@ -27724,63 +27332,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 20.9,
-							"y": 28.9,
-							"length": 0.3594,
-							"angle": 2.5142
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 20.9,
+						"y": 28.9,
+						"length": 0.3594,
+						"angle": 2.5142
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 41.3,
-							"y": 36.3,
-							"length": 0.1622,
-							"angle": 2.1365
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 41.3,
+						"y": 36.3,
+						"length": 0.1622,
+						"angle": 2.1365
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 26.6,
-							"y": 63.6,
-							"length": 0.2706,
-							"angle": -2.6152
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 26.6,
+						"y": 63.6,
+						"length": 0.2706,
+						"angle": -2.6152
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 55.4,
-							"y": 62.9,
-							"length": 0.1398,
-							"angle": -1.1744
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 55.4,
+						"y": 62.9,
+						"length": 0.1398,
+						"angle": -1.1744
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 77.2,
-							"y": 67.1,
-							"length": 0.3212,
-							"angle": -0.5613
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 77.2,
+						"y": 67.1,
+						"length": 0.3212,
+						"angle": -0.5613
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 70.3,
-							"y": 33.5,
-							"length": 0.2615,
-							"angle": 0.6825
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 70.3,
+						"y": 33.5,
+						"length": 0.2615,
+						"angle": 0.6825
 					}
 				},
 				"path": {
@@ -27865,7 +27461,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 52.2,
 					"y": 16.5,
 					"length": 0.3357,
@@ -27874,57 +27470,45 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 29,
-							"y": 26.5,
-							"length": 0.3151,
-							"angle": 2.3
-						}
+						"x": 29,
+						"y": 26.5,
+						"length": 0.3151,
+						"angle": 2.3
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 76,
-							"y": 27.2,
-							"length": 0.3458,
-							"angle": 0.7199
-						}
+						"x": 76,
+						"y": 27.2,
+						"length": 0.3458,
+						"angle": 0.7199
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 15.1,
-							"y": 49.6,
-							"length": 0.349,
-							"angle": 3.1301
-						}
+						"x": 15.1,
+						"y": 49.6,
+						"length": 0.349,
+						"angle": 3.1301
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 27.4,
-							"y": 73.4,
-							"length": 0.3253,
-							"angle": -2.3389
-						}
+						"x": 27.4,
+						"y": 73.4,
+						"length": 0.3253,
+						"angle": -2.3389
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 76.2,
-							"y": 65.2,
-							"length": 0.3028,
-							"angle": -0.5257
-						}
+						"x": 76.2,
+						"y": 65.2,
+						"length": 0.3028,
+						"angle": -0.5257
 					},
 					"6": {
 						"type": "normal",
-						"xy": {
-							"x": 38.9,
-							"y": 51.5,
-							"length": 0.112,
-							"angle": -3.0073
-						}
+						"x": 38.9,
+						"y": 51.5,
+						"length": 0.112,
+						"angle": -3.0073
 					}
 				},
 				"path": {
@@ -27988,7 +27572,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.5,
 					"y": 12.8,
 					"length": 0.3747,
@@ -27997,63 +27581,51 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 28.2,
-							"y": 27.7,
-							"length": 0.3118,
-							"angle": 2.3448
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28.2,
+						"y": 27.7,
+						"length": 0.3118,
+						"angle": 2.3448
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 76,
-							"y": 29.3,
-							"length": 0.3323,
-							"angle": 0.6723
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 76,
+						"y": 29.3,
+						"length": 0.3323,
+						"angle": 0.6723
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 15.1,
-							"y": 51,
-							"length": 0.3491,
-							"angle": -3.113
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 15.1,
+						"y": 51,
+						"length": 0.3491,
+						"angle": -3.113
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 28,
-							"y": 74.5,
-							"length": 0.3292,
-							"angle": -2.3025
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 28,
+						"y": 74.5,
+						"length": 0.3292,
+						"angle": -2.3025
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 76.2,
-							"y": 66.2,
-							"length": 0.308,
-							"angle": -0.5538
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 76.2,
+						"y": 66.2,
+						"length": 0.308,
+						"angle": -0.5538
 					},
 					"6": {
 						"type": "normal",
-						"xy": {
-							"x": 38.7,
-							"y": 52.9,
-							"length": 0.1166,
-							"angle": -2.8904
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 38.7,
+						"y": 52.9,
+						"length": 0.1166,
+						"angle": -2.8904
 					}
 				},
 				"path": {
@@ -28138,7 +27710,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 67.1,
 					"y": 15.3,
 					"length": 0.3868,
@@ -28147,57 +27719,45 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 48.3,
-							"y": 23,
-							"length": 0.2705,
-							"angle": 1.6336
-						}
+						"x": 48.3,
+						"y": 23,
+						"length": 0.2705,
+						"angle": 1.6336
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 21.5,
-							"y": 50.5,
-							"length": 0.285,
-							"angle": -3.1241
-						}
+						"x": 21.5,
+						"y": 50.5,
+						"length": 0.285,
+						"angle": -3.1241
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 48.3,
-							"y": 57.5,
-							"length": 0.0769,
-							"angle": -1.7937
-						}
+						"x": 48.3,
+						"y": 57.5,
+						"length": 0.0769,
+						"angle": -1.7937
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 75.6,
-							"y": 50.5,
-							"length": 0.256,
-							"angle": -0.0196
-						}
+						"x": 75.6,
+						"y": 50.5,
+						"length": 0.256,
+						"angle": -0.0196
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 30.6,
-							"y": 74.8,
-							"length": 0.3148,
-							"angle": -2.2347
-						}
+						"x": 30.6,
+						"y": 74.8,
+						"length": 0.3148,
+						"angle": -2.2347
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 65.7,
-							"y": 73.8,
-							"length": 0.2851,
-							"angle": -0.9877
-						}
+						"x": 65.7,
+						"y": 73.8,
+						"length": 0.2851,
+						"angle": -0.9877
 					}
 				},
 				"path": {
@@ -28278,7 +27838,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 67.9,
 					"y": 14.6,
 					"length": 0.3966,
@@ -28287,63 +27847,51 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 49.5,
-							"y": 22.3,
-							"length": 0.277,
-							"angle": 1.5888
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 49.5,
+						"y": 22.3,
+						"length": 0.277,
+						"angle": 1.5888
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 23.1,
-							"y": 49.6,
-							"length": 0.269,
-							"angle": 3.1267
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 23.1,
+						"y": 49.6,
+						"length": 0.269,
+						"angle": 3.1267
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 50,
-							"y": 57.1,
-							"length": 0.071,
-							"angle": -1.5708
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 50,
+						"y": 57.1,
+						"length": 0.071,
+						"angle": -1.5708
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 76.2,
-							"y": 50.1,
-							"length": 0.262,
-							"angle": -0.0039
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 76.2,
+						"y": 50.1,
+						"length": 0.262,
+						"angle": -0.0039
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 35.6,
-							"y": 80.8,
-							"length": 0.3399,
-							"angle": -2.0082
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 35.6,
+						"y": 80.8,
+						"length": 0.3399,
+						"angle": -2.0082
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 66.3,
-							"y": 80.4,
-							"length": 0.3449,
-							"angle": -1.0787
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 66.3,
+						"y": 80.4,
+						"length": 0.3449,
+						"angle": -1.0787
 					}
 				},
 				"path": {
@@ -28439,7 +27987,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 44.1,
 					"y": 11.6,
 					"length": 0.3885,
@@ -28448,57 +27996,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 59.2,
-							"y": 60.6,
-							"length": 0.1403,
-							"angle": -0.856
-						}
+						"x": 59.2,
+						"y": 60.6,
+						"length": 0.1403,
+						"angle": -0.856
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 23.9,
-							"y": 31.4,
-							"length": 0.3204,
-							"angle": 2.5224
-						}
+						"x": 23.9,
+						"y": 31.4,
+						"length": 0.3204,
+						"angle": 2.5224
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 80.4,
-							"y": 60.1,
-							"length": 0.3203,
-							"angle": -0.3208
-						}
+						"x": 80.4,
+						"y": 60.1,
+						"length": 0.3203,
+						"angle": -0.3208
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 68.7,
-							"y": 27.7,
-							"length": 0.291,
-							"angle": 0.8729
-						}
+						"x": 68.7,
+						"y": 27.7,
+						"length": 0.291,
+						"angle": 0.8729
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 69.3,
-							"y": 85.5,
-							"length": 0.404,
-							"angle": -1.0729
-						}
+						"x": 69.3,
+						"y": 85.5,
+						"length": 0.404,
+						"angle": -1.0729
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 27.8,
-							"y": 63.1,
-							"length": 0.2577,
-							"angle": -2.6085
-						}
+						"x": 27.8,
+						"y": 63.1,
+						"length": 0.2577,
+						"angle": -2.6085
 					}
 				},
 				"path": {
@@ -28557,7 +28093,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 40.5,
 					"y": 12.1,
 					"length": 0.3907,
@@ -28566,63 +28102,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 59,
-							"y": 59.4,
-							"length": 0.1301,
-							"angle": -0.8072
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 59,
+						"y": 59.4,
+						"length": 0.1301,
+						"angle": -0.8072
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 24.5,
-							"y": 31.2,
-							"length": 0.3168,
-							"angle": 2.5062
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 24.5,
+						"y": 31.2,
+						"length": 0.3168,
+						"angle": 2.5062
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 80.4,
-							"y": 59.2,
-							"length": 0.3176,
-							"angle": -0.2939
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 80.4,
+						"y": 59.2,
+						"length": 0.3176,
+						"angle": -0.2939
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 68.9,
-							"y": 26.1,
-							"length": 0.3046,
-							"angle": 0.9016
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 68.9,
+						"y": 26.1,
+						"length": 0.3046,
+						"angle": 0.9016
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 67.9,
-							"y": 84.6,
-							"length": 0.3895,
-							"angle": -1.0934
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 67.9,
+						"y": 84.6,
+						"length": 0.3895,
+						"angle": -1.0934
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 28.4,
-							"y": 62.4,
-							"length": 0.249,
-							"angle": -2.6205
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 28.4,
+						"y": 62.4,
+						"length": 0.249,
+						"angle": -2.6205
 					}
 				},
 				"path": {
@@ -28690,7 +28214,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.9,
 					"y": 85.5,
 					"length": 0.3573,
@@ -28699,57 +28223,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 23.7,
-							"y": 33.7,
-							"length": 0.3094,
-							"angle": 2.5867
-						}
+						"x": 23.7,
+						"y": 33.7,
+						"length": 0.3094,
+						"angle": 2.5867
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 40.9,
-							"y": 16,
-							"length": 0.3519,
-							"angle": 1.8323
-						}
+						"x": 40.9,
+						"y": 16,
+						"length": 0.3519,
+						"angle": 1.8323
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 58.4,
-							"y": 34.4,
-							"length": 0.1771,
-							"angle": 1.0768
-						}
+						"x": 58.4,
+						"y": 34.4,
+						"length": 0.1771,
+						"angle": 1.0768
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 76.2,
-							"y": 68.7,
-							"length": 0.3218,
-							"angle": -0.6199
-						}
+						"x": 76.2,
+						"y": 68.7,
+						"length": 0.3218,
+						"angle": -0.6199
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 52.4,
-							"y": 64.3,
-							"length": 0.145,
-							"angle": -1.4046
-						}
+						"x": 52.4,
+						"y": 64.3,
+						"length": 0.145,
+						"angle": -1.4046
 					},
 					"6": {
 						"type": "normal",
-						"xy": {
-							"x": 22.1,
-							"y": 66.8,
-							"length": 0.3256,
-							"angle": -2.5996
-						}
+						"x": 22.1,
+						"y": 66.8,
+						"length": 0.3256,
+						"angle": -2.5996
 					}
 				},
 				"path": {
@@ -28820,7 +28332,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.5,
 					"y": 84.3,
 					"length": 0.3447,
@@ -28829,63 +28341,51 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 23.3,
-							"y": 33.3,
-							"length": 0.3149,
-							"angle": 2.5826
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 23.3,
+						"y": 33.3,
+						"length": 0.3149,
+						"angle": 2.5826
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 40.7,
-							"y": 15.1,
-							"length": 0.3611,
-							"angle": 1.8312
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 40.7,
+						"y": 15.1,
+						"length": 0.3611,
+						"angle": 1.8312
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 58.2,
-							"y": 33.5,
-							"length": 0.1842,
-							"angle": 1.1095
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 58.2,
+						"y": 33.5,
+						"length": 0.1842,
+						"angle": 1.1095
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 76.6,
-							"y": 68,
-							"length": 0.3211,
-							"angle": -0.595
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 76.6,
+						"y": 68,
+						"length": 0.3211,
+						"angle": -0.595
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 52,
-							"y": 62.9,
-							"length": 0.1305,
-							"angle": -1.417
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 52,
+						"y": 62.9,
+						"length": 0.1305,
+						"angle": -1.417
 					},
 					"6": {
 						"type": "normal",
-						"xy": {
-							"x": 26,
-							"y": 61.3,
-							"length": 0.2652,
-							"angle": -2.7016
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 26,
+						"y": 61.3,
+						"length": 0.2652,
+						"angle": -2.7016
 					}
 				},
 				"path": {
@@ -28971,7 +28471,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 36,
 					"y": 13.9,
 					"length": 0.3871,
@@ -28980,57 +28480,45 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 23.5,
-							"y": 33.3,
-							"length": 0.3132,
-							"angle": 2.5792
-						}
+						"x": 23.5,
+						"y": 33.3,
+						"length": 0.3132,
+						"angle": 2.5792
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 57.4,
-							"y": 46.6,
-							"length": 0.0814,
-							"angle": 0.4306
-						}
+						"x": 57.4,
+						"y": 46.6,
+						"length": 0.0814,
+						"angle": 0.4306
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 23.3,
-							"y": 68.9,
-							"length": 0.3271,
-							"angle": -2.5257
-						}
+						"x": 23.3,
+						"y": 68.9,
+						"length": 0.3271,
+						"angle": -2.5257
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 77.8,
-							"y": 68.5,
-							"length": 0.3339,
-							"angle": -0.5872
-						}
+						"x": 77.8,
+						"y": 68.5,
+						"length": 0.3339,
+						"angle": -0.5872
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 52.6,
-							"y": 83.6,
-							"length": 0.337,
-							"angle": -1.4936
-						}
+						"x": 52.6,
+						"y": 83.6,
+						"length": 0.337,
+						"angle": -1.4936
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 72.9,
-							"y": 22.6,
-							"length": 0.357,
-							"angle": 0.8746
-						}
+						"x": 72.9,
+						"y": 22.6,
+						"length": 0.357,
+						"angle": 0.8746
 					}
 				},
 				"path": {
@@ -29118,7 +28606,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 33.8,
 					"y": 14.4,
 					"length": 0.3911,
@@ -29127,63 +28615,51 @@
 				"clearing": {
 					"1": {
 						"type": "caves",
-						"xy": {
-							"x": 23.1,
-							"y": 34.4,
-							"length": 0.3109,
-							"angle": 2.616
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 23.1,
+						"y": 34.4,
+						"length": 0.3109,
+						"angle": 2.616
 					},
 					"2": {
 						"type": "caves",
-						"xy": {
-							"x": 58,
-							"y": 51.2,
-							"length": 0.0808,
-							"angle": -0.1489
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 58,
+						"y": 51.2,
+						"length": 0.0808,
+						"angle": -0.1489
 					},
 					"3": {
 						"type": "caves",
-						"xy": {
-							"x": 24.3,
-							"y": 69.2,
-							"length": 0.3208,
-							"angle": -2.5
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 24.3,
+						"y": 69.2,
+						"length": 0.3208,
+						"angle": -2.5
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 52.4,
-							"y": 86.7,
-							"length": 0.3677,
-							"angle": -1.5055
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 52.4,
+						"y": 86.7,
+						"length": 0.3677,
+						"angle": -1.5055
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 75.2,
-							"y": 67.8,
-							"length": 0.3085,
-							"angle": -0.615
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 75.2,
+						"y": 67.8,
+						"length": 0.3085,
+						"angle": -0.615
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 73.3,
-							"y": 22.8,
-							"length": 0.3581,
-							"angle": 0.8624
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 73.3,
+						"y": 22.8,
+						"length": 0.3581,
+						"angle": 0.8624
 					}
 				},
 				"path": {
@@ -29275,7 +28751,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 85.3,
 					"length": 0.3556,
@@ -29284,57 +28760,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 28.8,
-							"y": 72.2,
-							"length": 0.3069,
-							"angle": -2.3332
-						}
+						"x": 28.8,
+						"y": 72.2,
+						"length": 0.3069,
+						"angle": -2.3332
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 22.1,
-							"y": 38.6,
-							"length": 0.3013,
-							"angle": 2.7536
-						}
+						"x": 22.1,
+						"y": 38.6,
+						"length": 0.3013,
+						"angle": 2.7536
 					},
 					"3": {
 						"type": "normal",
-						"xy": {
-							"x": 47.3,
-							"y": 15.6,
-							"length": 0.345,
-							"angle": 1.6491
-						}
+						"x": 47.3,
+						"y": 15.6,
+						"length": 0.345,
+						"angle": 1.6491
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 73.1,
-							"y": 31.4,
-							"length": 0.2965,
-							"angle": 0.6779
-						}
+						"x": 73.1,
+						"y": 31.4,
+						"length": 0.2965,
+						"angle": 0.6779
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 73.1,
-							"y": 63.8,
-							"length": 0.269,
-							"angle": -0.5386
-						}
+						"x": 73.1,
+						"y": 63.8,
+						"length": 0.269,
+						"angle": -0.5386
 					},
 					"6": {
 						"type": "normal",
-						"xy": {
-							"x": 48.3,
-							"y": 48.7,
-							"length": 0.0214,
-							"angle": 2.4887
-						}
+						"x": 48.3,
+						"y": 48.7,
+						"length": 0.0214,
+						"angle": 2.4887
 					}
 				},
 				"path": {
@@ -29391,7 +28855,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 80.4,
 					"y": 44.9,
 					"length": 0.3082,
@@ -29400,62 +28864,50 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 38.7,
-							"y": 88.8,
-							"length": 0.4041,
-							"angle": -1.8542
-						},
-						"magic": "W"
+						"magic": "W",
+						"x": 38.7,
+						"y": 88.8,
+						"length": 0.4041,
+						"angle": -1.8542
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 34.2,
-							"y": 67.3,
-							"length": 0.2342,
-							"angle": -2.311
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 34.2,
+						"y": 67.3,
+						"length": 0.2342,
+						"angle": -2.311
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 49.5,
-							"y": 48.7,
-							"length": 0.0139,
-							"angle": 1.9379
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 49.5,
+						"y": 48.7,
+						"length": 0.0139,
+						"angle": 1.9379
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 63.5,
-							"y": 66.6,
-							"length": 0.2139,
-							"angle": -0.8881
-						},
-						"magic": "P"
+						"magic": "P",
+						"x": 63.5,
+						"y": 66.6,
+						"length": 0.2139,
+						"angle": -0.8881
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 58.2,
-							"y": 88.8,
-							"length": 0.3965,
-							"angle": -1.3626
-						},
-						"magic": "B"
+						"magic": "B",
+						"x": 58.2,
+						"y": 88.8,
+						"length": 0.3965,
+						"angle": -1.3626
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 47.1,
-							"y": 19.1,
-							"length": 0.3103,
-							"angle": 1.6643
-						}
+						"x": 47.1,
+						"y": 19.1,
+						"length": 0.3103,
+						"angle": 1.6643
 					}
 				},
 				"path": {
@@ -29545,7 +28997,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 34.4,
 					"y": 88.3,
 					"length": 0.4135,
@@ -29554,57 +29006,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 63.9,
-							"y": 38.6,
-							"length": 0.1797,
-							"angle": 0.6869
-						}
+						"x": 63.9,
+						"y": 38.6,
+						"length": 0.1797,
+						"angle": 0.6869
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 48.5,
-							"y": 13.9,
-							"length": 0.3613,
-							"angle": 1.6123
-						}
+						"x": 48.5,
+						"y": 13.9,
+						"length": 0.3613,
+						"angle": 1.6123
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 22.7,
-							"y": 66.2,
-							"length": 0.3174,
-							"angle": -2.6061
-						}
+						"x": 22.7,
+						"y": 66.2,
+						"length": 0.3174,
+						"angle": -2.6061
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 74.1,
-							"y": 67.8,
-							"length": 0.2996,
-							"angle": -0.6362
-						}
+						"x": 74.1,
+						"y": 67.8,
+						"length": 0.2996,
+						"angle": -0.6362
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 43.3,
-							"y": 63.1,
-							"length": 0.1471,
-							"angle": -2.0436
-						}
+						"x": 43.3,
+						"y": 63.1,
+						"length": 0.1471,
+						"angle": -2.0436
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 36.6,
-							"y": 35.8,
-							"length": 0.1952,
-							"angle": 2.3272
-						}
+						"x": 36.6,
+						"y": 35.8,
+						"length": 0.1952,
+						"angle": 2.3272
 					}
 				},
 				"path": {
@@ -29679,7 +29119,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.3,
 					"y": 84.1,
 					"length": 0.343,
@@ -29688,63 +29128,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 29,
-							"y": 42.1,
-							"length": 0.2243,
-							"angle": 2.7817
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 29,
+						"y": 42.1,
+						"length": 0.2243,
+						"angle": 2.7817
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 21.5,
-							"y": 68.9,
-							"length": 0.3419,
-							"angle": -2.5561
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 21.5,
+						"y": 68.9,
+						"length": 0.3419,
+						"angle": -2.5561
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 47.5,
-							"y": 13.5,
-							"length": 0.3658,
-							"angle": 1.6391
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 47.5,
+						"y": 13.5,
+						"length": 0.3658,
+						"angle": 1.6391
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 76.6,
-							"y": 68.7,
-							"length": 0.3251,
-							"angle": -0.6128
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 76.6,
+						"y": 68.7,
+						"length": 0.3251,
+						"angle": -0.6128
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 63.9,
-							"y": 34.7,
-							"length": 0.2067,
-							"angle": 0.8333
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 63.9,
+						"y": 34.7,
+						"length": 0.2067,
+						"angle": 0.8333
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 49.3,
-							"y": 60.3,
-							"length": 0.1032,
-							"angle": -1.6387
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 49.3,
+						"y": 60.3,
+						"length": 0.1032,
+						"angle": -1.6387
 					}
 				},
 				"path": {
@@ -29811,7 +29239,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 47.7,
 					"y": 47,
 					"length": 0.0378,
@@ -29820,57 +29248,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 52,
-							"y": 11.4,
-							"length": 0.3865,
-							"angle": 1.519
-						}
+						"x": 52,
+						"y": 11.4,
+						"length": 0.3865,
+						"angle": 1.519
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 48.7,
-							"y": 88.3,
-							"length": 0.3832,
-							"angle": -1.6048
-						}
+						"x": 48.7,
+						"y": 88.3,
+						"length": 0.3832,
+						"angle": -1.6048
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 79,
-							"y": 29.8,
-							"length": 0.3534,
-							"angle": 0.6084
-						}
+						"x": 79,
+						"y": 29.8,
+						"length": 0.3534,
+						"angle": 0.6084
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 81,
-							"y": 68.9,
-							"length": 0.363,
-							"angle": -0.5476
-						}
+						"x": 81,
+						"y": 68.9,
+						"length": 0.363,
+						"angle": -0.5476
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 23.9,
-							"y": 71.3,
-							"length": 0.3368,
-							"angle": -2.4572
-						}
+						"x": 23.9,
+						"y": 71.3,
+						"length": 0.3368,
+						"angle": -2.4572
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 20.5,
-							"y": 32.1,
-							"length": 0.345,
-							"angle": 2.5962
-						}
+						"x": 20.5,
+						"y": 32.1,
+						"length": 0.345,
+						"angle": 2.5962
 					}
 				},
 				"path": {
@@ -29953,7 +29369,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.9,
 					"y": 49.1,
 					"length": 0.0322,
@@ -29962,63 +29378,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 52.2,
-							"y": 11.6,
-							"length": 0.3846,
-							"angle": 1.5135
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 52.2,
+						"y": 11.6,
+						"length": 0.3846,
+						"angle": 1.5135
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 46.7,
-							"y": 87.6,
-							"length": 0.3774,
-							"angle": -1.6584
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 46.7,
+						"y": 87.6,
+						"length": 0.3774,
+						"angle": -1.6584
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 78.6,
-							"y": 30.7,
-							"length": 0.345,
-							"angle": 0.5936
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 78.6,
+						"y": 30.7,
+						"length": 0.345,
+						"angle": 0.5936
 					},
 					"4": {
 						"type": "woods",
-						"xy": {
-							"x": 79.2,
-							"y": 70.6,
-							"length": 0.3573,
-							"angle": -0.6144
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 79.2,
+						"y": 70.6,
+						"length": 0.3573,
+						"angle": -0.6144
 					},
 					"5": {
 						"type": "woods",
-						"xy": {
-							"x": 23.1,
-							"y": 69.4,
-							"length": 0.3316,
-							"angle": -2.5168
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 23.1,
+						"y": 69.4,
+						"length": 0.3316,
+						"angle": -2.5168
 					},
 					"6": {
 						"type": "woods",
-						"xy": {
-							"x": 20.1,
-							"y": 30,
-							"length": 0.3597,
-							"angle": 2.552
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 20.1,
+						"y": 30,
+						"length": 0.3597,
+						"angle": 2.552
 					}
 				},
 				"path": {
@@ -30116,7 +29520,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 32,
 					"y": 85.7,
 					"length": 0.3998,
@@ -30125,57 +29529,45 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 75,
-							"y": 32.1,
-							"length": 0.3074,
-							"angle": 0.6213
-						}
+						"x": 75,
+						"y": 32.1,
+						"length": 0.3074,
+						"angle": 0.6213
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 25.8,
-							"y": 31.9,
-							"length": 0.3022,
-							"angle": 2.4994
-						}
+						"x": 25.8,
+						"y": 31.9,
+						"length": 0.3022,
+						"angle": 2.4994
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 50,
-							"y": 79,
-							"length": 0.29,
-							"angle": -1.5708
-						}
+						"x": 50,
+						"y": 79,
+						"length": 0.29,
+						"angle": -1.5708
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 72.9,
-							"y": 67.1,
-							"length": 0.2858,
-							"angle": -0.6415
-						}
+						"x": 72.9,
+						"y": 67.1,
+						"length": 0.2858,
+						"angle": -0.6415
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 25.2,
-							"y": 64.5,
-							"length": 0.2872,
-							"angle": -2.6126
-						}
+						"x": 25.2,
+						"y": 64.5,
+						"length": 0.2872,
+						"angle": -2.6126
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 50,
-							"y": 16.5,
-							"length": 0.3349,
-							"angle": 1.5707
-						}
+						"x": 50,
+						"y": 16.5,
+						"length": 0.3349,
+						"angle": 1.5707
 					}
 				},
 				"path": {
@@ -30240,7 +29632,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 33.2,
 					"y": 90.2,
 					"length": 0.4356,
@@ -30249,63 +29641,51 @@
 				"clearing": {
 					"1": {
 						"type": "woods",
-						"xy": {
-							"x": 75,
-							"y": 32.8,
-							"length": 0.3034,
-							"angle": 0.6026
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 75,
+						"y": 32.8,
+						"length": 0.3034,
+						"angle": 0.6026
 					},
 					"2": {
 						"type": "woods",
-						"xy": {
-							"x": 25.8,
-							"y": 31.4,
-							"length": 0.3052,
-							"angle": 2.4862
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 25.8,
+						"y": 31.4,
+						"length": 0.3052,
+						"angle": 2.4862
 					},
 					"3": {
 						"type": "woods",
-						"xy": {
-							"x": 50,
-							"y": 81.5,
-							"length": 0.3149,
-							"angle": -1.5708
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 50,
+						"y": 81.5,
+						"length": 0.3149,
+						"angle": -1.5708
 					},
 					"4": {
 						"type": "caves",
-						"xy": {
-							"x": 75.2,
-							"y": 69.6,
-							"length": 0.3192,
-							"angle": -0.6611
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 75.2,
+						"y": 69.6,
+						"length": 0.3192,
+						"angle": -0.6611
 					},
 					"5": {
 						"type": "caves",
-						"xy": {
-							"x": 22.5,
-							"y": 68.7,
-							"length": 0.3325,
-							"angle": -2.5445
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 22.5,
+						"y": 68.7,
+						"length": 0.3325,
+						"angle": -2.5445
 					},
 					"6": {
 						"type": "caves",
-						"xy": {
-							"x": 50,
-							"y": 15.8,
-							"length": 0.3419,
-							"angle": 1.5707
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 50,
+						"y": 15.8,
+						"length": 0.3419,
+						"angle": 1.5707
 					}
 				},
 				"path": {
@@ -30374,7 +29754,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 65.1,
 					"y": 12.8,
 					"length": 0.4014,
@@ -30383,62 +29763,50 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 68.5,
-							"y": 34.2,
-							"length": 0.2432,
-							"angle": 0.7068
-						},
-						"extra": "fatigue"
+						"extra": "fatigue",
+						"x": 68.5,
+						"y": 34.2,
+						"length": 0.2432,
+						"angle": 0.7068
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 38.9,
-							"y": 23.3,
-							"length": 0.2891,
-							"angle": 1.9647
-						},
-						"extra": "fatigue"
+						"extra": "fatigue",
+						"x": 38.9,
+						"y": 23.3,
+						"length": 0.2891,
+						"angle": 1.9647
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 23.5,
-							"y": 53.1,
-							"length": 0.2668,
-							"angle": -3.0252
-						},
-						"extra": "fatigue"
+						"extra": "fatigue",
+						"x": 23.5,
+						"y": 53.1,
+						"length": 0.2668,
+						"angle": -3.0252
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 45.7,
-							"y": 79.2,
-							"length": 0.2951,
-							"angle": -1.7171
-						},
-						"extra": "fatigue"
+						"extra": "fatigue",
+						"x": 45.7,
+						"y": 79.2,
+						"length": 0.2951,
+						"angle": -1.7171
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 72.5,
-							"y": 64.1,
-							"length": 0.2655,
-							"angle": -0.5598
-						}
+						"x": 72.5,
+						"y": 64.1,
+						"length": 0.2655,
+						"angle": -0.5598
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 47.7,
-							"y": 48.7,
-							"length": 0.0264,
-							"angle": 2.6271
-						},
-						"extra": "wound"
+						"extra": "wound",
+						"x": 47.7,
+						"y": 48.7,
+						"length": 0.0264,
+						"angle": 2.6271
 					}
 				},
 				"path": {
@@ -30505,7 +29873,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 58.2,
 					"y": 9.7,
 					"length": 0.4112,
@@ -30514,69 +29882,57 @@
 				"clearing": {
 					"1": {
 						"type": "mountain",
-						"xy": {
-							"x": 69.5,
-							"y": 33.1,
-							"length": 0.258,
-							"angle": 0.714
-						},
 						"magic": "P",
-						"extra": "wound"
+						"extra": "wound",
+						"x": 69.5,
+						"y": 33.1,
+						"length": 0.258,
+						"angle": 0.714
 					},
 					"2": {
 						"type": "mountain",
-						"xy": {
-							"x": 38.9,
-							"y": 23,
-							"length": 0.2919,
-							"angle": 1.9608
-						},
 						"magic": "P",
-						"extra": "wound"
+						"extra": "wound",
+						"x": 38.9,
+						"y": 23,
+						"length": 0.2919,
+						"angle": 1.9608
 					},
 					"3": {
 						"type": "mountain",
-						"xy": {
-							"x": 22.9,
-							"y": 52.6,
-							"length": 0.2722,
-							"angle": -3.046
-						},
 						"magic": "P",
-						"extra": "wound"
+						"extra": "wound",
+						"x": 22.9,
+						"y": 52.6,
+						"length": 0.2722,
+						"angle": -3.046
 					},
 					"4": {
 						"type": "mountain",
-						"xy": {
-							"x": 45.7,
-							"y": 80.1,
-							"length": 0.304,
-							"angle": -1.7127
-						},
 						"magic": "P",
-						"extra": "wound"
+						"extra": "wound",
+						"x": 45.7,
+						"y": 80.1,
+						"length": 0.304,
+						"angle": -1.7127
 					},
 					"5": {
 						"type": "mountain",
-						"xy": {
-							"x": 72.1,
-							"y": 64.3,
-							"length": 0.2632,
-							"angle": -0.5744
-						},
 						"magic": "P",
-						"extra": "fatigue"
+						"extra": "fatigue",
+						"x": 72.1,
+						"y": 64.3,
+						"length": 0.2632,
+						"angle": -0.5744
 					},
 					"6": {
 						"type": "mountain",
-						"xy": {
-							"x": 46.9,
-							"y": 48.4,
-							"length": 0.0348,
-							"angle": 2.6651
-						},
 						"magic": "P",
-						"extra": "serious_wound"
+						"extra": "serious_wound",
+						"x": 46.9,
+						"y": 48.4,
+						"length": 0.0348,
+						"angle": 2.6651
 					}
 				},
 				"path": {
@@ -30669,7 +30025,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 85.3,
 					"length": 0.3556,
@@ -30678,39 +30034,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 48.9,
-							"y": 18.1,
-							"length": 0.3191,
-							"angle": 1.6052
-						}
+						"x": 48.9,
+						"y": 18.1,
+						"length": 0.3191,
+						"angle": 1.6052
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 76.2,
-							"y": 33.5,
-							"length": 0.3096,
-							"angle": 0.562
-						}
+						"x": 76.2,
+						"y": 33.5,
+						"length": 0.3096,
+						"angle": 0.562
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 36,
-							"y": 56.6,
-							"length": 0.1547,
-							"angle": -2.7011
-						}
+						"x": 36,
+						"y": 56.6,
+						"length": 0.1547,
+						"angle": -2.7011
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 66.5,
-							"y": 70.3,
-							"length": 0.2615,
-							"angle": -0.8883
-						}
+						"x": 66.5,
+						"y": 70.3,
+						"length": 0.2615,
+						"angle": -0.8883
 					}
 				},
 				"path": {
@@ -30765,7 +30113,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.3,
 					"y": 84.1,
 					"length": 0.343,
@@ -30774,43 +30122,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 47.3,
-							"y": 17.4,
-							"length": 0.3271,
-							"angle": 1.6534
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 47.3,
+						"y": 17.4,
+						"length": 0.3271,
+						"angle": 1.6534
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 75.6,
-							"y": 34.7,
-							"length": 0.2982,
-							"angle": 0.5386
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 75.6,
+						"y": 34.7,
+						"length": 0.2982,
+						"angle": 0.5386
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 36,
-							"y": 55.7,
-							"length": 0.1511,
-							"angle": -2.755
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 36,
+						"y": 55.7,
+						"length": 0.1511,
+						"angle": -2.755
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 66.5,
-							"y": 69.6,
-							"length": 0.2562,
-							"angle": -0.8711
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 66.5,
+						"y": 69.6,
+						"length": 0.2562,
+						"angle": -0.8711
 					}
 				},
 				"path": {
@@ -30874,7 +30214,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 85.3,
 					"length": 0.3556,
@@ -30883,39 +30223,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 21.9,
-							"y": 35.1,
-							"length": 0.318,
-							"angle": 2.654
-						}
+						"x": 21.9,
+						"y": 35.1,
+						"length": 0.318,
+						"angle": 2.654
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 52,
-							"y": 15.8,
-							"length": 0.3425,
-							"angle": 1.5123
-						}
+						"x": 52,
+						"y": 15.8,
+						"length": 0.3425,
+						"angle": 1.5123
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 30.8,
-							"y": 70.3,
-							"length": 0.2794,
-							"angle": -2.3284
-						}
+						"x": 30.8,
+						"y": 70.3,
+						"length": 0.2794,
+						"angle": -2.3284
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 78,
-							"y": 58,
-							"length": 0.2912,
-							"angle": -0.2783
-						}
+						"x": 78,
+						"y": 58,
+						"length": 0.2912,
+						"angle": -0.2783
 					}
 				},
 				"path": {
@@ -30964,7 +30296,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.3,
 					"y": 84.1,
 					"length": 0.343,
@@ -30973,43 +30305,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 21.9,
-							"y": 38.2,
-							"length": 0.3047,
-							"angle": 2.744
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 21.9,
+						"y": 38.2,
+						"length": 0.3047,
+						"angle": 2.744
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 51.2,
-							"y": 16.7,
-							"length": 0.3332,
-							"angle": 1.5347
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 51.2,
+						"y": 16.7,
+						"length": 0.3332,
+						"angle": 1.5347
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 30.4,
-							"y": 72,
-							"length": 0.2946,
-							"angle": -2.2986
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 30.4,
+						"y": 72,
+						"length": 0.2946,
+						"angle": -2.2986
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 76,
-							"y": 58.2,
-							"length": 0.2726,
-							"angle": -0.3056
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 76,
+						"y": 58.2,
+						"length": 0.2726,
+						"angle": -0.3056
 					}
 				},
 				"path": {
@@ -31073,7 +30397,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 85.3,
 					"length": 0.3556,
@@ -31082,39 +30406,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 21.9,
-							"y": 39.3,
-							"length": 0.3006,
-							"angle": 2.7777
-						}
+						"x": 21.9,
+						"y": 39.3,
+						"length": 0.3006,
+						"angle": 2.7777
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 51,
-							"y": 36.8,
-							"length": 0.1323,
-							"angle": 1.4951
-						}
+						"x": 51,
+						"y": 36.8,
+						"length": 0.1323,
+						"angle": 1.4951
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 21.5,
-							"y": 65.7,
-							"length": 0.3253,
-							"angle": -2.6381
-						}
+						"x": 21.5,
+						"y": 65.7,
+						"length": 0.3253,
+						"angle": -2.6381
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 63.7,
-							"y": 61.3,
-							"length": 0.1775,
-							"angle": -0.6897
-						}
+						"x": 63.7,
+						"y": 61.3,
+						"length": 0.1775,
+						"angle": -0.6897
 					}
 				},
 				"path": {
@@ -31157,7 +30473,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.3,
 					"y": 84.1,
 					"length": 0.343,
@@ -31166,43 +30482,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 21.1,
-							"y": 38.9,
-							"length": 0.3095,
-							"angle": 2.7748
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 21.1,
+						"y": 38.9,
+						"length": 0.3095,
+						"angle": 2.7748
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 49.5,
-							"y": 36.5,
-							"length": 0.135,
-							"angle": 1.6078
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 49.5,
+						"y": 36.5,
+						"length": 0.135,
+						"angle": 1.6078
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 21.3,
-							"y": 65.7,
-							"length": 0.3271,
-							"angle": -2.6411
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 21.3,
+						"y": 65.7,
+						"length": 0.3271,
+						"angle": -2.6411
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 64.5,
-							"y": 60.8,
-							"length": 0.1808,
-							"angle": -0.6402
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 64.5,
+						"y": 60.8,
+						"length": 0.1808,
+						"angle": -0.6402
 					}
 				},
 				"path": {
@@ -31266,7 +30574,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 45.7,
 					"y": 85.3,
 					"length": 0.3556,
@@ -31275,39 +30583,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 46.1,
-							"y": 15.3,
-							"length": 0.3491,
-							"angle": 1.6827
-						}
+						"x": 46.1,
+						"y": 15.3,
+						"length": 0.3491,
+						"angle": 1.6827
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 72.3,
-							"y": 32.8,
-							"length": 0.2816,
-							"angle": 0.6569
-						}
+						"x": 72.3,
+						"y": 32.8,
+						"length": 0.2816,
+						"angle": 0.6569
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 20.7,
-							"y": 56.8,
-							"length": 0.3007,
-							"angle": -2.9136
-						}
+						"x": 20.7,
+						"y": 56.8,
+						"length": 0.3007,
+						"angle": -2.9136
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 48.1,
-							"y": 62.9,
-							"length": 0.1303,
-							"angle": -1.7171
-						}
+						"x": 48.1,
+						"y": 62.9,
+						"length": 0.1303,
+						"angle": -1.7171
 					}
 				},
 				"path": {
@@ -31356,7 +30656,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 46.3,
 					"y": 84.1,
 					"length": 0.343,
@@ -31365,43 +30665,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 46.9,
-							"y": 15.6,
-							"length": 0.3453,
-							"angle": 1.6606
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 46.9,
+						"y": 15.6,
+						"length": 0.3453,
+						"angle": 1.6606
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 72.3,
-							"y": 31.9,
-							"length": 0.2872,
-							"angle": 0.6818
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 72.3,
+						"y": 31.9,
+						"length": 0.2872,
+						"angle": 0.6818
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 22.3,
-							"y": 57.8,
-							"length": 0.2877,
-							"angle": -2.8672
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 22.3,
+						"y": 57.8,
+						"length": 0.2877,
+						"angle": -2.8672
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 48.1,
-							"y": 62,
-							"length": 0.1214,
-							"angle": -1.7279
-						},
-						"magic": "R"
+						"magic": "R",
+						"x": 48.1,
+						"y": 62,
+						"length": 0.1214,
+						"angle": -1.7279
 					}
 				},
 				"path": {
@@ -31459,7 +30751,7 @@
 				"etile": true
 			},
 			"normal": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 37.5,
 					"y": 85.7,
 					"length": 0.3782,
@@ -31468,39 +30760,31 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 23.7,
-							"y": 26.8,
-							"length": 0.3507,
-							"angle": 2.4187
-						}
+						"x": 23.7,
+						"y": 26.8,
+						"length": 0.3507,
+						"angle": 2.4187
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 49.1,
-							"y": 15.1,
-							"length": 0.3491,
-							"angle": 1.5965
-						}
+						"x": 49.1,
+						"y": 15.1,
+						"length": 0.3491,
+						"angle": 1.5965
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 23.5,
-							"y": 65,
-							"length": 0.3045,
-							"angle": -2.6266
-						}
+						"x": 23.5,
+						"y": 65,
+						"length": 0.3045,
+						"angle": -2.6266
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 54.4,
-							"y": 71,
-							"length": 0.2145,
-							"angle": -1.3643
-						}
+						"x": 54.4,
+						"y": 71,
+						"length": 0.2145,
+						"angle": -1.3643
 					}
 				},
 				"path": {
@@ -31549,7 +30833,7 @@
 				}
 			},
 			"enchanted": {
-				"offroad_xy": {
+				"offroad": {
 					"x": 44.1,
 					"y": 44.2,
 					"length": 0.0827,
@@ -31558,43 +30842,35 @@
 				"clearing": {
 					"1": {
 						"type": "normal",
-						"xy": {
-							"x": 24.3,
-							"y": 27.2,
-							"length": 0.3435,
-							"angle": 2.4159
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 24.3,
+						"y": 27.2,
+						"length": 0.3435,
+						"angle": 2.4159
 					},
 					"2": {
 						"type": "normal",
-						"xy": {
-							"x": 49.5,
-							"y": 15.3,
-							"length": 0.347,
-							"angle": 1.5852
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 49.5,
+						"y": 15.3,
+						"length": 0.347,
+						"angle": 1.5852
 					},
 					"4": {
 						"type": "normal",
-						"xy": {
-							"x": 23.9,
-							"y": 65.2,
-							"length": 0.302,
-							"angle": -2.6143
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 23.9,
+						"y": 65.2,
+						"length": 0.302,
+						"angle": -2.6143
 					},
 					"5": {
 						"type": "normal",
-						"xy": {
-							"x": 54.8,
-							"y": 71.5,
-							"length": 0.2202,
-							"angle": -1.3512
-						},
-						"magic": "G"
+						"magic": "G",
+						"x": 54.8,
+						"y": 71.5,
+						"length": 0.2202,
+						"angle": -1.3512
 					}
 				},
 				"path": {

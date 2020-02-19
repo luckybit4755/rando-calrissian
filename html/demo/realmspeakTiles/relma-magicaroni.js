@@ -29,6 +29,7 @@ const relma_magicaroni = function() {
 		self.GameObject( elo );
 		self.nicerValues( elo );
 		self.featherTheNest( elo );
+		self.xAndYAndNuisance( elo );
 		self.itsASetup( elo );
 
 		console.log( self.z( elo ) ); // final victory
@@ -241,7 +242,6 @@ const relma_magicaroni = function() {
 			if ( /^<<EMPTY/.test( value ) ) return target[ key ] = true;
 			if ( /^[0-9]+$/.test( value ) ) return target[ key ] = parseInt( value );
 			if ( /^clearing_[0-9]+$/.test( value ) ) target[ key ] = parseInt( value.replace( /.*_/, '' ) );
-			if ( /_xy$/.test( key ) && /,/.test( value ) ) return target[ key ] = self.parseXY( value, true );
 			if ( /_arc$/.test( key ) && /,/.test( value ) ) return target[ key ] = self.parseXY( value, true );
 		});
 
@@ -350,6 +350,31 @@ const relma_magicaroni = function() {
 			}
 		}
 	};
+		
+	self.xAndYAndNuisance = function( elo ) {
+		self.walk( elo, (value,path,ancestors) => {
+			if ( !self.isString( value ) ) return;
+			if ( !/,/.test( value ) ) return;
+
+			let key = self.last( path );
+			if ( !( "xy" === key || "offroad" === key ) ) return;
+
+			let target = self.last( ancestors, 2 );
+			let xy = self.parseXY( value, true );
+
+			if ( 'xy' === key ) {
+				for ( let k in xy ) {
+					if ( k in target ) throw k + ' already in ' + self.z( target );
+					target[ k ] = xy[ k ];
+				}
+				delete target[ key ];
+			} else {
+				target[ key ] = xy;
+			}
+
+
+		});
+	}
 
 	self.itsASetup = function( elo ) {
 		let setups = {};
@@ -528,6 +553,8 @@ const relma_magicaroni = function() {
 		, 'Add:from'                : 'add:from'
 		, 'Add:targetObjectID'      : 'add:targetObjectID'
 		, 'Add:transferType'        : 'add:transferType'
+		// ugg...
+		, 'offroad_xy'              : 'offroad'
 	};
 	/////////////////////////////////////////////////////////////////////////////
 };
