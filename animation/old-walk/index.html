@@ -10,7 +10,7 @@
 
 		<script type="text/javascript">
 			const SPRITE = {
-				"x":-33, "y":66, "index":0, "fps":12,
+				"x":-1965, "y":66, "index":0, "fps":12,
 				"frames":[
 					{"dx":0,   "dy":0,  "image":"images/fixed-frame_001.png"},
 					{"dx":-6,  "dy":0,  "image":"images/fixed-frame_002.png"},
@@ -33,14 +33,14 @@
 
 			const walk = function() {
 				let img = document.getElementsByTagName( 'img' )[ 0 ];
-				let idx = SPRITE.index++ % NFO.length;
+				let idx = SPRITE.index++ % SPRITE.frames.length;
 
 				let frame = SPRITE.frames[ idx ];
 				img.src = frame.image;
 
+				if ( SPRITE.x < -100 ) SPRITE.x = window.innerWidth;
 				SPRITE.x += frame.dx;
 				SPRITE.y += frame.dy;
-				if ( SPRITE.x < 0 ) SPRITE.x = window.innerWidth;
 
 				img.style.left = SPRITE.x + 'px';
 				img.style.top  = SPRITE.y + 'px';
@@ -48,48 +48,7 @@
 				setTimeout( function() { requestAnimationFrame( walk ) }, 1000 / SPRITE.fps );
 			};
 
-			const NFO = `
-					images/fixed-frame_001.png 0 0
-					images/fixed-frame_002.png -6 0
-					images/fixed-frame_003.png -16 0
-					images/fixed-frame_004.png -6 0
-					images/fixed-frame_005.png -6 0
-					images/fixed-frame_006.png -28 0
-					images/fixed-frame_007.png -48 0
-					images/fixed-frame_008.png -56 0
-					images/fixed-frame_009.png -98 0
-					images/fixed-frame_010.png -74 2
-					images/fixed-frame_011.png -100 -6
-					images/fixed-frame_012.png -88 -1
-					images/fixed-frame_013.png -99 -7
-					images/fixed-frame_014.png -115 -1
-					images/fixed-frame_015.png -144 -5
-					images/fixed-frame_016.png -144 2
-			`.trim().replace( /^\t+/, '' ).split( '\n' ).map( (k,v)=>k.trim().split( ' ' ) )
-
-			window.onload = function() { 
-				let ax = 0;
-				let ay = 0;
-
-				SPRITE.frames = [];
-				for ( let i = 0 ; i < NFO.length ; i++ ) {
-					let image = NFO[ i ][ 0 ];
-					let x = parseInt( NFO[ i ][ 1 ] );
-					let y = parseInt( NFO[ i ][ 2 ] );
-
-					let dx = x - ax;
-					let dy = y - ay;
-					nnn = { dx:dx, dy:dy, image:image };
-					//nnn = { x:x, y:y, ax:ax, ay:ay, dx:dx, image:image };
-					SPRITE.frames.push( nnn );
-
-					ax = x;
-					ay = y;
-				}
-					
-				console.log( JSON.stringify( SPRITE.frames ) );
-				
-				walk() } 
+			window.onload = function() { walk() } 
 		</script>
 	</HEAD>
 	<BODY>
