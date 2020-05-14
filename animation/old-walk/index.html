@@ -1,0 +1,57 @@
+<HTML>
+	<HEAD>
+		<TITLE>walk</TITLE>
+
+		<style>
+			img { 
+				position:absolute; 
+			}
+			img:nth-child(2) { left: 400px; }
+		</style>
+
+		<script type="text/javascript">
+			const FPS = 12;
+
+			let INDEX = 0;
+
+			const walk = function() {
+				let img = document.getElementsByTagName( 'img' )[ 0 ];
+				let idx = INDEX++ % NFO.length;
+
+				let x = 148 + parseInt( NFO[ idx ][ 1 ] );
+				let y = 101 + parseInt( NFO[ idx ][ 2 ] );
+
+				img.src = NFO[ idx ][ 0 ];
+				img.style.left = x + 'px';
+				img.style.top  = y + 'px';
+
+				setTimeout( function() { requestAnimationFrame( walk ) }, 1000 / FPS );
+			};
+
+			const NFO = `
+				images/fixed-frame_001.png 0 0
+				images/fixed-frame_002.png -6 0
+				images/fixed-frame_003.png -16 0
+				images/fixed-frame_004.png -6 0
+				images/fixed-frame_005.png -6 0
+				images/fixed-frame_006.png -28 0
+				images/fixed-frame_007.png -48 0
+				images/fixed-frame_008.png -56 0
+				images/fixed-frame_009.png -98 0
+				images/fixed-frame_010.png -74 2
+				images/fixed-frame_011.png -100 -6
+				images/fixed-frame_012.png -88 -1
+				images/fixed-frame_013.png -99 -7
+				images/fixed-frame_014.png -115 -1
+				images/fixed-frame_015.png -144 -5
+				images/fixed-frame_016.png -144 2
+			`.trim().replace( /^\t+/, '' ).split( '\n' ).map( (k,v)=>k.trim().split( ' ' ) )
+			window.onload = function() { walk() } 
+		</script>
+	</HEAD>
+	<BODY>
+		<img></img>
+		<img src="walk.gif"></img>
+		<a href="images">images</a>
+	</BODY>
+</HTML>
