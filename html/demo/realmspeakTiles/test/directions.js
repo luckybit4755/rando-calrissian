@@ -23,6 +23,9 @@ const Hexactions = {
 	, angle: function( direction ) {
 		return DIRECTIONS[ direction ].angle;
 	}
+	, orientationAngle: function( index ) {
+		return this.angle( this.directionAt( index ) );
+	}
 	, rotate: function( direction, orientation ) {
 		return this.directionAt( DIRECTIONS[ direction ].index + orientation );
 		let rotated = ( DIRECTIONS[ direction ].index + orientation ) % 6;
