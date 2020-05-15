@@ -1,0 +1,99 @@
+<HTML>
+	<HEAD>
+		<TITLE>web-video</TITLE>
+
+		<script type="text/javascript">
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const startCamera = function() {
+				navigator.mediaDevices.getUserMedia( { video:true } )
+					.then( function( camera ) { useCamera( camera ); })
+					.catch( function( err ) { out( 'could not get camera access', err ) } )
+				;
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const useCamera = function( camera ) {
+				out( 
+					`
+						<video  width="64" height="64" autoplay></video>
+						<canvas width="%W" height="%H"></canvas>
+					`.replace( /%W/, w ).replace( /%H/, h )
+				);
+
+				let video = first( 'video' );
+				let canvas = first( 'canvas' );
+
+				video.srcObject = camera;
+
+				let context = canvas.getContext( '2d' );
+
+				let loop = function() {
+					context.drawImage( video, 0, 0, w, h ); // get the image from the video
+					edgy( context ); // just a little example of using the data
+					setTimeout( function() { requestAnimationFrame( loop ) }, 1000 / 12 );
+				};
+			
+				loop();
+			};
+
+			const edgy = function( context ) {
+				let max = 3 * 255 * 255 * 0.00088;
+				let min = 0.50;
+					
+				let imageData = context.getImageData( 0, 0, w, h );
+				for ( let i = 0 ; i < w * h * 4 - 4 ; ) {
+					let n = i + 4;
+					let d0 = imageData.data[ i + 0 ] - imageData.data[ n + 0 ];
+					let d1 = imageData.data[ i + 1 ] - imageData.data[ n + 1 ];
+					let d2 = imageData.data[ i + 2 ] - imageData.data[ n + 2 ];
+					let d = min + ( d0 * d0 + d1 * d1 + d2 * d2 ) / max;
+
+					imageData.data[ i++ ] *= d;
+					imageData.data[ i++ ] *= 1;
+					imageData.data[ i++ ] *= 1;
+					i++;
+				}
+				context.putImageData( imageData, 0, 0 );
+			};
+		
+			/////////////////////////////////////////////////////////////////////////////
+
+			const first = function( tag ) {
+				return document.getElementsByTagName( tag )[ 0 ];
+			};
+
+			const out = function( message, junk ) {
+				if ( junk ) {
+					message += ':' + junk;
+					console.log( junk );
+				}
+				document.body.innerHTML = message;
+			};
+
+			window.onload = function() {
+				document.body.onkeypress = document.body.onclick = function() {
+					out( 'trying to get the camera' );
+					document.body.onkeypress = document.body.onclick = function() {}
+					startCamera();
+				};
+			}; 
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const w = 640;
+			const h = 480;
+
+		</script>
+
+		<style>
+			body { font-family: sans-serif; }
+			body * { display:block; }
+		</style>
+	</HEAD>
+	<BODY>
+		click anywhere...
+	</BODY>
+</HTML>
