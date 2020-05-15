@@ -1,0 +1,86 @@
+<HTML>
+	<HEAD>
+		<TITLE>index</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+			sprite {
+				display:block;
+				zoom: 25%;
+			}
+		</style>
+
+		<script type="text/javascript">
+			const WIDTHS = [ 1100, 500];
+			const offsets = [
+				[200,-550,-1200,-1850,-2700]
+				,[0,-400,-800,-1230,-1660,-2100,-2380,-2680,-2980,-3200]
+			];
+
+			window.onload = function() {
+				let fps = 5;
+				let running = false;
+
+				let sprites = img2sprite();
+				let index = 0;
+
+				let frame = function() {
+					for ( let i = 0 ; i < sprites.length ; i++ ) {
+						let sprite = sprites[ i ];
+						let idx = index % offsets[ i ].length;
+						let x = offsets[ i ][ idx ];
+						sprite.style.backgroundPosition = x + "px " + 0 + "px";
+					}
+					index++;
+				};
+
+				document.body.onclick = function() {
+					running = false;
+					frame();
+				};
+
+				let animate = function() {
+					if ( running ) {
+						frame();
+						setTimeout( function() { requestAnimationFrame( animate ) }, 1000 / fps );
+					}
+				};
+
+				document.body.onkeypress = function( e ) {
+					if ( ' ' != e.key ) return;
+					running = !running;
+					animate();
+				}
+			}; 
+
+			const img2sprite = function() {
+				let sprites = [];
+				let imgz = document.getElementsByTagName( 'img' );
+				for ( let i = 0 ; i < imgz.length ; i++ ) {
+					let img = imgz[ i ];
+					let sprite = document.createElement( 'sprite' );
+					document.body.appendChild( sprite );
+					sprites.push( sprite );
+					sprite.image = img.src;
+					sprite.style.width = !true ? WIDTHS[ i ] : img.width;
+					sprite.style.height = img.height;
+					sprite.style.background = 'url(' + sprite.image + ')';
+				}
+
+				/* this is really weird... */
+				while ( 0 != imgz.length ) {
+					document.body.removeChild( imgz[ 0 ] );
+					imgz = document.getElementsByTagName( 'img' );
+				}
+
+				return sprites;
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<img src="images/example-take.jpg"></img>
+		<img src="images/example-secondary.jpg"></img>
+	</BODY>
+</HTML>
