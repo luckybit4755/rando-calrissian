@@ -1,0 +1,168 @@
+<HTML>
+	<HEAD>
+		<TITLE>web-video</TITLE>
+
+		<script type="text/javascript">
+			const WIDTH = 1024 * 1;
+			const HEIGHT = 768 * 1;
+
+			const FPS = 120;
+
+			const PIXEL_LENGTH = WIDTH * HEIGHT * 4;
+
+			let HITS = [];
+			let FRAME_COUNT = 0;
+			const BASIS = new Array( PIXEL_LENGTH ).fill( 0 );
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const startCamera = function() {
+				onInput();
+				navigator.mediaDevices.getUserMedia( { video:true } )
+					.then( function( camera ) { useCamera( camera ); })
+					.catch( function( err ) { out( 'could not get camera access', err ) } )
+				;
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const useCamera = function( camera ) {
+				out( 
+					`
+						<video  width="%W" height="%H" autoplay></video>
+						<canvas width="%W" height="%H"></canvas>
+					`.replace( /%W/g, WIDTH ).replace( /%H/g, HEIGHT )
+				);
+
+				let video = first( 'video' );
+				let canvas = first( 'canvas' );
+				let context = canvas.getContext( '2d' );
+
+				video.srcObject = camera;
+
+				onInput( function() { HITS = [] } );
+
+				let loop = function() {
+					context.drawImage( video, 0, 0, WIDTH, HEIGHT ); // get the image from the video
+					frame( context ); // just a little example of using the data
+					showHits( context );
+					setTimeout( function() { requestAnimationFrame( loop ) }, 1000 / FPS );
+					FRAME_COUNT++;
+				};
+			
+				loop();
+			};
+
+			const frame = function( context ) {
+				let imageData = context.getImageData( 0, 0, WIDTH, HEIGHT );
+				if ( 10 > FRAME_COUNT ) {
+					console.log( 'accumulating' );
+					for ( let i = 0 ; i < PIXEL_LENGTH ; i++ ) {
+						BASIS[ i ] += imageData.data[ i ];
+					}
+					return;
+				} 
+				if ( 10 == FRAME_COUNT ) {
+					console.log( 'accumulated' );
+					for ( let i = 0 ; i < PIXEL_LENGTH ; i++ ) {
+						BASIS[ i ] /= 10;
+					}
+				}
+		
+				let max = 0;
+				let at = 0;
+				for ( let i = 0 ; i < PIXEL_LENGTH ; i += 4 ) {
+					let d0 = imageData.data[ i + 0  ] - BASIS[ i + 0 ];
+					let d1 = imageData.data[ i + 1  ] - BASIS[ i + 1 ];
+					let d2 = imageData.data[ i + 2  ] - BASIS[ i + 2 ];
+					let d = d0 * d0 + d1 * d1 + d2 * d2;
+					if ( d > max ) {
+						max = d;
+						at = i;
+					}
+				}
+
+				if ( max < 120 * 1000 ) return; // FIXME: calibrate this plz...
+
+				at /= 4;
+				let x = at % WIDTH;
+				let y = Math.floor( at / WIDTH );
+
+				circle( context, x, y, 44, 'red' );
+
+				if ( HITS.length ) {
+					let last = HITS[ HITS.length - 1 ];
+					let dx = last.x - x;
+					let dy = last.y - y;
+					let dd = dx * dx + dy * dy;
+					if ( dd < 9 ) {
+						return;
+					}
+				}
+
+				HITS.push( {x:x,y:y} );
+			};
+
+			const circle = function( context, x, y, radius, style ) {
+				context.strokeStyle = style || 'red';
+				context.beginPath();
+				context.arc( x, y, radius, 0, 2 * Math.PI );
+				context.stroke();
+			};
+
+			const showHits = function( context ) {
+				context.strokeStyle = 'rgb(44,255,44)';
+				context.beginPath();
+				for ( let i = 0 ; i < HITS.length ; i++ ) {
+					let hit = HITS[ i ];
+					if ( 0 == i ) {
+						context.moveTo( hit.x, hit.y );
+					} else {
+						context.lineTo( hit.x, hit.y );
+					}
+				}
+				context.stroke();
+
+				for ( let i = 0 ; i < HITS.length ; i++ ) {
+					let hit = HITS[ i ];
+					circle( context, hit.x, hit.y, 4, 'yellow' );
+				}
+			};
+		
+			/////////////////////////////////////////////////////////////////////////////
+
+			const first = function( tag ) {
+				return document.getElementsByTagName( tag )[ 0 ];
+			};
+
+			const out = function( message, junk ) {
+				if ( junk ) {
+					message += ':' + junk;
+					console.log( junk );
+				}
+				document.body.innerHTML = message;
+			};
+
+			const onInput = function( cb ) {
+				document.body.onkeypress = document.body.onclick = function() {
+					if ( cb ) cb();
+				};
+			}
+
+			window.onload = function() {
+				onInput( startCamera );
+			}; 
+
+			/////////////////////////////////////////////////////////////////////////////
+
+		</script>
+
+		<style>
+			body { font-family: sans-serif; }
+			video { display:none;}
+		</style>
+	</HEAD>
+	<BODY>
+		click anywhere...
+	</BODY>
+</HTML>
