@@ -1,0 +1,68 @@
+<HTML>
+	<HEAD>
+		<TITLE>listenOrb</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript" src="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js" ></script>
+	   	<script type="text/javascript">
+			window.onload = function() {
+				let setup = Glo.demoSetup( Shadero.lit, 'uMatrix', { preserveDrawingBuffer:true } );
+				let gl = setup.gl;
+    			let program = setup.program;
+
+				let orb = TriangularPrism.instantiate();
+				while ( orb.subdivide().vertices.length < 3078 + 1 );
+				console.log( orb.vertices.length );
+
+				orb.colors = {
+					  faces: orb.vertices.map( (v, i) => 0.11 )
+					, edges: orb.vertices.map( (v, i) => i % 3 ? 0 : 1 )
+				};
+				orb.edges = Mesho.facesToEdges( orb.faces );
+
+
+				let frameCount = 0;
+
+				const draw = function() {
+					frameCount++;
+
+					//console.log( frameCount );
+						
+					Glo.clear( gl );
+					gl.useProgram( program );
+					setup.mouseLoop();
+
+					orb.vertices = Glo.data( gl, program, 'aPosition', orb.vertices );
+					Glo.data( gl, program, 'aColor', orb.colors.faces );
+					Glo.draw( gl, orb.faces );
+					Glo.data( gl, program, 'aColor', orb.colors.edges );
+                	Glo.draw( gl, orb.edges, gl.LINES );
+
+					for ( let i = 0 ; i < orb.vertices.length ; ) {
+						let x = orb.vertices[ i + 0 ];
+						let y = orb.vertices[ i + 1 ];
+						let z = orb.vertices[ i + 2 ];
+						let l = Math.sqrt( x * x + y * y + z * z );
+
+						let s = ( 1 + 0.2 * Math.sin( frameCount * 0.1 + 33 * z / l ) );
+						orb.vertices[ i++ ] = x/l * s;
+						orb.vertices[ i++ ] = y/l * s;
+						orb.vertices[ i++ ] = z/l * s;
+
+					}
+
+					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
+				}
+				draw();
+			}; 
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
