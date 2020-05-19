@@ -10,6 +10,8 @@
 
 		<script type="text/javascript" src="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js" ></script>
 	   	<script type="text/javascript">
+			const FPS = 40;
+
 			window.onload = function() {
 				let setup = Glo.demoSetup( Shadero.lit, 'uMatrix', { preserveDrawingBuffer:true } );
 				let gl = setup.gl;
@@ -17,22 +19,16 @@
 
 				let orb = TriangularPrism.instantiate();
 				while ( orb.subdivide().vertices.length < 3078 + 1 );
-				console.log( orb.vertices.length );
-
-				orb.colors = {
-					  faces: orb.vertices.map( (v, i) => 0.11 )
-					, edges: orb.vertices.map( (v, i) => i % 3 ? 0 : 1 )
-				};
 				orb.edges = Mesho.facesToEdges( orb.faces );
+				orb.colors = makeColors( orb.vertices );
 
-
-				let frameCount = 0;
+				// audio stuff
+				let analyser = false;
+				let frequencyArray = false;
+				let timeDomainArray = false;
+				let graphVertices = false;
 
 				const draw = function() {
-					frameCount++;
-
-					//console.log( frameCount );
-						
 					Glo.clear( gl );
 					gl.useProgram( program );
 					setup.mouseLoop();
@@ -40,26 +36,118 @@
 					orb.vertices = Glo.data( gl, program, 'aPosition', orb.vertices );
 					Glo.data( gl, program, 'aColor', orb.colors.faces );
 					Glo.draw( gl, orb.faces );
-					Glo.data( gl, program, 'aColor', orb.colors.edges );
-                	Glo.draw( gl, orb.edges, gl.LINES );
 
-					for ( let i = 0 ; i < orb.vertices.length ; ) {
-						let x = orb.vertices[ i + 0 ];
-						let y = orb.vertices[ i + 1 ];
-						let z = orb.vertices[ i + 2 ];
-						let l = Math.sqrt( x * x + y * y + z * z );
-
-						let s = ( 1 + 0.2 * Math.sin( frameCount * 0.1 + 33 * z / l ) );
-						orb.vertices[ i++ ] = x/l * s;
-						orb.vertices[ i++ ] = y/l * s;
-						orb.vertices[ i++ ] = z/l * s;
-
+					if ( false ) {
+						Glo.data( gl, program, 'aColor', orb.colors.edges );
+						Glo.draw( gl, orb.edges, gl.LINES );
 					}
 
-					setTimeout( function() { requestAnimationFrame( draw ) }, 22 );
-				}
-				draw();
+					if ( !analyser ) return;
+
+					if ( !graphVertices ) {
+						let length = analyser.frequencyBinCount;
+						timeDomainArray = new Uint8Array( length );
+						frequencyArray = new Uint8Array( length );
+						graphVertices = new Float32Array( length * 3 );
+					}
+
+					// grab the analysis
+					analyser.getByteFrequencyData( frequencyArray );
+					analyser.getByteTimeDomainData( timeDomainArray );
+
+					// update the orb
+					if ( false ) {
+						listenOrb( orb, timeDomainArray, frequencyArray );
+					} else {
+						listenOrb( orb, frequencyArray, timeDomainArray );
+					}
+
+					// show the graphs
+					Glo.matrix( gl, program, 'uMatrix', Matrixo.identity() );
+					plotGraph( setup, -0.95, 0.33, graphVertices, frequencyArray );
+					plotGraph( setup, +0.40, 0.66, graphVertices, timeDomainArray );
+				};
+					
+				Utilo.frame( draw, FPS ).start();
+
+				document.onclick = document.onmouseover = function() {
+					if ( analyser ) {
+						return Utilo.fullscreen( setup.canvas );
+					}
+				
+					/* setup the microphone analyser */	
+					navigator.mediaDevices.getUserMedia( { audio:true } )
+					.then( function( microphone ) {
+						let audioContext = new AudioContext();
+						analyser = audioContext.createAnalyser();
+						let microphone_stream = audioContext.createMediaStreamSource( microphone );
+						microphone_stream.connect( analyser );
+					})
+					.catch( function( err ) {
+						console.log( 'could not get microphone access' );
+						console.log( err );
+					});
+				};
 			}; 
+
+			const makeColors = function( vertices ) {
+				let v = 0.77;
+				let c = vertices.length;
+				console.log( c );
+				return { faces: nuR( c, v ) , edges: nuR( c, v ) };
+			};
+
+			const nuR = function( c, v ) { return new Array( c ).fill( v ) }
+
+			const listenOrb = function( orb, positionalData, colorData ) {
+				let dataLength = colorData.length;
+					
+				for ( let i = 0 ; i < orb.vertices.length ; i += 3 ) {
+					let x = orb.vertices[ i + 0 ];
+					let y = orb.vertices[ i + 1 ];
+					let z = orb.vertices[ i + 2 ];
+
+					// normalize the point 
+					let l = Math.sqrt( x * x + y * y + z * z );
+					x /= l; y /= l; z /= l;
+
+					// index the data using the zvalue
+					// z range is [-1:1] map it to [0:dataLength]
+					let index = Math.floor( ( z + 1 ) * 0.5 * dataLength );
+
+					// scale out the points using the frequency data
+					let s = 0.77 + 0.77 * positionalData[ index ] / 255;
+					orb.vertices[ i + 0 ] = x * s;
+					orb.vertices[ i + 1 ] = y * s;
+					orb.vertices[ i + 2 ] = z * s;
+
+					// set the color using the time domain data
+					let t = colorData[ index ] / 255;
+					orb.colors.faces[ i + 0 ] = t;
+					orb.colors.faces[ i + 1 ] = t/2;
+					orb.colors.faces[ i + 2 ] = 1-t;
+				}
+			};
+
+			const plotGraph = function( setup, offset, size, vertices, values ) {
+				let gl = setup.gl;
+    			let program = setup.program;
+
+				let x = -1;
+				let xinc = 2 / values.length;
+				for( let i = 0 ; i < values.length ; i++, x += xinc) {
+					let v = values[ i ];
+					vertices[ 3 * i + 0 ] = x;
+					vertices[ 3 * i + 1 ] = offset + size * ( v / 255 );
+					vertices[ 3 * i + 2 ] = 0;
+				}
+
+				Glo.data( gl, program, 'aPosition', vertices );
+				Glo.data( gl, program, 'aColor', vertices );
+
+				gl.drawArrays( gl.LINE_STRIP, 0,  vertices.length / 3 );
+			}
+
 		</script>
 	</HEAD>
 	<BODY>
