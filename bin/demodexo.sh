@@ -41,7 +41,7 @@ _demodexo_each() {
 
 _demodexo_find() {
 	find . -type f -name '*.html' \
-	| sort \
+	| xargs ls -t \
 	| sed 's,^\./,,' \
 	| egrep -v '(/node_modules/|^index.html$|/webgl/)' 
 }
