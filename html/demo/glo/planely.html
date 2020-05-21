@@ -1,0 +1,145 @@
+<HTML>
+	<HEAD>
+		<TITLE>planely</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript" src="rume-4-glo-min.js" isrc="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js" ></script>
+	   	<script type="text/javascript">
+			const FPS = 40;
+
+			// http://www.songho.ca/math/plane/plane.html
+
+			window.onload = function() {
+				let setup = Glo.demoSetup( Shadero.lit, 'uMatrix', { preserveDrawingBuffer:true } );
+				let gl = setup.gl;
+    			let program = setup.program;
+
+				let count = 3 + 1 + Math.floor( 3 * Math.random() );
+				let normalCount = nChooseK( count, 3 );
+				console.log( 'for ' + count + ' points, there are ' + normalCount + ' possible triangles' );
+
+				let vertices = [];//new Array( count * 3 ).fill( 0 ).map( v=>1-2*Math.random() );
+				for ( let i = 0 ; i < count * 3 ; ) {
+					let angle = Math.PI / 2 * i / ( count - 1 );
+					vertices[ i++ ] = 0.7 * Math.cos( angle );
+					vertices[ i++ ] = 0.7 * Math.sin( angle );
+					vertices[ i++ ] = 0.2 - 0.4 * Math.random();
+				}
+
+				let triangle = new Array( 3 * 3 );
+				let colors = colorFill( COLORS.white, vertices.slice( 0 ) );
+
+				let normalIndex = 0;
+				let normals = new Float32Array( 3 * normalCount );
+				let faces = [];
+				let dots = [];
+
+				// create the faces and compute the normal and dot product for each
+				for ( let i = 0 ; i < count - 2 ; i++ ) {
+					for ( let j = i + 1 ; j < count - 1 ; j++ ) {
+						for ( let k = j + 1 ; k < count ; k++ ) {
+							let face = [i,j,k];
+							faces.push( i );
+							faces.push( j );
+							faces.push( k );
+							Vertexo.surfaceNormal( normals, vertices, normalIndex, i * 3, j * 3 , k * 3 );
+							dots.push( Vertexo.dot( normals, vertices, normalIndex, i * 3 ) ); // same for j and k...
+							normalIndex += 3;
+						}
+					}
+				}
+
+				// find face with the smallest differnce to the other points
+				let min = 0;
+				let minAt = 0;
+				for ( let i = 0 ; i < dots.length ; i++ ) {
+					let dot = dots[ i ];
+					let fi = faces[ i * 3 + 0 ];
+					let fj = faces[ i * 3 + 1 ];
+					let fk = faces[ i * 3 + 2 ];
+					let sum = 0;
+					let dz = [];
+					for ( let j = 0 ; j < vertices.length ; j += 3 ) {
+						if ( j == fi || j == fj || j == fk ) continue;
+						let jdot = Vertexo.dot( normals, vertices, i * 3, j );
+						let d = jdot - dot;
+						dz.push( d );
+						sum += d * d;
+					}
+					if ( !i || sum < min ) {
+						min = sum;
+						minAt = i;
+					}
+					console.log( i + ' = ' + [fi,fj,fk] + ' = ' + dot + ' . ' + dz + ' -> ' + sum );
+				}
+				console.log( minAt + ' -> ' + min );
+				faces = faces.slice( minAt * 3, 3 + minAt * 3 );
+
+				let first = true;
+
+				const draw = function() {
+					Glo.clear( gl );
+					gl.useProgram( program );
+					setup.mouseLoop();
+
+					Glo.data( gl, program, 'aPosition', vertices );
+					Glo.data( gl, program, 'aColor', colors );
+					gl.drawArrays( gl.LINE_LOOP, 0,  vertices.length / 3 );
+
+					Glo.draw( gl, faces );
+				};
+					
+				Utilo.frame( draw, FPS ).start();
+				
+				//gestureUpOnThis( function() { return Utilo.fullscreen( setup.canvas ) } );
+			}; 
+
+			const gestureUpOnThis = function( callback ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress =
+				document.onclick = document.onmouseover = document.keypress = callback;
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const COLORS = {
+				  white:  [ 1.00, 1.00, 1.00 ]
+				, red:    [ 1.00, 0.00, 0.00 ]
+				, green:  [ 0.00, 1.00, 0.00 ]
+				, blue:   [ 0.00, 0.00, 1.00 ]
+				, orange: [ 1.00, 1.00, 0.00 ]
+				, purple: [ 1.00, 0.00, 1.00 ]
+				, cyan:   [ 0.00, 1.00, 1.00 ]
+			};
+			const colorFill = function( color, colors ) {
+				for ( let i = 0 ; i < colors.length ; i++ ) {
+					colors[ i ] = color[ i % 3 ];
+				}
+				return colors;
+			}
+
+			/////////////////////////////////////////////////////////////////////////////
+
+			const factorial = function( n ) {
+				let f = n;
+				while ( --n > 0 ) f *= n;
+				return f;
+			};
+			
+			const nChooseK = function( n, k ) {
+				// https://www.hackmath.net/en/calculator/n-choose-k
+				return factorial( n ) / ( factorial( k ) * factorial( n - k ) );
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
