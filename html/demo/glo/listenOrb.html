@@ -7,8 +7,6 @@
 				font-family: sans-serif;
 			}
 		</style>
-
-		<script type="text/javascript" src="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js" ></script>
 	   	<script type="text/javascript">
 			const FPS = 40;
 
@@ -69,25 +67,27 @@
 				};
 					
 				Utilo.frame( draw, FPS ).start();
-
-				document.onclick = document.onmouseover = function() {
-					if ( analyser ) {
-						return Utilo.fullscreen( setup.canvas );
-					}
 				
-					/* setup the microphone analyser */	
-					navigator.mediaDevices.getUserMedia( { audio:true } )
-					.then( function( microphone ) {
-						let audioContext = new AudioContext();
-						analyser = audioContext.createAnalyser();
-						let microphone_stream = audioContext.createMediaStreamSource( microphone );
-						microphone_stream.connect( analyser );
-					})
-					.catch( function( err ) {
-						console.log( 'could not get microphone access' );
-						console.log( err );
-					});
-				};
+				gestureUpOnThis( 
+					function() {
+						if ( analyser ) {
+							return Utilo.fullscreen( setup.canvas );
+						}
+					
+						/* setup the microphone analyser */	
+						navigator.mediaDevices.getUserMedia( { audio:true } )
+						.then( function( microphone ) {
+							let audioContext = new AudioContext();
+							analyser = audioContext.createAnalyser();
+							let microphone_stream = audioContext.createMediaStreamSource( microphone );
+							microphone_stream.connect( analyser );
+						})
+						.catch( function( err ) {
+							console.log( 'could not get microphone access' );
+							console.log( err );
+						});
+					}
+				);
 			}; 
 
 			const makeColors = function( vertices ) {
@@ -148,7 +148,13 @@
 				gl.drawArrays( gl.LINE_STRIP, 0,  vertices.length / 3 );
 			}
 
+			const gestureUpOnThis = function( callback ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress =
+				document.onclick = document.onmouseover = document.keypress = callback;
+			};
 		</script>
+
+		<script type="text/javascript" src="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js" ></script>
 	</HEAD>
 	<BODY>
 		<canvas width="512" height="512"></canvas>
