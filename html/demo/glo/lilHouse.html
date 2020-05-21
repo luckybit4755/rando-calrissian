@@ -1,0 +1,166 @@
+<HTML>
+	<HEAD>
+		<TITLE>lilHouse</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+	   	<script type="text/javascript">
+			const FPS = 40;
+
+			const lilHouse = function() {
+				let w = 0.9;
+				let l = 0.6;
+				let h = l;
+
+				let base = extrude( 
+					  [ 0, h, 0 ]
+					, Array.from({length:4},(v,i)=>i)
+					, circle( [ 0, 0, 0 ], [ w, l ], 4, Math.PI / 4 ) 
+					, !true
+				);
+				base.color = [145,139,55];
+				base.faces = base.faces.concat( [0,1,2,3] ); // bottom
+
+				// construction of the roof
+
+				let frontMiddle = new Array( 3 ); 
+				let backMiddle  = new Array( 3 );
+				Vertexo.tween( 0.5, base.vertices, frontMiddle, 3 * 4, 3 * 7, 0 ); 
+				Vertexo.tween( 0.5, base.vertices, backMiddle,  3 * 5, 3 * 6, 0 ); 
+				frontMiddle[ 1 ] += w * 0.5;
+				backMiddle[ 1 ]  += w * 0.5;
+
+				// this is nasty:
+				base.vertices = base.vertices.concat( frontMiddle );
+				base.faces = base.faces.concat( [4,7,8,4] ); // front "triangle"
+				base.vertices = base.vertices.concat( backMiddle );
+				base.faces = base.faces.concat( [5,6,9,5] ); // front "triangle"
+
+				let leftExtrude = [
+					  1.2 * ( base.vertices[ 4 * 3 + 0 ] - frontMiddle[ 0 ] )
+					, 1.2 * ( base.vertices[ 4 * 3 + 1 ] - frontMiddle[ 1 ] )
+					, 1.2 * ( base.vertices[ 4 * 3 + 2 ] - frontMiddle[ 2 ] )
+				];
+
+				let frontMiddleUp = frontMiddle.slice( 0 );
+				let backMiddleUp = backMiddle.slice( 0 );
+				frontMiddleUp[ 1 ] += w * 0.22;
+				backMiddleUp[ 1 ] += w * 0.22;
+
+				let roofVertices = frontMiddle.concat( frontMiddleUp ).concat( backMiddleUp ).concat( backMiddle );
+				roofVertices = roofVertices.map( (v,i)=>v*(0==i%3?1.2:1.0) );
+
+				let roofLeft = extrude(
+					leftExtrude
+					, [0,1,2,3]
+					, roofVertices
+					, true
+				);
+				roofLeft.color = [160,34,32];
+
+				let roofRight = JSON.parse( JSON.stringify( roofLeft ) );
+				roofRight.vertices = roofRight.vertices.map( (v,i)=>v*(2==i%3?-1:1) );
+
+				return mergo( base, roofLeft, roofRight );
+			};
+
+			// NB: indices are point indices ie: 3*index = position in vertices array
+			const extrude = function( extrusion, indices, vertices, cap ) {
+				let faces = [];
+				let nuIndices = [];
+				for ( let i = 0 ; i < indices.length ; i++ ) {
+					let index = indices[ i ];
+					let vertexIndex = 3 * index;
+					let nuIndex = index + indices.length;
+					nuIndices.push( nuIndex );
+					vertices.push( vertices[ vertexIndex + 0 ] + extrusion[ 0 ] );
+					vertices.push( vertices[ vertexIndex + 1 ] + extrusion[ 1 ] );
+					vertices.push( vertices[ vertexIndex + 2 ] + extrusion[ 2 ] );
+
+					let nextIndex = indices[ ( i + 1 ) % indices.length ];
+					let nextVertexIndex = 3 * nextIndex;
+					let nextNuIndex = nextIndex + indices.length;
+
+					faces.push( index );
+					faces.push( nuIndex );
+					faces.push( nextNuIndex );
+					faces.push( nextIndex );
+				}
+
+				if ( cap ) {
+					faces = faces.concat( indices );
+					faces = faces.concat( nuIndices );
+				};
+
+				return { faces:faces, perFace:4, vertices:vertices };
+			};
+
+			const circle = function( center, radiuses, count, start ) {
+				let vertices = [];
+				let bit = Math.PI * 2 / count;
+				let angle = start;
+				for ( let i = 0 ; i < count ; i++, angle += bit ) {
+					vertices.push( center[ 0 ] + radiuses[ 0 ] * Math.cos( angle ) );
+					vertices.push( center[ 2 ] );
+					vertices.push( center[ 1 ] + radiuses[ 1 ] * Math.sin( angle ) );
+				}
+				return vertices;
+			};
+
+			const mergo = function( base ) {
+				let merged = {faces:[],vertices:[],normals:[],colors:[]};
+				for( let i = 0 ; i < arguments.length ; i++ ) {
+					let raw = arguments[ i ];
+					if ( !( 'color' in raw ) ) raw.color = [1,1,1];
+					let colorScale = ( raw.color.some( v=>v>1 ) ? 1 / 255 : 1 );
+					let tmp = Mesho.normalize( raw );
+					tmp.colors = tmp.vertices.map( (v,i)=>colorScale*raw.color[i%3] );
+
+					let faceOff = merged.vertices.length / 3;
+					merged.vertices = merged.vertices.concat( tmp.vertices );
+					merged.normals  = merged.normals.concat( tmp.normals );
+					merged.colors   = merged.colors.concat( tmp.colors );
+
+					merged.faces = merged.faces.concat( tmp.faces.map( (v,i)=>v+faceOff ) );
+				}
+
+				return merged;
+			};
+
+			window.onload = function() {
+				let setup = Glo.demoSetup();
+				//gestureUpOnThis( function() { return Utilo.fullscreen( setup.canvas ) } );
+
+				let axis = Mesho.axis();
+
+				let house = lilHouse();
+				house.attributes = { aPosition:house.vertices, aColor:house.colors };
+
+				const draw = function() {
+					setup.mouseLoop( 1000 * 9 );
+
+			        Glo.drawMesh( setup.gl, setup.program, house );
+			        Glo.drawMesh( setup.gl, setup.program, axis );
+				};
+					
+				Utilo.frame( draw, FPS ).start();
+			};
+
+			const gestureUpOnThis = function( callback ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress =
+				document.onclick = document.onmouseover = document.keypress = callback;
+			};
+		</script>
+		<script type="text/javascript" 
+			isrc="rume-4-glo-min.js"
+			src="https://ghcdn.rawgit.org/luckybit4755/rume-4-glo/master/rume-4-glo-min.js"
+		></script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
