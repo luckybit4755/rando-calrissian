@@ -1,0 +1,36 @@
+<HTML>
+	<HEAD>
+		<TITLE>tmp</TITLE>
+	   	<script type="text/javascript">
+			const FPS = 40;
+			window.onload = function() {
+				let setup = Glo.demoSetup( Shadero.lit);
+				gestureUpOnThis( function() { return Utilo.fullscreen( setup.canvas ) } );
+
+				let mesh = TriangularPrism.instantiate();
+				while ( mesh.subdivide().vertices.length < 3078 + 1 );
+				mesh.attributes = { aPosition: mesh.vertices, aColor: mesh.vertices };
+
+				let axis = Mesho.axis();
+
+				let draw = function() {
+					setup.mouseLoop( );
+					Glo.drawMesh( setup.gl, setup.program, mesh );
+					Glo.drawMesh( setup.gl, setup.program, axis );
+				};
+
+				Utilo.frame( draw, FPS ).start();
+			}; 
+
+			const gestureUpOnThis = function( callback ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress =
+				document.onclick = document.onmouseover = document.keypress = callback;
+			};
+		</script>
+		<style> body { font-family: sans-serif; } </style>
+		<script type="text/javascript" src="rume-4-glo-min.js"></script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
