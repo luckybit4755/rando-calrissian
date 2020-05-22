@@ -7,21 +7,27 @@
 
 			const lilHouse = function() {
 				let w = about( 0.9 );  // x (red)
-				let l = about( 0.8 );  // y (green)
-				let h = about( 0.6 );  // z (blue)
+				let h = about( 0.6 );  // y (green)
+				let l = about( 0.8 );  // z (blue)
 				let roofOverHang = about( 1.4 );
 				let roofThickness = about( 0.13 );
 				let colors = {
-					  base: [145, 139,  55]
-					, roof: [160,  34,  32]
-					, door: [137,  56,   9]
+					  base:    [145, 139,  55]
+					, roof:    [160,  34,  32]
+					, door:    [137,  56,   9]
+					, chimney: [ 88,  34,  32]
 				};
 
 				//
 
 				for( let k in colors ) {
-					colors[ k ] = colors[ k ].sort((a,b)=>Math.random()-Math.random())
+					if ( false ) {
+						colors[ k ] = colors[ k ].sort((a,b)=>Math.random()-Math.random())
+					} else {
+						colors[ k ] = colors[ k ].map( v=>about(v,0.5) );
+					}
 				}
+
 				let quado = Array.from({length:4},(v,i)=>i);
 
 				let base = extrude( 
@@ -84,14 +90,30 @@
 				let door = extrude( 
 					[0,doorHeight,0]
 					, quado
-					, circle( [ doorOut, doorOffset, 0 ], [ doorWidth, doorThickness ], 4, Math.PI / 4 ) 
+					, circle( [ doorOut, 0, doorOffset ], [ doorWidth, doorThickness ], 4, Math.PI / 4 ) 
 					, true
 				);
 				door.color = colors.door;
 
-				// cleanup
+				// chimney
 
-				let house = mergo( base, roofLeft, roofRight, door );
+				let chimneyX = w * 0.49;
+				let chimneyY = h * 1.3; 
+				let chimneyZ = l * 0.51;
+				let chimneyHeight = 0.40;
+				let chimneyWidth = 0.13;
+
+				let chimney = extrude(
+					[0,chimneyHeight,0]
+					, quado
+					, circle( [ -chimneyX, chimneyY, chimneyZ ], [chimneyWidth,chimneyWidth],4,Math.PI/4)
+					, true
+				);
+				chimney.color = colors.chimney;
+
+				// merge elements to make the house
+
+				let house = mergo( base, roofLeft, roofRight, door, chimney );
 				house.attributes = { aPosition:house.vertices, aColor:house.colors };
 
 				return house;
@@ -134,14 +156,17 @@
 				return { faces:faces, perFace:4, vertices:vertices };
 			};
 
+			// xz:[1,0, 0,0, 0,1]...
 			const circle = function( center, radiuses, count, start ) {
 				let vertices = [];
 				let bit = Math.PI * 2 / count;
 				let angle = start;
 				for ( let i = 0 ; i < count ; i++, angle += bit ) {
-					vertices.push( center[ 0 ] + radiuses[ 0 ] * Math.cos( angle ) );
-					vertices.push( center[ 2 ] );
-					vertices.push( center[ 1 ] + radiuses[ 1 ] * Math.sin( angle ) );
+					let c = radiuses[ 0 ] * Math.cos( angle );
+					let s = radiuses[ 1 ] * Math.sin( angle );
+					vertices.push( center[ 0 ] + 1 * c + 0 * s );
+					vertices.push( center[ 1 ] + 0 * c + 0 * s );
+					vertices.push( center[ 2 ] + 0 * c + 1 * s );
 				}
 				return vertices;
 			};
