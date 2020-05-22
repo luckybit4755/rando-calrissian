@@ -6,17 +6,23 @@
 			const FPS = 40;
 
 			const lilHouse = function() {
-				let w = about( 0.9 );  // x (red)
-				let h = about( 0.6 );  // y (green)
-				let l = about( 0.8 );  // z (blue)
-				let roofOverHang = about( 1.4 );
+				let w = about( 0.9 );  // x (red)   front/back
+				let h = about( 0.6 );  // y (green) up/down
+				let l = about( 0.8 );  // z (blue)  left/right
+				let roofOverHang = about( 1.1 );
 				let roofThickness = about( 0.13 );
+
 				let colors = {
-					  base:    [145, 139,  55]
-					, roof:    [160,  34,  32]
-					, door:    [137,  56,   9]
-					, chimney: [ 88,  34,  32]
+					  base:       [ 145, 139,  55 ]
+					, roof:       [ 160,  34,  32 ]
+					, door:       [ 137,  56,   9 ]
+					, chimney:    [  88,  34,  32 ]
+					, windowPane: [ 128, 128, 128 ]
 				};
+
+				//
+
+				let parts = [];
 
 				//
 
@@ -33,9 +39,10 @@
 				let base = extrude( 
 					  [ 0, h, 0 ]
 					, quado
-					, circle( [ 0, 0, 0 ], [ w, l ], 4, Math.PI / 4 ) 
+					, circle( [ 0, 0, 0 ], [ w, l ] ) 
 					, !true
 				);
+				parts.push( base );
 				base.color = colors.base;
 				base.faces = base.faces.concat( quado ); // bottom
 
@@ -53,6 +60,8 @@
 				base.faces = base.faces.concat( [4,7,8,4] ); // front "triangle"
 				base.vertices = base.vertices.concat( backMiddle );
 				base.faces = base.faces.concat( [5,6,9,5] ); // front "triangle"
+
+				// back to work on the roof...
 
 				let leftExtrude = [
 					  roofOverHang * ( base.vertices[ 4 * 3 + 0 ] - frontMiddle[ 0 ] )
@@ -74,46 +83,97 @@
 					, roofVertices
 					, true
 				);
+				parts.push( roofLeft );
 				roofLeft.color = colors.roof;
 
 				let roofRight = JSON.parse( JSON.stringify( roofLeft ) );
 				roofRight.vertices = roofRight.vertices.map( (v,i)=>v*(2==i%3?-1:1) );
+				parts.push( roofRight );
 
 				// door
 
-				let doorHeight = about( 0.4 );
+				let doorW = 0.02;
+				let doorH = about( 0.4 );
 				let doorOut = w * 0.72; // idk, dude.. 
 				let doorOffset = -l * 0.35 + l * 0.7 * Math.random();
-				let doorWidth = 0.02;
 				let doorThickness = 0.17;
 
 				let door = extrude( 
-					[0,doorHeight,0]
+					[0,doorH,0]
 					, quado
-					, circle( [ doorOut, 0, doorOffset ], [ doorWidth, doorThickness ], 4, Math.PI / 4 ) 
+					, circle( [ doorOut, 0, doorOffset ], [ doorW, doorThickness ] ) 
 					, true
 				);
 				door.color = colors.door;
+				parts.push( door );
 
 				// chimney
 
-				let chimneyX = w * 0.49;
+				let chimneyX = -w * 0.49;
 				let chimneyY = h * 1.3; 
 				let chimneyZ = l * 0.51;
-				let chimneyHeight = 0.40;
-				let chimneyWidth = 0.13;
+				let chimneyW = 0.13;
+				let chimneyH = 0.40;
 
 				let chimney = extrude(
-					[0,chimneyHeight,0]
+					[0,chimneyH,0]
 					, quado
-					, circle( [ -chimneyX, chimneyY, chimneyZ ], [chimneyWidth,chimneyWidth],4,Math.PI/4)
+					, circle( [ chimneyX, chimneyY, chimneyZ ], [chimneyW,chimneyW],4,Math.PI/4)
 					, true
 				);
 				chimney.color = colors.chimney;
+				parts.push( chimney );
+
+				// window
+
+				let windowW = about( l * 0.4, 0.50 );
+				let windowH = about( h * 0.5, 0.50 );
+
+				let windowX = -w * 0.7;
+				let windowY = windowW * 0.4; //about( h * 0.2, 0.0 );
+				let windowZ = -l * 0.2 + Math.random() * 0.4 * l;
+
+				let windowPaneThickness = 0.02;
+				let windowFrameThickness = windowPaneThickness * 2.0;
+
+				let windowPane = extrude(
+					[0,windowH,0]
+					, quado
+					, circle( [windowX, windowY, windowZ], [windowPaneThickness,windowW] )
+					, true
+				);
+				let n = 128;
+				windowPane.color = colors.windowPane;
+				parts.push( windowPane );
+
+				let windowFrameBottom = extrude(
+					[0,windowH*0.10,0]
+					, quado
+					, circle( [windowX, windowY, windowZ], [windowFrameThickness,windowW] )
+					, true
+				);
+				windowFrameBottom.color = colors.door;
+				parts.push( windowFrameBottom );
+
+				let windowFrameTop = JSON.parse( JSON.stringify( windowFrameBottom ) );
+				let gap = windowH * 0.9; // see that * 0.1 above...
+				windowFrameTop.vertices = windowFrameTop.vertices.map( (v,i)=>1==i%3?v+gap:v );
+				parts.push( windowFrameTop );
+
+				for ( let i = -1 ; i <= 1 ; i+= 2 ) {
+					let windowFrameSide = extrude( 
+						[0,windowH,0]
+						, quado
+						, circle( [windowX, windowY, windowZ+windowW*0.7*i], [windowFrameThickness,windowW*0.08] )
+						, true
+					);
+					windowFrameSide.color = colors.door;
+					parts.push( windowFrameSide );
+				}
 
 				// merge elements to make the house
 
-				let house = mergo( base, roofLeft, roofRight, door, chimney );
+				let house = mergo( parts );
 				house.attributes = { aPosition:house.vertices, aColor:house.colors };
 
 				return house;
@@ -121,8 +181,9 @@
 
 			const about = function( v, percent ) {
 				percent = Utilo.idk( percent, 0.20 );
-				let r = 1 - percent;
-				return r * v + percent * v * Math.random();
+				//let r = 1 - percent;
+				//return r * v + percent * v * Math.random();
+				return ( 1 + percent * Math.random() ) * v;
 			};
 
 			// NB: indices are point indices ie: 3*index = position in vertices array
@@ -157,21 +218,53 @@
 			};
 
 			// xz:[1,0, 0,0, 0,1]...
-			const circle = function( center, radiuses, count, start ) {
+			const circle = function( center, radiuses, count, start, orientation ) {
+				count = Utilo.idk( count, 4 );
+				start = Utilo.idk( start, Math.PI / 4 );
+				orientation = Utilo.idk( orientation, 'xz' );
+				if ( 'string' === typeof( orientation ) ) {
+					if ( orientation.length > 2 ) {
+						throw 'string orientations should be [xyz]{1,2}, not "' + orientation + '"';
+					}
+					let tmp = new Array( 2 * 3 ).fill( 0 );
+					for ( let i = 0 ; i < orientation.length ; i++ ) {
+						let c = orientation[ i ];
+						let w = 'xyz'.indexOf( c ) * 2;
+						if ( w < 0 ) {
+							throw( 'unexpected character "' + c + '" in orientation "' + orientation + '"' );
+						}
+						w += i;
+						//console.log( c + '@' + i + ' -> ' + w );
+						tmp[ w ] = 1;
+					}
+					//console.log( tmp );
+					orientation = tmp
+				} else {
+					// todo: check values to make sure they are valid arrays...
+				}
+
 				let vertices = [];
 				let bit = Math.PI * 2 / count;
 				let angle = start;
+
+				let o = orientation;
+
 				for ( let i = 0 ; i < count ; i++, angle += bit ) {
 					let c = radiuses[ 0 ] * Math.cos( angle );
 					let s = radiuses[ 1 ] * Math.sin( angle );
-					vertices.push( center[ 0 ] + 1 * c + 0 * s );
-					vertices.push( center[ 1 ] + 0 * c + 0 * s );
-					vertices.push( center[ 2 ] + 0 * c + 1 * s );
+					let j = 0;
+					vertices.push( center[ 0 ] + o[ j++ ] * c + o[ j++ ] * s );
+					vertices.push( center[ 1 ] + o[ j++ ] * c + o[ j++ ] * s );
+					vertices.push( center[ 2 ] + o[ j++ ] * c + o[ j++ ] * s );
 				}
 				return vertices;
 			};
 
-			const mergo = function( base ) {
+			const mergo = function() {
+				if ( 1 == arguments.length && Array.isArray( arguments[ 0 ] ) ) {
+					arguments = arguments[ 0 ];
+				}
+
 				let merged = {faces:[],vertices:[],normals:[],colors:[]};
 				for( let i = 0 ; i < arguments.length ; i++ ) {
 					let raw = arguments[ i ];
@@ -214,6 +307,9 @@
 				document.body.onclick = document.body.onmouseover = document.body.keypress =
 				document.onclick = document.onmouseover = document.keypress = callback;
 			};
+
+			////
+
 		</script>
 		<script type="text/javascript" src="rume-4-glo-min.js"></script>
 		<style>
