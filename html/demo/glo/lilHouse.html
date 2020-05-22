@@ -2,28 +2,36 @@
 	<HEAD>
 		<TITLE>lilHouse</TITLE>
 
-		<style>
-			body {
-				font-family: sans-serif;
-			}
-		</style>
-
 	   	<script type="text/javascript">
 			const FPS = 40;
 
 			const lilHouse = function() {
-				let w = 0.9;
-				let l = 0.6;
-				let h = l;
+				let w = about( 0.9 );  // x (red)
+				let l = about( 0.8 );  // y (green)
+				let h = about( 0.6 );  // z (blue)
+				let roofOverHang = about( 1.4 );
+				let roofThickness = about( 0.13 );
+				let colors = {
+					  base: [145, 139,  55]
+					, roof: [160,  34,  32]
+					, door: [137,  56,   9]
+				};
+
+				//
+
+				for( let k in colors ) {
+					colors[ k ] = colors[ k ].sort((a,b)=>Math.random()-Math.random())
+				}
+				let quado = Array.from({length:4},(v,i)=>i);
 
 				let base = extrude( 
 					  [ 0, h, 0 ]
-					, Array.from({length:4},(v,i)=>i)
+					, quado
 					, circle( [ 0, 0, 0 ], [ w, l ], 4, Math.PI / 4 ) 
 					, !true
 				);
-				base.color = [145,139,55];
-				base.faces = base.faces.concat( [0,1,2,3] ); // bottom
+				base.color = colors.base;
+				base.faces = base.faces.concat( quado ); // bottom
 
 				// construction of the roof
 
@@ -41,31 +49,58 @@
 				base.faces = base.faces.concat( [5,6,9,5] ); // front "triangle"
 
 				let leftExtrude = [
-					  1.2 * ( base.vertices[ 4 * 3 + 0 ] - frontMiddle[ 0 ] )
-					, 1.2 * ( base.vertices[ 4 * 3 + 1 ] - frontMiddle[ 1 ] )
-					, 1.2 * ( base.vertices[ 4 * 3 + 2 ] - frontMiddle[ 2 ] )
+					  roofOverHang * ( base.vertices[ 4 * 3 + 0 ] - frontMiddle[ 0 ] )
+					, roofOverHang * ( base.vertices[ 4 * 3 + 1 ] - frontMiddle[ 1 ] )
+					, roofOverHang * ( base.vertices[ 4 * 3 + 2 ] - frontMiddle[ 2 ] )
 				];
 
 				let frontMiddleUp = frontMiddle.slice( 0 );
 				let backMiddleUp = backMiddle.slice( 0 );
-				frontMiddleUp[ 1 ] += w * 0.22;
-				backMiddleUp[ 1 ] += w * 0.22;
+				frontMiddleUp[ 1 ] += roofThickness;
+				backMiddleUp[ 1 ] += roofThickness;
 
 				let roofVertices = frontMiddle.concat( frontMiddleUp ).concat( backMiddleUp ).concat( backMiddle );
 				roofVertices = roofVertices.map( (v,i)=>v*(0==i%3?1.2:1.0) );
 
 				let roofLeft = extrude(
 					leftExtrude
-					, [0,1,2,3]
+					, quado
 					, roofVertices
 					, true
 				);
-				roofLeft.color = [160,34,32];
+				roofLeft.color = colors.roof;
 
 				let roofRight = JSON.parse( JSON.stringify( roofLeft ) );
 				roofRight.vertices = roofRight.vertices.map( (v,i)=>v*(2==i%3?-1:1) );
 
-				return mergo( base, roofLeft, roofRight );
+				// door
+
+				let doorHeight = about( 0.4 );
+				let doorOut = w * 0.72; // idk, dude.. 
+				let doorOffset = -l * 0.35 + l * 0.7 * Math.random();
+				let doorWidth = 0.02;
+				let doorThickness = 0.17;
+
+				let door = extrude( 
+					[0,doorHeight,0]
+					, quado
+					, circle( [ doorOut, doorOffset, 0 ], [ doorWidth, doorThickness ], 4, Math.PI / 4 ) 
+					, true
+				);
+				door.color = colors.door;
+
+				// cleanup
+
+				let house = mergo( base, roofLeft, roofRight, door );
+				house.attributes = { aPosition:house.vertices, aColor:house.colors };
+
+				return house;
+			};
+
+			const about = function( v, percent ) {
+				percent = Utilo.idk( percent, 0.20 );
+				let r = 1 - percent;
+				return r * v + percent * v * Math.random();
 			};
 
 			// NB: indices are point indices ie: 3*index = position in vertices array
@@ -138,10 +173,10 @@
 				let axis = Mesho.axis();
 
 				let house = lilHouse();
-				house.attributes = { aPosition:house.vertices, aColor:house.colors };
+				setup.canvas.onclick = function() { house = lilHouse() };
 
 				const draw = function() {
-					setup.mouseLoop( 1000 * 9 );
+					setup.mouseLoop( 1000 * 30 );
 
 			        Glo.drawMesh( setup.gl, setup.program, house );
 			        Glo.drawMesh( setup.gl, setup.program, axis );
@@ -156,6 +191,10 @@
 			};
 		</script>
 		<script type="text/javascript" src="rume-4-glo-min.js"></script>
+		<style>
+			body { font-family: sans-serif; background:#121;} 
+			canvas { margin:auto; width:512px; display:block; padding:2em; }
+		</style>
 	</HEAD>
 	<BODY>
 		<canvas width="512" height="512"></canvas>
