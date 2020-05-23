@@ -62,7 +62,7 @@
 
 					// show the graphs
 					Glo.matrix( gl, program, 'uMatrix', Matrixo.identity() );
-					plotGraph( setup, -0.95, 0.33, graphVertices, frequencyArray );
+					plotGraph( setup, -0.95, 0.33, graphVertices, frequencyArray, true );
 					plotGraph( setup, +0.40, 0.66, graphVertices, timeDomainArray );
 				};
 					
@@ -71,7 +71,7 @@
 				gestureUpOnThis( 
 					function() {
 						if ( analyser ) {
-							return Utilo.fullscreen( setup.canvas );
+							//return Utilo.fullscreen( setup.canvas );
 						}
 					
 						/* setup the microphone analyser */	
@@ -101,7 +101,7 @@
 
 			const listenOrb = function( orb, positionalData, colorData ) {
 				let dataLength = colorData.length;
-					
+
 				for ( let i = 0 ; i < orb.vertices.length ; i += 3 ) {
 					let x = orb.vertices[ i + 0 ];
 					let y = orb.vertices[ i + 1 ];
@@ -129,24 +129,40 @@
 				}
 			};
 
-			const plotGraph = function( setup, offset, size, vertices, values ) {
+			const plotGraph = function( setup, offset, size, vertices, values, hasLongTail ) {
 				let gl = setup.gl;
     			let program = setup.program;
+
+				// the fft has an annoying long tail...
+				if ( hasLongTail ) { 
+					let last = 0;
+					for( let i = 0 ; i < values.length ; i++ ) {
+						let v = values[ i ];
+						if ( v > 0 ) { 
+							last = i;
+						} 
+					}
+					last = 850; // more observational nonsense... sry, not sry
+					values = values.slice( 0, last );
+				} 
+
+				let graphData = new Array( 3 * values.length );
 
 				let x = -1;
 				let xinc = 2 / values.length;
 				for( let i = 0 ; i < values.length ; i++, x += xinc) {
 					let v = values[ i ];
-					vertices[ 3 * i + 0 ] = x;
-					vertices[ 3 * i + 1 ] = offset + size * ( v / 255 );
-					vertices[ 3 * i + 2 ] = 0;
+					graphData[ 3 * i + 0 ] = x;
+					graphData[ 3 * i + 1 ] = offset + size * ( v / 255 );
+					graphData[ 3 * i + 2 ] = 0;
 				}
 
-				Glo.data( gl, program, 'aPosition', vertices );
-				Glo.data( gl, program, 'aColor', vertices );
+				Glo.data( gl, program, 'aPosition', graphData );
+				Glo.data( gl, program, 'aColor', graphData );
 
-				gl.drawArrays( gl.LINE_STRIP, 0,  vertices.length / 3 );
+				gl.drawArrays( gl.LINE_STRIP, 0,  graphData.length / 3 );
 			}
+
 
 			const gestureUpOnThis = function( callback ) {
 				document.body.onclick = document.body.onmouseover = document.body.keypress =
