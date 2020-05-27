@@ -34,17 +34,14 @@
 					}
 				}
 
-				let quado = Array.from({length:4},(v,i)=>i);
-
 				let base = extrude( 
 					  [ 0, h, 0 ]
-					, quado
 					, circle( [ 0, 0, 0 ], [ w, l ] ) 
 					, !true
 				);
 				parts.push( base );
 				base.color = colors.base;
-				base.faces = base.faces.concat( quado ); // bottom
+				base.faces = base.faces.concat( [0,1,2,3] );
 
 				// construction of the roof
 
@@ -79,9 +76,7 @@
 
 				let roofLeft = extrude(
 					leftExtrude
-					, quado
 					, roofVertices
-					, true
 				);
 				parts.push( roofLeft );
 				roofLeft.color = colors.roof;
@@ -100,9 +95,7 @@
 
 				let door = extrude( 
 					[0,doorH,0]
-					, quado
 					, circle( [ doorOut, 0, doorOffset ], [ doorW, doorThickness ] ) 
-					, true
 				);
 				door.color = colors.door;
 				parts.push( door );
@@ -117,9 +110,7 @@
 
 				let chimney = extrude(
 					[0,chimneyH,0]
-					, quado
 					, circle( [ chimneyX, chimneyY, chimneyZ ], [chimneyW,chimneyW],4,Math.PI/4)
-					, true
 				);
 				chimney.color = colors.chimney;
 				parts.push( chimney );
@@ -138,9 +129,7 @@
 
 				let windowPane = extrude(
 					[0,windowH,0]
-					, quado
 					, circle( [windowX, windowY, windowZ], [windowPaneThickness,windowW] )
-					, true
 				);
 				let n = 128;
 				windowPane.color = colors.windowPane;
@@ -148,9 +137,7 @@
 
 				let windowFrameBottom = extrude(
 					[0,windowH*0.10,0]
-					, quado
 					, circle( [windowX, windowY, windowZ], [windowFrameThickness,windowW] )
-					, true
 				);
 				windowFrameBottom.color = colors.door;
 				parts.push( windowFrameBottom );
@@ -163,9 +150,7 @@
 				for ( let i = -1 ; i <= 1 ; i+= 2 ) {
 					let windowFrameSide = extrude( 
 						[0,windowH,0]
-						, quado
 						, circle( [windowX, windowY, windowZ+windowW*0.7*i], [windowFrameThickness,windowW*0.08] )
-						, true
 					);
 					windowFrameSide.color = colors.door;
 					parts.push( windowFrameSide );
@@ -186,8 +171,10 @@
 				return ( 1 + percent * Math.random() ) * v;
 			};
 
-			// NB: indices are point indices ie: 3*index = position in vertices array
-			const extrude = function( extrusion, indices, vertices, cap ) {
+			const extrude = function( extrusion, vertices, cap, indices ) {
+				cap = Utilo.idk( cap, true );
+				indices = Utilo.idk( indices, new Array( vertices.length / 3 ).fill().map((v,i)=>i) );
+
 				let faces = [];
 				let nuIndices = [];
 				for ( let i = 0 ; i < indices.length ; i++ ) {
@@ -212,7 +199,7 @@
 				if ( cap ) {
 					faces = faces.concat( indices );
 					faces = faces.concat( nuIndices );
-				};
+				}
 
 				return { faces:faces, perFace:4, vertices:vertices };
 			};
