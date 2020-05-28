@@ -40,14 +40,16 @@
 							faces.push( i );
 							faces.push( j );
 							faces.push( k );
-							Vertexo.surfaceNormal( normals, vertices, normalIndex, i * 3, j * 3 , k * 3 );
-							dots.push( Vertexo.dot( normals, vertices, normalIndex, i * 3 ) ); // same for j and k...
+							let v = vertices;
+
+							Vertexo.surfaceNormal( {v:v,o:i*3}, {v:v,o:j*3}, {v:v,o:k*3}, {v:normals} );
+							dots.push( Vertexo.dot( {v:normals,o:normalIndex}, {v:vertices,o:i*3} ) ); // same for j and k...
 							normalIndex += 3;
 						}
 					}
 				}
 
-				// find face with the smallest differnce to the other points
+				// find face with the smallest difference to the other points
 				let min = 0;
 				let minAt = 0;
 				for ( let i = 0 ; i < dots.length ; i++ ) {
@@ -59,7 +61,7 @@
 					let dz = [];
 					for ( let j = 0 ; j < vertices.length ; j += 3 ) {
 						if ( j == fi || j == fj || j == fk ) continue;
-						let jdot = Vertexo.dot( normals, vertices, i * 3, j );
+						let jdot = Vertexo.dot( {v:normals,o:i*3}, {v:vertices,o:j} );
 						let d = jdot - dot;
 						dz.push( d );
 						sum += d * d;

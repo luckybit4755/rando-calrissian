@@ -1,55 +1,73 @@
 const Vertexo={
-surfaceNormal:function(normals,vertices,n,i,j,k,tmp1,tmp2){
-let v0=Utilo.idk(tmp1,new Float32Array(3));
-let v1=Utilo.idk(tmp2,new Float32Array(3));
-this.subtract(vertices,v0,i,j,0);
-this.subtract(vertices,v1,k,j,0);
-this.normalize(v0,v0,0,0);
-this.normalize(v1,v1,0,0);
-this.cross(v0,v1,normals,0,0,n);
+surfaceNormal:function(v1,v2,v3,to,tmp1,tmp2){
+tmp1=Utilo.idk(tmp1,{v:new Float32Array(3)});
+tmp2=Utilo.idk(tmp2,{v:new Float32Array(3)});
+this.subtract(v1,v2,tmp1);
+this.subtract(v3,v2,tmp2);
+this.normalize(tmp1);
+this.normalize(tmp2);
+this.cross(tmp1,tmp2,to);
 }
-,add:function(vertices,to,i,j,o){
-to[o+0]=vertices[i+0]+vertices[j+0];
-to[o+1]=vertices[i+1]+vertices[j+1];
-to[o+2]=vertices[i+2]+vertices[j+2];
+,add:function(v1,v2,to){
+let i=Utilo.idk(v1.o,0);
+let j=Utilo.idk(v2.o,0);
+let k=Utilo.idk(to.o,0);
+to.v[k+0]=v1.v[i+0]+v2.v[j+0];
+to.v[k+1]=v1.v[i+1]+v2.v[j+1];
+to.v[k+2]=v1.v[i+2]+v2.v[j+2];
 }
-,subtract:function(vertices,to,i,j,o){
-to[o+0]=vertices[i+0]-vertices[j+0];
-to[o+1]=vertices[i+1]-vertices[j+1];
-to[o+2]=vertices[i+2]-vertices[j+2];
+,subtract:function(v1,v2,to){
+let i=Utilo.idk(v1.o,0);
+let j=Utilo.idk(v2.o,0);
+let k=Utilo.idk(to.o,0);
+to.v[k+0]=v1.v[i+0]-v2.v[j+0];
+to.v[k+1]=v1.v[i+1]-v2.v[j+1];
+to.v[k+2]=v1.v[i+2]-v2.v[j+2];
 }
-,tween:function(t,vertices,to,i,j,o){
-to[o+0]=vertices[i+0]+t*(vertices[j+0]-vertices[i+0]);
-to[o+1]=vertices[i+1]+t*(vertices[j+1]-vertices[i+1]);
-to[o+2]=vertices[i+2]+t*(vertices[j+2]-vertices[i+2]);
+,tween:function(time,v1,v2,to){
+let i=Utilo.idk(v1.o,0);
+let j=Utilo.idk(v2.o,0);
+let k=Utilo.idk(to.o,0);
+to.v[k+0]=v1.v[i+0]+time*(v2.v[j+0]-v1.v[i+0]);
+to.v[k+1]=v1.v[i+1]+time*(v2.v[j+1]-v1.v[i+1]);
+to.v[k+2]=v1.v[i+2]+time*(v2.v[j+2]-v1.v[i+2]);
 }
-,normalize:function(vertices,to,i,o){
-let length=this.length(vertices,i);
+,normalize:function(v1,to){
+let i=Utilo.idk(v1.o,0);
+to=Utilo.idk(to,v1);
+let k=Utilo.idk(to.o,0);
+let length=this.length(v1);
 if(0==length)length=1;
-to[o+0]=vertices[i+0]/length;
-to[o+1]=vertices[i+1]/length;
-to[o+2]=vertices[i+2]/length;
+to.v[k+0]=v1.v[i+0]/length;
+to.v[k+1]=v1.v[i+1]/length;
+to.v[k+2]=v1.v[i+2]/length;
 }
-,length:function(vertices,i){
-return Math.sqrt(this.length2(vertices,i));
+,length:function(v1){
+return Math.sqrt(this.length2(v1));
 }
-,length2:function(vertices,i){
+,length2:function(v1){
+let i=Utilo.idk(v1.o,0);
 return(
-vertices[i+0]*vertices[i+0]
-+vertices[i+1]*vertices[i+1]
-+vertices[i+2]*vertices[i+2]
+v1.v[i+0]*v1.v[i+0]
++v1.v[i+1]*v1.v[i+1]
++v1.v[i+2]*v1.v[i+2]
 );
 }
-,cross:function(v0,v1,normals,i,j,n){
-normals[n+0]=v0[i+1]*v1[j+2]-v0[i+2]*v1[j+1]
-normals[n+1]=v0[i+2]*v1[j+0]-v0[i+0]*v1[j+2]
-normals[n+2]=v0[i+0]*v1[j+1]-v0[i+1]*v1[j+0]
+,cross:function(v1,v2,to){
+let i=Utilo.idk(v1.o,0);
+let j=Utilo.idk(v2.o,0);
+let k=Utilo.idk(to.o,0);
+to.v[k+0]=v1.v[i+1]*v2.v[j+2]-v1.v[i+2]*v2.v[j+1];
+to.v[k+1]=v1.v[i+2]*v2.v[j+0]-v1.v[i+0]*v2.v[j+2];
+to.v[k+2]=v1.v[i+0]*v2.v[j+1]-v1.v[i+1]*v2.v[j+0];
 }
-,dot:function(v0,v1,i,j){
+,dot:function(v1,v2){
+let i=Utilo.idk(v1.o,0);
+let j=Utilo.idk(v2.o,0);
 return(
-v0[i+0]*v1[j+0]
-+v0[i+1]*v1[j+1]
-+v0[i+2]*v1[j+2]
+v1.v[i+0]*v2.v[j+0]
++v1.v[i+1]*v2.v[j+1]
++v1.v[i+2]*v2.v[j+2]
 )
 }
 };

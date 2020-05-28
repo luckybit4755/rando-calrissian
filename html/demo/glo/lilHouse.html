@@ -47,8 +47,10 @@
 
 				let frontMiddle = new Array( 3 ); 
 				let backMiddle  = new Array( 3 );
-				Vertexo.tween( 0.5, base.vertices, frontMiddle, 3 * 4, 3 * 7, 0 ); 
-				Vertexo.tween( 0.5, base.vertices, backMiddle,  3 * 5, 3 * 6, 0 ); 
+				let v = base.vertices;
+				Vertexo.tween( 0.5, {v:v,o:3*4}, {v:v,o:3*7}, {v:frontMiddle} );
+				Vertexo.tween( 0.5, {v:v,o:3*5}, {v:v,o:3*6}, {v:backMiddle}  );
+
 				frontMiddle[ 1 ] += w * 0.5;
 				backMiddle[ 1 ]  += w * 0.5;
 
@@ -171,6 +173,11 @@
 				return ( 1 + percent * Math.random() ) * v;
 			};
 
+			const inset = function( inset, vertices, indices ) {
+				indices = Utilo.idk( indices, new Array( vertices.length / 3 ).fill().map((v,i)=>i) );
+				// TODO: implement this!
+			};
+
 			const extrude = function( extrusion, vertices, cap, indices ) {
 				cap = Utilo.idk( cap, true );
 				indices = Utilo.idk( indices, new Array( vertices.length / 3 ).fill().map((v,i)=>i) );
@@ -197,6 +204,7 @@
 				}
 
 				if ( cap ) {
+					// FIXME: and when there are more than 4 vertices?
 					faces = faces.concat( indices );
 					faces = faces.concat( nuIndices );
 				}
