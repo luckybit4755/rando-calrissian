@@ -1,0 +1,174 @@
+<HTML>
+	<HEAD>
+		<TITLE>web-audio-microphone-analyser</TITLE>
+
+		<script type="text/javascript">
+			const FPS = 24;
+
+			window.onload = function() {
+				try {
+					microphone_analyser_start();
+				} catch( e ) {
+					/* may need this if audio needs to be user initiated */
+					let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					canvas.getContext( '2d' ).fillText( 'click me', 33, 33 );
+					canvas.onclick = function() { microphone_analyser_start() };
+				};
+			};
+
+			const microphone_analyser_start = function() {
+				/* request the microphone */
+				navigator.mediaDevices.getUserMedia( { audio:true } )
+				.then( function( microphone ) { 
+					microphone_analyser_run( microphone );
+				})
+				.catch( function( err ) {
+					console.log( 'could not get microphone access' );
+					console.log( err );
+				});
+			};
+
+			const microphone_analyser_run = function( microphone ) {
+				/* get the web audio context */
+				let audioContext = new AudioContext();
+
+				/* setup the analyser and the data space */
+
+				let analyser = audioContext.createAnalyser();
+				analyser.fftSize = 2048;
+				let bufferLength = analyser.frequencyBinCount;
+				let timeDomain = new Uint8Array( bufferLength );
+				let frequency = new Uint8Array( bufferLength );
+
+				/* connect it to the microphone using a stream */
+
+				let microphone_stream = audioContext.createMediaStreamSource( microphone );
+				microphone_stream.connect( analyser );
+
+				/* get the canvas and context to draw stuff */
+
+				let logo = document.getElementsByTagName( 'img' )[ 0 ];
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let context = canvas.getContext( '2d' );
+
+				let radius = logo.width * 0.25;
+				let angle = 0;
+
+				/* draw some stuff */
+
+				const drawData = function( color, data, mininum ) {
+					let x = 0;
+					let sum = 0;
+					let sliceWidth = canvas.width * 1.0 / data.length;
+					if ( 'undefined' === typeof( mininum ) ) mininum = -1;
+
+					let count = 0;
+					let min = 0;
+					let max = 0;
+					let minAt = 0;
+					let maxAt = 0;
+
+					context.strokeStyle = color;
+					context.beginPath();
+					for ( let i = 0; i < data.length ; i++, x+= sliceWidth ) {
+						let v = data[ i ];
+						sum += v;
+						if ( v > mininum ) count++;
+						let y = canvas.height * v / 256.0;
+						( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
+						if( 0 === i || v < min ) {
+							min = v;
+							minAt = i;
+						}
+						if( 0 === i || v > max ) {
+							max = v;
+							maxAt = i;
+						}
+					}
+					context.stroke();
+
+					return {sum:sum,count:count,average:sum/count,min:min,max:max,minAt:minAt,maxAt:maxAt};
+				};
+
+				const draw = function() {
+					/* request next frame */
+
+					setTimeout( function() { requestAnimationFrame( draw ) } , 1000 / FPS );
+
+					/* place and clear the canvas */
+
+					if ( canvas.width != window.innerWidth ) {
+						canvas.width = window.innerWidth;
+					}
+					if ( canvas.style.top != window.innerHeight - canvas.height ) {
+						canvas.style.top = window.innerHeight - canvas.height;
+					}
+
+					context.fillStyle = 'black';
+					context.fillRect( 0, 0, canvas.width, canvas.height );
+
+					/* analyse the data */
+
+					analyser.getByteTimeDomainData( timeDomain );
+					analyser.getByteFrequencyData( frequency );
+
+					/* draw the analysis */
+
+					let timeDomainInfo = drawData( 'red', timeDomain );
+					let frequencyInfo = drawData( 'blue', frequency );
+
+					let f = frequencyInfo.average / 66;
+					let g = ( 129 - timeDomainInfo.average ) / 1.5;
+					//console.log( timeDomainInfo.average + ' and ' + frequencyInfo.average + ' so ' + f + ' and ' + g );
+
+					g = frequencyInfo.maxAt / 25;//jfrequency.length;
+					if ( g > 1 ) g = 1;
+
+					angle = Math.PI * 2 * f;
+					radius = logo.width * 0.07 * g;
+/*
+					angle = 0;
+					for ( let i = 0 ; i < frequency.length ; i++ ) {
+						//let v = ( frequency[ i ] - frequencyInfo.min ) / ( frequencyInfo.max - frequencyInfo.min );
+						let v = frequency[ i ] / 256;
+						let a = Math.PI * 2 * i / frequency.length;
+						angle += v * a;
+					}
+*/
+
+					let x = window.innerWidth * 0.5 + radius * Math.cos( angle );
+					let y = window.innerHeight * 0.5 + radius * Math.sin( angle );
+
+					logo.style.left = ( x - logo.width * 0.5 ) + 'px';
+					logo.style.top = ( y - logo.height * 0.5 ) + 'px';
+
+				};
+
+				/* initial call to draw function */
+
+				draw();
+			};
+		</script>
+		<style>
+			body {
+				background: black;
+				overflow: hidden;
+			}
+			img {
+				display:block;
+				position:absolute;
+				z-index:1;
+			}
+			canvas {
+				display:block;
+				position:absolute;
+				left:-1px;
+				z-index:2;
+			}
+		</style>
+	</HEAD>
+	<BODY>
+		<img src="https://raw.githubusercontent.com/luckybit4755/rume-4-glo/master/images/cube-maps/opel/Opel1.jpg"></img>
+		<canvas width="1024" height="48" style="border:1px solid red"></canvas>
+	</BODY>
+</HTML>

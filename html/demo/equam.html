@@ -1,0 +1,118 @@
+<HTML>
+	<HEAD>
+		<TITLE>equam</TITLE>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				try {
+					microphone_analyser_start();
+				} catch( e ) {
+					/* may need this if audio needs to be user initiated */
+					var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					canvas.getContext( '2d' ).fillText( 'click me', 33, 33 );
+					canvas.onclick = function() { microphone_analyser_start() };
+				};
+			};
+
+			const microphone_analyser_start = function() {
+				/* request the microphone */
+				navigator.mediaDevices.getUserMedia( { audio:true, video:true } )
+				.then( function( microphone, idk ) { 
+					microphone_analyser_run( microphone );
+				})
+				.catch( function( err ) {
+					console.log( 'could not get microphone access' );
+					console.log( err );
+				});
+			};
+
+			const microphone_analyser_run = function( microphone ) {
+				/* get the web audio context */
+				var audioContext = new AudioContext();
+
+				/* setup the analyser and the data space */
+
+				var analyser = audioContext.createAnalyser();
+				var bufferLength = analyser.frequencyBinCount;
+				var timeDomainArray = new Uint8Array( bufferLength );
+				var frequencyArray = new Uint8Array( bufferLength );
+
+				/* connect it to the microphone using a stream */
+
+				var microphone_stream = audioContext.createMediaStreamSource( microphone );
+				microphone_stream.connect( analyser );
+
+				/* get the canvas and context to draw stuff */
+
+				var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				var context = canvas.getContext( '2d' );
+
+				let video = document.getElementsByTagName( 'video' )[ 0 ];
+				video.srcObject = microphone;
+
+				context.lineWidth = 2;
+				context.strokeStyle = 'black';
+				context.fillStyle = 'gray';
+				
+				/* draw some stuff */
+
+				var draw = function() {
+					/* request next frame */
+
+					setTimeout( function() { requestAnimationFrame( draw ); } , 1000 / 24 );
+
+					/* analyse the data */
+
+					analyser.getByteTimeDomainData( timeDomainArray );
+					analyser.getByteFrequencyData( frequencyArray );
+
+					/* draw the analysis */
+					
+					context.drawImage( video, 0, 0 );
+
+					let w = parseInt( canvas.width );
+					let h = parseInt( canvas.height );
+
+					let imageData = context.getImageData( 0, 0, w, h );
+					let idx = 0;
+					for ( let y = 0 ; y < h ; y++, idx += w * 4 ) {
+						let off = Math.floor( timeDomainArray.length * y / h );
+						let xox = Math.floor( 44 * timeDomainArray[ off ] / 256 );
+						for ( let x = w - 1 ; x >= xox ; x-- ) {
+							let o = x - xox;
+							imageData.data[ idx + x * 4 + 0 ] = imageData.data[ idx + o * 4 + 0 ];
+							imageData.data[ idx + x * 4 + 1 ] = imageData.data[ idx + o * 4 + 1 ];
+							imageData.data[ idx + x * 4 + 2 ] = imageData.data[ idx + o * 4 + 2 ];
+						}
+					}
+
+					idx = 0;
+					let max = w * h * 4;
+					for ( let y = 0 ; y < h ; y++ ) {
+						for ( let x = 0 ; x < w ; x++ ) {
+							let off = Math.floor( frequencyArray.length * idx / max );
+							let xox = Math.floor( 64 * frequencyArray[ off ] / 256 );
+							imageData.data[ idx++ ] += xox;
+							imageData.data[ idx++ ] += xox;
+							imageData.data[ idx++ ] += xox;
+							idx++;
+						}
+					}
+
+					context.putImageData( imageData, 0, 0 );
+				};
+
+				/* initial call to draw function */
+
+				draw();
+			};
+		</script>
+		<style>
+			video { display:none};
+		</style>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+		<video  width="512" height="512" autoplay></video>
+	</BODY>
+</HTML>

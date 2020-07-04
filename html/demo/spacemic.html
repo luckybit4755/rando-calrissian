@@ -1,6 +1,6 @@
 <HTML>
 	<HEAD>
-		<TITLE>web-audio-microphone-analyser</TITLE>
+		<TITLE>spacemic</TITLE>
 
 		<script type="text/javascript">
 			window.onload = function() {
@@ -47,9 +47,13 @@
 				let context = canvas.getContext( '2d' );
 				let sliceWidth = canvas.width * 1.0 / timeDomain.length;
 
-				context.lineWidth = 2;
-				context.strokeStyle = 'black';
-				context.fillStyle = 'gray';
+                let indices = new Array(timeDomain.length).fill(0).map((v,i)=>i).sort(function(a,b){return Math.random()-Math.random()});
+
+				let dudes = [];
+                for ( let i = 0 ; i < 64 ; i++ ) {
+					dudes.push( {x:33, y:canvas.height*0.5, dx:0, dy:0} );
+                }
+
 				
 				/* draw some stuff */
 
@@ -65,6 +69,7 @@
 
 					/* clear the canvas */
 
+					context.fillStyle = 'rgba(0,0,0,0.2)';
 					context.fillRect(0, 0, canvas.width, canvas.height);
 
 					/* draw the analysis */
@@ -75,13 +80,65 @@
 						context.strokeStyle = entries[ j ].color;
 
 						let x = 0;
+						let h = canvas.height * 0.25;
 						context.beginPath();
 						for (let i = 0; i < data.length; i++, x+= sliceWidth ) {
-							let y = canvas.height - canvas.height * ( data[ i ] / 256 );
+							let k = i;//!j ? i : indices[ i ];
+							let y = canvas.height - h * ( data[ k ] / 256 );
 							( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
 						}
 
 						context.stroke();
+					}
+
+					/* draw the dudes */
+
+					//canvas.height
+					//dudes.push( {x:33, y:canvas.height*0.5, dx:0, dy:0} );
+					let part = frequency.length / dudes.length;
+					let w = canvas.width;
+					let h = canvas.height;
+					let range = { x:{min:0,max:0}, y:{min:0,max:0} };
+					for ( let i = 0 ; i < dudes.length ; i++ ) {
+						let dude = dudes[ i ];
+						if ( !i || dude.x < range.x.min ) range.x.min = dude.x;
+						if ( !i || dude.x > range.x.max ) range.x.max = dude.x;
+						if ( !i || dude.y < range.y.min ) range.y.min = dude.y;
+						if ( !i || dude.y > range.y.max ) range.y.max = dude.y;
+					}
+					range.x.diff = range.x.max - range.x.min;
+					range.y.diff = range.y.max - range.y.min;
+					if ( 0 == range.x.diff ) range.x.diff = 1;
+					if ( 0 == range.y.diff ) range.y.diff = 1;
+					let dampening = 0.9;
+					console.log( JSON.stringify( range ) );
+					for ( let i = 0 ; i < dudes.length ; i++ ) {
+						let dude = dudes[ i ];
+						let x = ( dude.x - range.x.min ) / range.x.diff * w;
+						let y = ( dude.y - range.y.min ) / range.y.diff * h;
+
+						context.fillStyle = 'white';
+						context.fillRect( x, y, 3, 2 );
+
+						dude.x += dude.dx;
+						dude.y += dude.dy;
+						dude.dx *= dampening;
+						dude.dy *= dampening;
+
+						let sum = 0;
+						let bum = 0;
+						for ( let j = i * part ; j < i * part + part ; j++ ) {
+							sum += frequency[ j ];
+							bum += timeDomain[ j ];
+						}
+						sum /= part;
+						bum /= part;
+
+						let q = ( sum - 128 ) / 128 + 1.9;
+						let p = ( bum - 128 ) / 128 + 0.9;
+						dude.dy += q;
+						dude.dx += p;
+						
 					}
 
 				};
