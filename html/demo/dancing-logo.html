@@ -125,16 +125,17 @@
 					if ( g > 1 ) g = 1;
 
 					angle = Math.PI * 2 * f;
-					radius = logo.width * 0.07 * g;
-/*
-					angle = 0;
-					for ( let i = 0 ; i < frequency.length ; i++ ) {
-						//let v = ( frequency[ i ] - frequencyInfo.min ) / ( frequencyInfo.max - frequencyInfo.min );
-						let v = frequency[ i ] / 256;
-						let a = Math.PI * 2 * i / frequency.length;
-						angle += v * a;
+					radius = logo.width * 0.45 * g;
+
+					if ( false ) {
+						angle = 0;
+						for ( let i = 0 ; i < frequency.length ; i++ ) {
+							//let v = ( frequency[ i ] - frequencyInfo.min ) / ( frequencyInfo.max - frequencyInfo.min );
+							let v = frequency[ i ] / 256;
+							let a = Math.PI * 2 * i / frequency.length;
+							angle += v * a;
+						}
 					}
-*/
 
 					let x = window.innerWidth * 0.5 + radius * Math.cos( angle );
 					let y = window.innerHeight * 0.5 + radius * Math.sin( angle );
