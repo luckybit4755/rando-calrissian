@@ -1,0 +1,198 @@
+<HTML>
+	<HEAD>
+		<TITLE>wavemic</TITLE>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				try {
+					microphone_analyser_start();
+				} catch( e ) {
+					/* may need this if audio needs to be user initiated */
+					let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					canvas.getContext( '2d' ).fillText( 'click me', 33, 33 );
+					canvas.onclick = function() { microphone_analyser_start() };
+				};
+			};
+
+			const microphone_analyser_start = function() {
+				/* request the microphone */
+				navigator.mediaDevices.getUserMedia( { audio:true } )
+				.then( function( microphone ) { 
+					microphone_analyser_run( microphone );
+				})
+				.catch( function( err ) {
+					console.log( 'could not get microphone access' );
+					console.log( err );
+				});
+			};
+
+			const microphone_analyser_run = function( microphone ) {
+				/* get the web audio context */
+				let audioContext = new AudioContext();
+
+				/* setup the analyser and the data space */
+
+				let analyser = audioContext.createAnalyser();
+				let timeDomain = new Uint8Array( analyser.frequencyBinCount );
+
+				/* connect it to the microphone using a stream */
+
+				let microphone_stream = audioContext.createMediaStreamSource( microphone );
+				microphone_stream.connect( analyser );
+
+				/* get the canvas and context to draw stuff */
+
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				canvas.onclick = function() { fullscreen( canvas ) };
+				let context = canvas.getContext( '2d' );
+
+				context.lineWidth = 2;
+				context.fillStyle = context.strokeStyle = 'black';
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+				
+				/* draw some stuff */
+
+				/// settings...
+				let wave_draw = true;
+				let line_draw = false;
+				let copier = true;
+				let blur = true;
+				let fade = !true;
+
+				let fadeStyle = 'rgba(0,0,99,0.01)';
+				context.fillStyle = fadeStyle.replace( /0\.\d+/, 1 );
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				let draw = function() {
+					/* request next frame */
+					
+					setTimeout( function() { requestAnimationFrame( draw ); } , 1000 / 24 );
+
+					/* analyse the data */
+
+					analyser.getByteTimeDomainData( timeDomain );
+					let min, max;
+					for ( let i = 0 ; i < timeDomain.length ; i++ ) {
+						if ( !i || timeDomain[ i ] < min ) min = timeDomain[ i ];
+						if ( !i || timeDomain[ i ] > max ) max = timeDomain[ i ];
+					}
+
+					/* clear the canvas */
+
+					let w = canvas.width;
+					let h = canvas.height;
+					let h2 = Math.floor( h / 2 );
+
+					if ( fade ) {
+						context.fillStyle = fadeStyle;
+						context.fillRect( 0, 0, w, h );
+					}
+
+					/* draw the analysis */
+
+					let sliceWidth = w * 1.0 / timeDomain.length;
+
+					if ( copier ) {
+						let tmp = context.getImageData( 0, 1, w, h2  );
+						context.putImageData( tmp, 0, 0 );
+						tmp = context.getImageData( 0, h2, w, h2  );
+						context.putImageData( tmp, 0, h2 + 1 );
+					}
+					
+					let src = context.getImageData( 0, 0, w, h );
+					let dst = context.getImageData( 0, 0, w, h );
+
+					/* blur */
+					if ( blur ) {
+						let r, g, b, rc, gc, bc, rt, gt, bt;
+						let idx = w * 4;
+
+						let offsets = [];
+						for ( let dy = -1 ; dy < 2 ; dy++ ) {
+							for ( let dx = -1 ; dx < 2 ; dx++ ) {
+								offsets.push( 4 * ( dx + dy * w ) );
+							}
+						}
+						
+						for ( let y = 1 ; y < h - 1 ; y++, idx += 4 ) {
+							idx += 4;
+							for ( let x = 1 ; x < w - 1 ; x++ ) {
+								r = g = b = rc = gc = bc = 0;
+								for ( let i = 0 ; i < 3 ; i++ ) {
+									for ( let j = 0 ; j < offsets.length ; j++ ) {
+										dst.data[ idx ] += src.data[ idx + offsets[ j ] ];
+									}
+									dst.data[ idx++ ] /= offsets.length;
+								}
+								idx++;
+							}
+						}
+						context.putImageData( dst, 0, 0 );
+					}
+
+
+					/* line draw*/
+					if ( line_draw ) {
+						let start = h2 * w * 4;
+						let end = start + w * 4;
+						let i = 0;
+
+						for ( let idx = start ; idx < end ; idx++, i++ ) {
+							let o = Math.floor( timeDomain.length * i / w );
+							let v = timeDomain[ o ];
+							dst.data[ idx++ ] = 10 * ( ( v >> 0 ) & 25 );
+							dst.data[ idx++ ] = 10 * ( ( v >> 2 ) & 25 );
+							dst.data[ idx++ ] = 10 * ( ( v >> 4 ) & 25 );
+						}
+
+						context.putImageData( dst, 0, 0 );
+					}
+
+					/* wave draw */
+					if ( wave_draw ) {
+						let x = 0;
+						let lastX = x;
+						let lastY = h2;
+						for (let i = 0; i < timeDomain.length; i++, x+= sliceWidth ) {
+							let v = timeDomain[ i ];
+							let y = h * v / 256;
+							// 1 3 7 15 31 63 127 255
+							let r = Math.floor( 11 * ( ( v >> 0 ) & 31 ) ); 
+							let g = Math.floor( 11 * ( ( v >> 2 ) & 31 ) );
+							let b = Math.floor( 11 * ( ( v >> 4 ) & 31 ) );
+						
+							context.strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
+							context.beginPath();
+							context.moveTo( lastX, lastY );
+							context.lineTo( x, y );
+							context.stroke();
+
+							lastX = x;
+							lastY = y;
+						}
+					}
+				};
+
+
+				/* initial call to draw function */
+
+				draw();
+			};
+
+			const fullscreen = function( element ) {
+				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
+
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in element ) {
+						element[ f ]();
+						break;
+					}
+				}
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="1024" height="512"></canvas>
+	</BODY>
+</HTML>
