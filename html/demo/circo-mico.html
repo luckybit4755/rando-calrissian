@@ -4,7 +4,10 @@
 
 		<script type="text/javascript">
 			const FPS = 24;
-			const CMAX = 16777215;
+			const CMAX = 16777215; /* 24-bits all on... (r,g,b) */
+
+			const QUIET_THRESHOLD = 0.01;
+			const QUIET_MAX = FPS * 0.5;
 
 			window.onload = function() {
 				try {
@@ -57,6 +60,10 @@
 				/* draw some stuff */
 					
 				let frame = 0;
+				let mode = 0;
+
+				let quietFrameCount = 0;
+				let isQuiet = false;
 
 				let draw = function() {
 					frame++;
@@ -75,7 +82,7 @@
 					let w = canvas.width;
 					let h = canvas.height;
 
-					context.fillStyle = 'rgba(0,0,0,0.3)';
+					context.fillStyle = 'rgba(0,0,0,0.5)';
 					context.fillRect(0, 0, w, h);
 
 					/* draw the analysis */
@@ -86,11 +93,33 @@
 						sum += volume;
 					}
 					let average = sum / frequencies.length;
+
 					let average2 = average * average;
+
+					/* try to find the gap in songs to change mode... */
+					if ( average < QUIET_THRESHOLD ) {
+						quietFrameCount++;
+						if ( isQuiet ) {
+						} else {
+							if ( quietFrameCount > QUIET_MAX ) {
+								isQuiet = true;
+								console.log( 'QUIET!' );
+							}
+						}
+					} else {
+						quietFrameCount = 0;
+						if ( isQuiet ) {
+							isQuiet = false;
+							console.log( 'started playing...' );
+							mode++;
+						} else {
+							console.log( 'still playing' );
+						}
+					}
 
 					let x, y;
 					
-					let mode = Math.floor( frame / 733 ) % 2;
+					//mode = Math.floor( frame / 733 ) % 4;
 
 					for ( let i = 0 ; i < frequencies.length ; i++ ) {
 						let frequency = i % frequencies.length / frequencies.length;
@@ -105,11 +134,12 @@
 						let b = ( c >>  0 ) & 0xFF;
 						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
 
-						let a = 0.01 + 0.05;
-						if ( mode ) {
-							a *= 4.4;
+						let alpha = 0.01 + 0.05;
+						/* odd modes are lines so make the alpha higher */
+						if ( mode % 2 ) {
+							alpha *= 4.4;
 						}
-						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + a +')' );
+						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + alpha +')' );
 
 						context.strokeStyle = context.fillStyle = fillStyle;
 
@@ -122,12 +152,25 @@
 						x = w * 0.5 + Math.cos( angles[ i ] ) * offset;
 						y = h * 0.5 + Math.sin( angles[ i ] ) * offset;
 
-						context.beginPath();
-						context.arc( x, y, radius, 0, 2 * Math.PI );
-						if ( mode ) {
-							context.stroke();
-						} else { 
-							context.fill();
+						switch( mode % 4 ) {
+							case 0:
+								context.beginPath();
+								context.arc( x, y, radius, 0, 2 * Math.PI );
+								context.fill();
+								break;
+							case 1:
+								context.beginPath();
+								context.arc( x, y, radius, 0, 2 * Math.PI );
+								context.stroke();
+								break;
+							case 2:
+								context.fillRect( x - radius * 0.5, y - radius * 0.5, radius, radius);
+								break;
+							case 3:
+								context.beginPath();
+								context.rect( x - radius * 0.5, y - radius * 0.5, radius, radius);
+								context.stroke();
+								break;
 						}
 					}
 
