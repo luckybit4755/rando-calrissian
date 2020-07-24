@@ -43,6 +43,9 @@
 
 				let timeDomain = new Uint8Array( size );
 				let frequencies = new Uint8Array( size );
+
+				/* accumulate information about the frequencies over time */
+
 				let angles = new Array( size ).fill( 0 );
 				let radiuses = new Array( size ).fill( 0 );
 
@@ -65,7 +68,8 @@
 				let context = canvas.getContext( '2d' );
 
 				/* relax: no matter what happens, go fullscreen! :-P */
-				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { mode++; fullscreen( canvas ) }
+
+				doTheThing( canvas, function() { mode++; fullscreen( canvas ) } );
 
 				context.lineWidth = 2;
 				
@@ -109,21 +113,21 @@
 					if ( average < QUIET_THRESHOLD ) {
 						quietFrameCount++;
 						if ( 1 == quietFrameCount ) {
+							line( context, 'yellow', 0, 33, w, 33 );
 							context.fillStyle = 'rgba(0,0,255,0.1)';
-							context.fillRect( 0, 0, w, h );
 						}
 
 						if ( !isQuiet && quietFrameCount > QUIET_MAX ) {
 							isQuiet = true;
 							console.log( 'QUIET!' );
-							context.fillStyle = 'rgba(255,0,0,0.1)';
-							context.fillRect( 0, 0, w, h );
+							line( context, 'red', 0, 33, w, 33 );
 						}
 					} else {
 						quietFrameCount = 0;
 						if ( isQuiet ) {
 							isQuiet = false;
 							console.log( 'started playing...' );
+							line( context, 'green', 0, 33, w, 33 );
 							mode++;
 						} else {
 							//console.log( 'still playing' );
@@ -138,6 +142,11 @@
 
 					let useRadiusAccumulator = ( Math.floor( frame / ( FPS * 3 ) ) % 2 );
 					useRadiusAccumulator = true;
+
+					let angularDecay = 1;
+					if ( Math.floor( frame / ( FPS * 30 ) ) % 2 ) {
+						angularDecay = 0.9;
+					}
 
 					/* process the volume for each frequency */
 
@@ -183,6 +192,7 @@
 						/* each frequency has an angle that changes depending on current relative volume */
 						let v = volume2 - average2 * 1.33;
 						angles[ i ] += v * 0.77;
+						angles[ i ] *= angularDecay;
 
 						/* save these to later and to make the code cleaner */
 
@@ -258,8 +268,21 @@
 				draw();
 			};
 
+			const line = function( context, color, x1, y1, x2, y2 ) {
+				context.strokeStyle = color;
+				context.beginPath();
+				context.moveTo( x1, y1 );
+				context.lineTo( x2, y2 );
+				context.stroke();
+			}
+
+			const doTheThing = function( element, cb ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress = 
+				document.onclick = document.onmouseover = document.keypress = element.onclick = 
+				element.on = cb;
+			}
+
 			const fullscreen = function( element ) {
-				return;
 				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
 				for ( var i = 0 ; i < fz.length ; i++ ) {
 					var f = fz[ i ];
@@ -274,6 +297,7 @@
 			body { 
 				font-family: sans-serif;
 				background:black;
+				user-select: none;
 			}
 			a {
 				color:#727;
@@ -283,8 +307,8 @@
 			a:hover {
 				color:#F9F;
 				font-weight: bold;
-			}
 
+			}
 		</style>
 	</HEAD>
 	<BODY>
