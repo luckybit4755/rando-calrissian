@@ -150,7 +150,7 @@
 						let b = ( c >>  0 ) & 0xFF;
 						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
 
-						/* base the alpha value (transparency) on the volume for this frequency );
+						/* base the alpha value (transparency) on the volume for this frequency */
 
 						let alpha = 0.01 + 0.05 * volume;
 						if ( mode % 2 ) {
@@ -179,7 +179,6 @@
 					
 						x = xmid + cos * offset;
 						y = ymid + sin * offset;
-
 						switch( mode % 5 ) {
 							case 0:
 								/* filled circles */
