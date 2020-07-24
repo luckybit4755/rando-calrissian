@@ -44,6 +44,7 @@
 				let timeDomain = new Uint8Array( size );
 				let frequencies = new Uint8Array( size );
 				let angles = new Array( size ).fill( 0 );
+				let radiuses = new Array( size ).fill( 0 );
 
 				/* connect it to the microphone using a stream */
 
@@ -135,7 +136,14 @@
 								
 					context.lineWidth = 2;
 
+					let useRadiusAccumulator = ( Math.floor( frame / ( FPS * 3 ) ) % 2 );
+					useRadiusAccumulator = true;
+
+					/* process the volume for each frequency */
+
 					for ( let i = 0 ; i < size ; i++ ) {
+						/* convert the ranges to [0:1] */
+
 						let frequency = i % size / size;
 						let volume = frequencies[ i ] / 256;
 
@@ -166,6 +174,12 @@
 						let radius = 0.50 * w * volume;        /* size of the circle */
 						let offset = 0.50 * w * volumeInverse; /* distance from the center */
 
+						if ( useRadiusAccumulator ) {
+							radiuses[ i ] += volume2 - average2;
+							radius = Math.abs( radiuses[ i ] * 0.05 * w );
+							radiuses[ i ] = 0.9 * Math.max( 0, radiuses[ i ] );
+						}
+
 						/* each frequency has an angle that changes depending on current relative volume */
 						let v = volume2 - average2 * 1.33;
 						angles[ i ] += v * 0.77;
@@ -179,6 +193,9 @@
 					
 						x = xmid + cos * offset;
 						y = ymid + sin * offset;
+
+						/* different way to draw the frequency's volume */
+
 						switch( mode % 5 ) {
 							case 0:
 								/* filled circles */
@@ -219,7 +236,7 @@
 						}
 					}
 
-					/* time domain graph */
+					/* draw time domain graph */
 
 					context.lineWidth = 1;
 
@@ -242,6 +259,7 @@
 			};
 
 			const fullscreen = function( element ) {
+				return;
 				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
 				for ( var i = 0 ; i < fz.length ; i++ ) {
 					var f = fz[ i ];
