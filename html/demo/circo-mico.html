@@ -83,9 +83,11 @@
 
 					let w = canvas.width;
 					let h = canvas.height;
+					let xmid = w * 0.5;
+					let ymid = h * 0.5;
 
 					context.fillStyle = 'rgba(0,0,0,0.5)';
-					context.fillRect(0, 0, w, h);
+					context.fillRect( 0, 0, w, h );
 
 					/* draw the analysis */
 
@@ -101,12 +103,16 @@
 					/* try to find the gap in songs to change mode... */
 					if ( average < QUIET_THRESHOLD ) {
 						quietFrameCount++;
-						if ( isQuiet ) {
-						} else {
-							if ( quietFrameCount > QUIET_MAX ) {
-								isQuiet = true;
-								console.log( 'QUIET!' );
-							}
+						if ( 1 == quietFrameCount ) {
+							context.fillStyle = 'rgba(0,0,255,0.1)';
+							context.fillRect( 0, 0, w, h );
+						}
+
+						if ( !isQuiet && quietFrameCount > QUIET_MAX ) {
+							isQuiet = true;
+							console.log( 'QUIET!' );
+							context.fillStyle = 'rgba(255,0,0,0.1)';
+							context.fillRect( 0, 0, w, h );
 						}
 					} else {
 						quietFrameCount = 0;
@@ -120,8 +126,8 @@
 					}
 
 					let x, y;
-					
-					//mode = Math.floor( frame / 733 ) % 4;
+								
+					context.lineWidth = 2;
 
 					for ( let i = 0 ; i < frequencies.length ; i++ ) {
 						let frequency = i % frequencies.length / frequencies.length;
@@ -150,11 +156,13 @@
 
 						let v = volume2 - average2 * 1.33;
 						angles[ i ] += v * 0.77;
+						let cos = Math.cos( angles[ i ] );
+						let sin = Math.sin( angles[ i ] );
 					
-						x = w * 0.5 + Math.cos( angles[ i ] ) * offset;
-						y = h * 0.5 + Math.sin( angles[ i ] ) * offset;
+						x = xmid + cos * offset;
+						y = ymid + sin * offset;
 
-						switch( mode % 4 ) {
+						switch( mode % 5 ) {
 							case 0:
 								context.beginPath();
 								context.arc( x, y, radius, 0, 2 * Math.PI );
@@ -173,10 +181,25 @@
 								context.rect( x - radius * 0.5, y - radius * 0.5, radius, radius);
 								context.stroke();
 								break;
+							case 4:
+								context.lineWidth = w * 0.07;
+
+								x = xmid + Math.cos( angles[ i ] ) * volume * w * 0.5
+								y = ymid + Math.sin( angles[ i ] ) * volume * h * 0.5
+								if ( i ) { 
+									context.lineTo( x, y );
+									context.stroke();
+								} 
+
+								context.beginPath();
+								context.moveTo( x, y );
+								break;
 						}
 					}
 
 					/* time domain graph */
+
+					context.lineWidth = 1;
 
 					context.strokeStyle = 'rgba(255,0,0,0.2)';
 					context.beginPath();
