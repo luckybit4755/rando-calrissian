@@ -48,22 +48,24 @@
 				let microphone_stream = audioContext.createMediaStreamSource( microphone );
 				microphone_stream.connect( analyser );
 
-				/* get the canvas and context to draw stuff */
-
-				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
-				let context = canvas.getContext( '2d' );
-
-				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { fullscreen( canvas ) }
-
-				context.lineWidth = 2;
-				
-				/* draw some stuff */
+				/* some state stuff */
 					
 				let frame = 0;
 				let mode = 0;
 
 				let quietFrameCount = 0;
 				let isQuiet = false;
+
+				/* get the canvas and context to draw stuff */
+
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let context = canvas.getContext( '2d' );
+
+				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { mode++; fullscreen( canvas ) }
+
+				context.lineWidth = 2;
+				
+				/* draw some stuff */
 
 				let draw = function() {
 					frame++;
