@@ -39,9 +39,11 @@
 				/* setup the analyser and the data space */
 
 				let analyser = audioContext.createAnalyser();
-				let timeDomain = new Uint8Array( analyser.frequencyBinCount );
-				let frequencies = new Uint8Array( analyser.frequencyBinCount );
-				let angles = new Array( frequencies.length ).fill( 0 );
+				let size = analyser.frequencyBinCount;
+
+				let timeDomain = new Uint8Array( size );
+				let frequencies = new Uint8Array( size );
+				let angles = new Array( size ).fill( 0 );
 
 				/* connect it to the microphone using a stream */
 
@@ -61,6 +63,7 @@
 				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 				let context = canvas.getContext( '2d' );
 
+				/* relax: no matter what happens, go fullscreen! :-P */
 				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { mode++; fullscreen( canvas ) }
 
 				context.lineWidth = 2;
@@ -89,18 +92,19 @@
 					context.fillStyle = 'rgba(0,0,0,0.5)';
 					context.fillRect( 0, 0, w, h );
 
-					/* draw the analysis */
+					/* get an feel for the current slice of data */
 
 					let sum = 0;
-					for ( let i = 0 ; i < frequencies.length ; i++ ) {
+					for ( let i = 0 ; i < size ; i++ ) {
 						let volume = frequencies[ i ] / 256;
 						sum += volume;
 					}
-					let average = sum / frequencies.length;
+					let average = sum / size;
 
 					let average2 = average * average;
 
 					/* try to find the gap in songs to change mode... */
+
 					if ( average < QUIET_THRESHOLD ) {
 						quietFrameCount++;
 						if ( 1 == quietFrameCount ) {
@@ -125,63 +129,82 @@
 						}
 					}
 
+					/* draw the analysis */
+
 					let x, y;
 								
 					context.lineWidth = 2;
 
-					for ( let i = 0 ; i < frequencies.length ; i++ ) {
-						let frequency = i % frequencies.length / frequencies.length;
+					for ( let i = 0 ; i < size ; i++ ) {
+						let frequency = i % size / size;
 						let volume = frequencies[ i ] / 256;
+
 						let volume2 = volume * volume;
 						let volumeInverse = 1 - volume;
 
+						/* convert the frequency to a color */
+
 						let c = Math.floor( CMAX * frequency );
-						
 						let r = ( c >> 16 ) & 0xFF;
 						let g = ( c >>  8 ) & 0xFF;
 						let b = ( c >>  0 ) & 0xFF;
 						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
 
-						let alpha = 0.01 + 0.05;
-						/* odd modes are lines so make the alpha higher */
+						/* base the alpha value (transparency) on the volume for this frequency );
+
+						let alpha = 0.01 + 0.05 * volume;
 						if ( mode % 2 ) {
+							/* odd modes are lines so make the alpha higher */
 							alpha *= 4.4;
 						}
 						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + alpha +')' );
 
 						context.strokeStyle = context.fillStyle = fillStyle;
 
+						/* cook some sizes and coordinates from the volume and stuff */
+
 						let radius = 0.50 * w * volume;        /* size of the circle */
 						let offset = 0.50 * w * volumeInverse; /* distance from the center */
 
+						/* each frequency has an angle that changes depending on current relative volume */
 						let v = volume2 - average2 * 1.33;
 						angles[ i ] += v * 0.77;
+
+						/* save these to later and to make the code cleaner */
+
 						let cos = Math.cos( angles[ i ] );
 						let sin = Math.sin( angles[ i ] );
+
+						/* the actual coordinate with good old trig */
 					
 						x = xmid + cos * offset;
 						y = ymid + sin * offset;
 
 						switch( mode % 5 ) {
 							case 0:
+								/* filled circles */
 								context.beginPath();
 								context.arc( x, y, radius, 0, 2 * Math.PI );
 								context.fill();
 								break;
 							case 1:
+								/* line circles */
 								context.beginPath();
 								context.arc( x, y, radius, 0, 2 * Math.PI );
 								context.stroke();
 								break;
 							case 2:
+								/* fill rectangles */
 								context.fillRect( x - radius * 0.5, y - radius * 0.5, radius, radius);
 								break;
 							case 3:
+								/* line rectangles */
 								context.beginPath();
 								context.rect( x - radius * 0.5, y - radius * 0.5, radius, radius);
 								context.stroke();
 								break;
 							case 4:
+								/* big weird lines or something :-P */
 								context.lineWidth = w * 0.07;
 
 								x = xmid + Math.cos( angles[ i ] ) * volume * w * 0.5
@@ -204,10 +227,10 @@
 					context.strokeStyle = 'rgba(255,0,0,0.2)';
 					context.beginPath();
 
-					let sliceWidth = w * 1.0 / timeDomain.length;
+					let sliceWidth = w * 1.0 / size;
 
 					x = 0;
-					for ( let i = 0; i < timeDomain.length; i++, x+= sliceWidth ) {
+					for ( let i = 0; i < size ; i++, x+= sliceWidth ) {
 						let y = h - h * ( timeDomain[ i ] / 256 ) * 0.1;
 						( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
 					}
