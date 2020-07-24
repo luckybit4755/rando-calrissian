@@ -4,6 +4,7 @@
 
 		<script type="text/javascript">
 			const FPS = 24;
+			const CMAX = 16777215;
 
 			window.onload = function() {
 				try {
@@ -47,7 +48,6 @@
 
 				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 				let context = canvas.getContext( '2d' );
-				let sliceWidth = canvas.width * 1.0 / timeDomain.length;
 
 				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { fullscreen( canvas ) }
 
@@ -71,55 +71,73 @@
 
 					/* clear the canvas */
 
+					let w = canvas.width;
+					let h = canvas.height;
+
 					context.fillStyle = 'rgba(0,0,0,0.3)';
-					context.fillRect(0, 0, canvas.width, canvas.height);
+					context.fillRect(0, 0, w, h);
 
 					/* draw the analysis */
 
-					let mode = Math.floor( frame / 101 ) % 2;
+					let rutro = 0;
+					for ( let i = 0 ; i < frequency.length ; i++ ) {
+						rutro += frequency[ i ];
+					}
 
-					let cmax = 16777215;
+					rutro = 8 + w * 0.25 * ( rutro / 256 / frequency.length );
+
+					let x = w * 0.5 + Math.cos( frame / 10 ) * rutro;
+					let y = h * 0.5 + Math.sin( frame / 10 ) * rutro;
+					
+					let mode = Math.floor( frame / 133 ) % 2;
+
 					for ( let i = 0 ; i < frequency.length ; i++ ) {
 						let q = frequency[ i ] / 256;
-						let p = i / frequency.length;
-
-						switch( mode ) {
-							case 1: p = 1 - p; break;
-						}
+						let p = ( i + frame ) % frequency.length / frequency.length;
 
 						let v = q;
-						let c = Math.floor( cmax * p );
+						let c = Math.floor( CMAX * p );
 						
 						let r = ( c >> 16 ) & 0xFF;
 						let g = ( c >>  8 ) & 0xFF;
 						let b = ( c >>  0 ) & 0xFF;
 						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
-						context.strokeStyle = strokeStyle
 
-						let a = 0.1 + 0.9 * v;
+						let a = 0.1 + 0.4 * v;
 						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + a +')' );
-						context.fillStyle = fillStyle;
 
-						let x = canvas.width * 0.5;
-						let y = canvas.height * 0.5;
-						let radius = 4 + canvas.width * 0.5 * v;
+						context.strokeStyle = context.fillStyle = fillStyle;
+
+						let radius = 2 + v * w * 0.28; /* size of the circle */
+						let offset = 4 + v * w * 0.18; /* distance from the center (the 2 floats add up to < 0.5 ) */ 
+						let angle = frame / 10;
+						angle += Math.PI * 2 * ( p + q );
+					
+						x = w * 0.5 + Math.cos( angle ) * offset;
+						y = h * 0.5 + Math.sin( angle ) * offset;
 
 						context.beginPath();
 						context.arc( x, y, radius, 0, 2 * Math.PI );
-						context.stroke();
-						context.fill();
+						if ( mode ) {
+							context.stroke();
+						} else { 
+							context.fill();
+						}
 					}
 
-						let data = timeDomain;
-						context.strokeStyle = 'rgba(255,0,0,0.2)';
+					/* frequency graph */
 
-						let x = 0;
-						context.beginPath();
-						for (let i = 0; i < data.length; i++, x+= sliceWidth ) {
-							let y = canvas.height - canvas.height * ( data[ i ] / 256 );
-							( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
-						}
-						context.stroke();
+					context.strokeStyle = 'rgba(255,0,0,0.2)';
+					context.beginPath();
+
+					let sliceWidth = w * 1.0 / timeDomain.length;
+
+					x = 0;
+					for ( let i = 0; i < timeDomain.length; i++, x+= sliceWidth ) {
+						let y = h - h * ( timeDomain[ i ] / 256 ) * 0.1;
+						( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
+					}
+					context.stroke();
 				};
 
 				/* initial call to draw function */
