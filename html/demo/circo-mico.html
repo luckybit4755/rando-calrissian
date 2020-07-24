@@ -1,0 +1,147 @@
+<HTML>
+	<HEAD>
+		<TITLE>circo-mico</TITLE>
+
+		<script type="text/javascript">
+			const FPS = 24;
+
+			window.onload = function() {
+				try {
+					microphone_analyser_start();
+				} catch( e ) {
+					/* may need this if audio needs to be user initiated */
+					let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					canvas.getContext( '2d' ).fillText( 'click me', 33, 33 );
+					canvas.onclick = function() { microphone_analyser_start() };
+				};
+			};
+
+			const microphone_analyser_start = function() {
+				/* request the microphone */
+				navigator.mediaDevices.getUserMedia( { audio:true } )
+				.then( function( microphone ) { 
+					microphone_analyser_run( microphone );
+				})
+				.catch( function( err ) {
+					console.log( 'could not get microphone access' );
+					console.log( err );
+				});
+			};
+
+			const microphone_analyser_run = function( microphone ) {
+				/* get the web audio context */
+				let audioContext = new AudioContext();
+
+				/* setup the analyser and the data space */
+
+				let analyser = audioContext.createAnalyser();
+				let timeDomain = new Uint8Array( analyser.frequencyBinCount );
+				let frequency = new Uint8Array( analyser.frequencyBinCount );
+
+				/* connect it to the microphone using a stream */
+
+				let microphone_stream = audioContext.createMediaStreamSource( microphone );
+				microphone_stream.connect( analyser );
+
+				/* get the canvas and context to draw stuff */
+
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let context = canvas.getContext( '2d' );
+				let sliceWidth = canvas.width * 1.0 / timeDomain.length;
+
+				document.body.onclick = document.body.onmouseover = document.body.keypress = document.onclick = document.onmouseover = document.keypress = canvas.onclick = canvas.on = function() { fullscreen( canvas ) }
+
+				context.lineWidth = 2;
+				
+				/* draw some stuff */
+					
+				let frame = 0;
+
+				let draw = function() {
+					frame++;
+
+					/* request next frame */
+
+					setTimeout( function() { requestAnimationFrame( draw ); } , 1000 / FPS );
+
+					/* analyse the data */
+
+					analyser.getByteTimeDomainData( timeDomain );
+					analyser.getByteFrequencyData( frequency );
+
+					/* clear the canvas */
+
+					context.fillStyle = 'rgba(0,0,0,0.3)';
+					context.fillRect(0, 0, canvas.width, canvas.height);
+
+					/* draw the analysis */
+
+					let mode = Math.floor( frame / 101 ) % 2;
+
+					let cmax = 16777215;
+					for ( let i = 0 ; i < frequency.length ; i++ ) {
+						let q = frequency[ i ] / 256;
+						let p = i / frequency.length;
+
+						switch( mode ) {
+							case 1: p = 1 - p; break;
+						}
+
+						let v = q;
+						let c = Math.floor( cmax * p );
+						
+						let r = ( c >> 16 ) & 0xFF;
+						let g = ( c >>  8 ) & 0xFF;
+						let b = ( c >>  0 ) & 0xFF;
+						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
+						context.strokeStyle = strokeStyle
+
+						let a = 0.1 + 0.9 * v;
+						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + a +')' );
+						context.fillStyle = fillStyle;
+						if( i == 33 ) console.log( fillStyle );
+
+						let x = canvas.width * 0.5;
+						let y = canvas.height * 0.5;
+						let radius = 4 + canvas.width * 0.5 * v;
+
+						context.beginPath();
+						context.arc( x, y, radius, 0, 2 * Math.PI );
+						context.stroke();
+						context.fill();
+					}
+
+						let data = timeDomain;
+						context.strokeStyle = 'rgba(255,0,0,0.2)';
+
+						let x = 0;
+						context.beginPath();
+						for (let i = 0; i < data.length; i++, x+= sliceWidth ) {
+							let y = canvas.height - canvas.height * ( data[ i ] / 256 );
+							( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
+						}
+						context.stroke();
+				};
+
+				/* initial call to draw function */
+
+				draw();
+			};
+
+			const fullscreen = function( element ) {
+				return;
+				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in element ) {
+						element[ f ]();
+						break;
+					}
+				}
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
