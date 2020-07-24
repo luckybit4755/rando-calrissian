@@ -3,11 +3,17 @@
 		<TITLE>circo-mico</TITLE>
 
 		<script type="text/javascript">
+		
+			/* frames per second */
 			const FPS = 24;
-			const CMAX = 16777215; /* 24-bits all on... (r,g,b) */
+
+			/* color max is all 24-bits on */
+			const CMAX = 255 << 16 | 255 < 8 | 255;
 
 			const QUIET_THRESHOLD = 0.01;
 			const QUIET_MAX = FPS * 0.5;
+
+			/* fire it up ! */
 
 			window.onload = function() {
 				try {
@@ -20,6 +26,8 @@
 				};
 			};
 
+			/* get the microphone */
+
 			const microphone_analyser_start = function() {
 				/* request the microphone */
 				navigator.mediaDevices.getUserMedia( { audio:true } )
@@ -31,6 +39,8 @@
 					console.log( err );
 				});
 			};
+
+			/* setup and perform the analysis */
 
 			const microphone_analyser_run = function( microphone ) {
 				/* get the web audio context */
@@ -268,20 +278,23 @@
 				draw();
 			};
 
+			/* draw a line */
 			const line = function( context, color, x1, y1, x2, y2 ) {
 				context.strokeStyle = color;
 				context.beginPath();
 				context.moveTo( x1, y1 );
 				context.lineTo( x2, y2 );
 				context.stroke();
-			}
+			};
 
+			/* hookup like 10 million activations for fullscreen */
 			const doTheThing = function( element, cb ) {
 				document.body.onclick = document.body.onmouseover = document.body.keypress = 
 				document.onclick = document.onmouseover = document.keypress = element.onclick = 
 				element.on = cb;
 			}
 
+			/* try 17 zillion ways to make the element fullscreen */
 			const fullscreen = function( element ) {
 				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
 				for ( var i = 0 ; i < fz.length ; i++ ) {
