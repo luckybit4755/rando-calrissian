@@ -37,7 +37,8 @@
 
 				let analyser = audioContext.createAnalyser();
 				let timeDomain = new Uint8Array( analyser.frequencyBinCount );
-				let frequency = new Uint8Array( analyser.frequencyBinCount );
+				let frequencies = new Uint8Array( analyser.frequencyBinCount );
+				let angles = new Array( frequencies.length ).fill( 0 );
 
 				/* connect it to the microphone using a stream */
 
@@ -67,7 +68,7 @@
 					/* analyse the data */
 
 					analyser.getByteTimeDomainData( timeDomain );
-					analyser.getByteFrequencyData( frequency );
+					analyser.getByteFrequencyData( frequencies );
 
 					/* clear the canvas */
 
@@ -80,41 +81,43 @@
 					/* draw the analysis */
 
 					let rutro = 0;
-					for ( let i = 0 ; i < frequency.length ; i++ ) {
-						rutro += frequency[ i ];
+					for ( let i = 0 ; i < frequencies.length ; i++ ) {
+						rutro += frequencies[ i ];
 					}
 
-					rutro = 8 + w * 0.25 * ( rutro / 256 / frequency.length );
+					rutro = 8 + w * 0.25 * ( rutro / 256 / frequencies.length );
 
 					let x = w * 0.5 + Math.cos( frame / 10 ) * rutro;
 					let y = h * 0.5 + Math.sin( frame / 10 ) * rutro;
 					
 					let mode = Math.floor( frame / 133 ) % 2;
 
-					for ( let i = 0 ; i < frequency.length ; i++ ) {
-						let q = frequency[ i ] / 256;
-						let p = ( i + frame ) % frequency.length / frequency.length;
+					for ( let i = 0 ; i < frequencies.length ; i++ ) {
+						let frequency = i % frequencies.length / frequencies.length;
+						let volume = frequencies[ i ] / 256;
 
-						let v = q;
-						let c = Math.floor( CMAX * p );
+						let c = Math.floor( CMAX * frequency );
 						
 						let r = ( c >> 16 ) & 0xFF;
 						let g = ( c >>  8 ) & 0xFF;
 						let b = ( c >>  0 ) & 0xFF;
 						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
 
-						let a = 0.1 + 0.4 * v;
+						let a = 0.01 + 0.05;
+						if ( mode ) {
+							a *= 4.4;
+						}
 						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + a +')' );
 
 						context.strokeStyle = context.fillStyle = fillStyle;
 
-						let radius = 2 + v * w * 0.28; /* size of the circle */
-						let offset = 4 + v * w * 0.18; /* distance from the center (the 2 floats add up to < 0.5 ) */ 
-						let angle = frame / 10;
-						angle += Math.PI * 2 * ( p + q );
+						let radius = 2 + volume * w * 0.28; /* size of the circle */
+						let offset = 4 + volume * w * 0.18; /* distance from the center (the 2 floats add up to < 0.5 ) */ 
+
+						angles[ i ] += ( volume * volume ) - 0.5;
 					
-						x = w * 0.5 + Math.cos( angle ) * offset;
-						y = h * 0.5 + Math.sin( angle ) * offset;
+						x = w * 0.5 + Math.cos( angles[ i ] ) * offset;
+						y = h * 0.5 + Math.sin( angles[ i ] ) * offset;
 
 						context.beginPath();
 						context.arc( x, y, radius, 0, 2 * Math.PI );
@@ -125,7 +128,7 @@
 						}
 					}
 
-					/* frequency graph */
+					/* time domain graph */
 
 					context.strokeStyle = 'rgba(255,0,0,0.2)';
 					context.beginPath();
