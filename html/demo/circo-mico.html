@@ -106,15 +106,12 @@
 					analyser.getByteTimeDomainData( timeDomain );
 					analyser.getByteFrequencyData( frequencies );
 
-					/* clear the canvas */
+					/* avoid a lot of copy/pasta mess */
 
 					let w = canvas.width;
 					let h = canvas.height;
 					let xmid = w * 0.5;
 					let ymid = h * 0.5;
-
-					context.fillStyle = 'rgba(0,0,0,0.5)';
-					context.fillRect( 0, 0, w, h );
 
 					/* get an feel for the current slice of data */
 
@@ -132,6 +129,12 @@
 					let average2 = average * average;
 
 					let scaleUp = ( !SHOULD_SCALE || 0.5 > max ) ? 1 : 1 / max;
+
+					/* clear the canvas */
+
+					let alpha = 0.1 + 0.4 * max;
+					context.fillStyle = 'rgba(0,0,0,' + alpha + ')';
+					context.fillRect( 0, 0, w, h );
 
 					/* try to find the gap in songs to change mode... */
 
@@ -206,7 +209,7 @@
 
 						/* base the alpha value (transparency) on the volume for this frequency */
 
-						let alpha = 0.01 + 0.05 * volume;
+						alpha = 0.001 + 0.05 * volume;
 						if ( mode % 2 ) {
 							/* odd modes are lines so make the alpha higher */
 							alpha *= 8.8;//4.4;
