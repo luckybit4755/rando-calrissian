@@ -72,6 +72,13 @@
 				let quietFrameCount = 0;
 				let isQuiet = false;
 
+				let shifts = [ 16, 8, 0 ];
+
+				let shifted = Math.random() * 3344;
+				let decayed = Math.random() * 3344;
+					
+				let angularDecay = 1;
+
 				/* get the canvas and context to draw stuff */
 
 				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
@@ -147,15 +154,27 @@
 					/* draw the analysis */
 
 					let x, y;
+					let color = new Array( 4 );
 								
 					context.lineWidth = 2;
 
 					let useRadiusAccumulator = ( Math.floor( frame / ( FPS * 3 ) ) % 2 );
 					useRadiusAccumulator = true;
 
-					let angularDecay = 1;
-					if ( Math.floor( frame / ( FPS * 30 ) ) % 2 ) {
-						angularDecay = 0.9;
+					if ( ++decayed > FPS * 30 ) {
+						decayed = 0;
+						if ( 1 === angularDecay ) { 
+							angularDecay = 0.9;
+						} else {
+							angularDecay = 1.0;
+						}
+						console.log( 'decay:' + angularDecay );
+					}
+
+					if ( ++shifted > FPS * 10 ) {
+						shifted = 0;
+						shifts = shifts.sort( (x,y)=>Math.random()-Math.random() );
+						console.log( 'shifts' + JSON.stringify( shifts ) );
 					}
 
 					/* process the volume for each frequency */
@@ -172,21 +191,21 @@
 						/* convert the frequency to a color */
 
 						let c = Math.floor( CMAX * frequency );
-						let r = ( c >> 16 ) & 0xFF;
-						let g = ( c >>  8 ) & 0xFF;
-						let b = ( c >>  0 ) & 0xFF;
-						let strokeStyle = 'rgb(x,x,x)'.replace( /x/, r ).replace( /x/, g ).replace( /x/, b );
+
+						for ( let j = 0 ; j < shifts.length ; j++ ) {
+							color[ j ] = ( c >> shifts[ j ] ) & 0xFF;
+						}
 
 						/* base the alpha value (transparency) on the volume for this frequency */
 
 						let alpha = 0.01 + 0.05 * volume;
 						if ( mode % 2 ) {
 							/* odd modes are lines so make the alpha higher */
-							alpha *= 4.4;
+							alpha *= 8.8;//4.4;
 						}
-						let fillStyle = strokeStyle.replace( 'rgb', 'rgba' ).replace( /\)/, ',' + alpha +')' );
+						color[ 3 ] = alpha;
 
-						context.strokeStyle = context.fillStyle = fillStyle;
+						context.strokeStyle = context.fillStyle = 'rgba(' + color.join( ',' ) + ')';
 
 						/* cook some sizes and coordinates from the volume and stuff */
 
