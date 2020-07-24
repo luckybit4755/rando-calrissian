@@ -80,21 +80,23 @@
 
 					/* draw the analysis */
 
-					let rutro = 0;
+					let sum = 0;
 					for ( let i = 0 ; i < frequencies.length ; i++ ) {
-						rutro += frequencies[ i ];
+						let volume = frequencies[ i ] / 256;
+						sum += volume;
 					}
+					let average = sum / frequencies.length;
+					let average2 = average * average;
 
-					rutro = 8 + w * 0.25 * ( rutro / 256 / frequencies.length );
-
-					let x = w * 0.5 + Math.cos( frame / 10 ) * rutro;
-					let y = h * 0.5 + Math.sin( frame / 10 ) * rutro;
+					let x, y;
 					
-					let mode = Math.floor( frame / 133 ) % 2;
+					let mode = Math.floor( frame / 733 ) % 2;
 
 					for ( let i = 0 ; i < frequencies.length ; i++ ) {
 						let frequency = i % frequencies.length / frequencies.length;
 						let volume = frequencies[ i ] / 256;
+						let volume2 = volume * volume;
+						let volumeInverse = 1 - volume;
 
 						let c = Math.floor( CMAX * frequency );
 						
@@ -111,10 +113,11 @@
 
 						context.strokeStyle = context.fillStyle = fillStyle;
 
-						let radius = 2 + volume * w * 0.28; /* size of the circle */
-						let offset = 4 + volume * w * 0.18; /* distance from the center (the 2 floats add up to < 0.5 ) */ 
+						let radius = 0.50 * w * volume;        /* size of the circle */
+						let offset = 0.50 * w * volumeInverse; /* distance from the center */
 
-						angles[ i ] += ( volume * volume ) - 0.5;
+						let v = volume2 - average2 * 1.33;
+						angles[ i ] += v * 0.77;
 					
 						x = w * 0.5 + Math.cos( angles[ i ] ) * offset;
 						y = h * 0.5 + Math.sin( angles[ i ] ) * offset;
