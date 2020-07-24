@@ -230,8 +230,10 @@
 						}
 
 						/* each frequency has an angle that changes depending on current relative volume */
-						let v = volume2 - average2 * 1.33;
-						angles[ i ] += v * 0.77;
+						if ( 0 == average2 ) average2 = 1; 
+						let v = volume2 / average2 - 0.5; // use 0.22 instead of 0.88
+						v = volume2 - average2 * 1.33; // this is nice...
+						angles[ i ] += v * 0.88;
 						angles[ i ] *= angularDecay;
 
 						/* save these to later and to make the code cleaner */
