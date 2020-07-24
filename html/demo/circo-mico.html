@@ -13,6 +13,8 @@
 			const QUIET_THRESHOLD = 0.01;
 			const QUIET_MAX = FPS * 0.5;
 
+			const SHOULD_SCALE = -1 != document.location.toString().indexOf( 'scalo' );
+
 			/* fire it up ! */
 
 			window.onload = function() {
@@ -117,13 +119,19 @@
 					/* get an feel for the current slice of data */
 
 					let sum = 0;
+					let min = 0;
+					let max = 0;
 					for ( let i = 0 ; i < size ; i++ ) {
 						let volume = frequencies[ i ] / 256;
 						sum += volume;
+						if ( !i || volume < min ) min = volume;
+						if ( !i || volume > max ) max = volume;
 					}
 					let average = sum / size;
 
 					let average2 = average * average;
+
+					let scaleUp = ( !SHOULD_SCALE || 0.5 > max ) ? 1 : 1 / max;
 
 					/* try to find the gap in songs to change mode... */
 
@@ -183,7 +191,7 @@
 						/* convert the ranges to [0:1] */
 
 						let frequency = i % size / size;
-						let volume = frequencies[ i ] / 256;
+						let volume = frequencies[ i ] / 256 * scaleUp;
 
 						let volume2 = volume * volume;
 						let volumeInverse = 1 - volume;
@@ -315,6 +323,7 @@
 
 			/* try 17 zillion ways to make the element fullscreen */
 			const fullscreen = function( element ) {
+				return;
 				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
 				for ( var i = 0 ; i < fz.length ; i++ ) {
 					var f = fz[ i ];
