@@ -1,0 +1,199 @@
+<HTML>
+	<HEAD>
+		<TITLE>bdo-level-experience</TITLE>
+
+		<script type="text/javascript">
+			const XP = '1 1 1 1 1 161 472 1181 2626 5319 10005 17721 29865 48273 75300 113911 167777 241381 340127 470464 640005 857666 1133804 1480364 1911035 2441411 3089163 3874210 4818908 5948238 7290005 8875042 10737423 12914685 15448049 18382661 21767828 25657269 30109369 35187443 40960005 47501047 54890322 63213635 72563144 83037661 94742974 118571374 158997683 207619316 415238632 830477264 1245715896 1868573844 2802860766 8408582298 21021455745 52553639363 105107278725 210214557450 630643672350 1261287344700 2522574689400 5045149378800 10090298757600 20180597515200'.split( ' ' ).map( (v,i)=>parseInt(v) );
+			const COLORS = 'Pink Cyan Silver LightBlue Orange #a368e8 #A67B5B Yellow Lime Green Magenta Olive'.split( ' ' );
+			const STATE = {from:1,to:56};
+
+			const TOO_SMALL = 0.09;
+			const TEXT_HEIGHT = 14;
+
+			const update = function( context, type, value ) {
+				STATE[ type ] = value;
+				let sum = 0;
+				for ( let level = STATE.from ; level <= STATE.to ; level++ ) {
+					sum += XP[ level ];
+				}
+				
+				document.getElementsByTagName( 'to' )[ 0 ].innerHTML = STATE.to;
+				document.getElementsByTagName( 'from' )[ 0 ].innerHTML = STATE.from;
+
+				let levels = document.getElementsByTagName( 'levels' )[ 0 ];
+				levels.innerHTML = '';
+
+				let w = parseInt( context.canvas.width );
+				let h = parseInt( context.canvas.height );
+				let r = ( w + h ) * 0.25;
+				let x = w * 0.5;
+				let y = h * 0.5;
+
+				context.fillStyle = 'white';
+				context.fillRect( 0, 0, w, h );
+
+				context.fillStyle = context.strokeStyle = 'black';
+
+				let CI = 0;
+			
+				let angle = 0;
+				let lastDrawn = 0;
+				let lastDrawnLevel = STATE.from;
+				for ( let level = STATE.from ; level <= STATE.to ; level++ ) {
+					let l = XP[ level ].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+					let slice = XP[ level ] / sum;
+					let size = Math.PI * 2 * slice;
+					let next = angle + size;
+
+					let txt = level;
+
+					let diff = next - lastDrawn;
+					if ( diff < Math.PI * TOO_SMALL ) {
+						angle = next;
+						continue;
+					} 
+
+					if ( lastDrawn != angle ) {
+						console.log( 'catchup to ' + lastDrawnLevel + ' to ' + level );
+						pln = txt = lastDrawnLevel + ' to ' + level;
+					}
+					angle = lastDrawn;
+					lastDrawn = next;
+					lastDrawnLevel = level;
+
+					let p = Math.floor( ( next - angle ) / Math.PI / 2 * 100 ) + '%';
+
+					let x0 = x + Math.cos( angle ) * r;
+					let y0 = y + Math.sin( angle ) * r;
+					let x1 = x + Math.cos( next ) * r;
+					let y1 = y + Math.sin( next ) * r;
+					let x2 = x + Math.cos( ( next + angle ) * 0.5 ) * r * 0.753;
+					let y2 = y + Math.sin( ( next + angle ) * 0.5 ) * r * 0.753;
+
+					let bg = context.fillStyle = COLORS[ CI++ % COLORS.length ];
+					console.log( bg );
+
+					context.beginPath();
+					context.moveTo( x, y );
+					context.lineTo( x0, y0 );
+					context.arc( x, y, r, angle, next );
+					context.lineTo( x, y );
+					context.fill();
+					context.stroke();
+
+					context.fillStyle = 'black';
+					context.fillText( txt, x2, y2 );
+					context.fillText( p, x2, y2 + TEXT_HEIGHT * 1 );
+					context.fillText( l, x2 - TEXT_HEIGHT * 1, y2 + TEXT_HEIGHT * 2 );
+
+					let levelE = document.createElement( 'level' );
+					levels.appendChild( levelE );
+					let block = document.createElement( 'block' );
+					block.style.backgroundColor = bg;
+					levelE.append( block );
+					let levelI = document.createElement( 'levelI' );
+					levelE.appendChild( levelI );
+					levelI.append( document.createTextNode( txt ) );
+					let levelP = document.createElement( 'levelP' );
+					levelE.appendChild( levelP );
+					levelP.append( document.createTextNode( p ) );
+
+					angle = next;
+				}
+
+				console.log( type + ' is ' + value + ' -> ' + JSON.stringify( STATE ) + ' sum:' + sum );
+			};
+
+			const eventHandler = function( context, type, parent ) {
+				let inputs = [];
+				for ( let j = 0 ; j < parent.childNodes.length ; j++ ) {
+					let sibling = parent.childNodes[ j ];
+					if ( 'INPUT' === sibling.nodeName ) {
+						inputs.push( sibling );
+					}
+				}
+
+				for ( let j = 0 ; j < inputs.length ; j++ ) {
+					let input = inputs[ j ];
+					let other = inputs[ ( j + 1 ) % inputs.length ];
+					input.oninput = input.onchange = function() { 
+						other.value = input.value;
+						update( context, type, input.value );
+					}
+					if ( !j ) input.onchange();
+				}
+			}
+
+			const eventHandlers = function( context ) {
+				let labels = document.getElementsByTagName( 'label' );
+				for ( let i = 0 ; i < labels.length ; i++ ) {
+					let label = labels[ i ];
+					let type = labels[ i ].innerHTML;
+					eventHandler( context, type, label.parentNode );
+				}
+			};
+
+			window.onload = function() {
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let context = canvas.getContext( '2d' );
+				context.canvas = canvas;
+
+				eventHandlers( context );
+			}; 
+		</script>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+			label {
+				width:4em;
+				display:inline-block;
+			}
+			input[type="range"] {
+				width:33em;
+				display:inline-block;
+			}
+			input[type="text"] {
+				width:4em;
+				display:inline-block;
+			}
+			levels {
+				display:inline-block;
+				width:166px;
+				height:512px;
+			}
+			level {
+				display:block;
+				height:1em;
+			}
+			block {
+				display:inline-block;
+				height:0.8em;
+				width:1.0em;
+				border: 1px solid black;
+			}
+			leveli {
+				display:inline-block;
+				width:4em;
+				text-align: right;
+			}
+			levelp {
+				display:inline-block;
+				width:2em;
+				text-align: right;
+				padding-left:1em;
+			}
+		</style>
+	</HEAD>
+	<BODY>
+		<h2>Percent of Total Experience to get from <from>1</from> to <to>56</to></h2>
+		<table><tbody><tr><!-- I know... I know... -->
+			<td><canvas width="512" height="512"></canvas></td>
+			<td><levels></levels></td>
+		</tr></tbody></table>
+		<div><label>from</label><input type="range" min="1" max="64" value="1"></input><input type="text"></input></div>
+		<div><label>to</label><input type="range" min="2" max="65" value="56"></input><input type="text"></input></div>
+	</BODY>
+</HTML>
