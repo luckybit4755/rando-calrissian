@@ -17,7 +17,7 @@
 
 			const test = function() {
 				/* select some random dogs and schedule them */
-				let count = 4 + Math.floor( Math.random() * 10 );
+				let count = 8 + Math.floor( Math.random() * 10 );
 				let tmp = document.getElementsByTagName( 'input' );
 				let inputs = [];
 				for ( let i = 0 ; i < tmp.length ; i++ ) inputs.push( tmp[ i ] );
@@ -25,8 +25,8 @@
 				get( 'button' ).click();
 			};
 
-
 			const schedule = function() {
+				/* create a structure to handle the scheduling */
 				let yards = [];
 
 				for ( let name in CONFIGURATION.yards ) {
@@ -43,7 +43,16 @@
 
 				/* initial assignment */
 
-				let inputs = document.getElementsByTagName( 'input' );
+				let tmp = document.getElementsByTagName( 'input' );
+				let inputs = [];
+				for ( let i = 0 ; i < tmp.length ; i++ ) {
+					inputs.push( tmp[ i ] );
+				}
+				inputs = inputs.sort( (a,b)=>Math.random() - Math.random() );
+
+				let unassigned = [];
+				let conflicted = [];
+
 				for ( let i = 0 ; i < inputs.length ; i++ ) {
 					if ( !inputs[ i ].checked ) continue;
 					let name = inputs[ i ].value;
@@ -61,31 +70,70 @@
 
 					for ( let j = 0 ; j < yards.length && !assigned ; j++ ) {
 						let yard = yards[ j ];
-						let inYard = Object.keys( yard[ type ] ).length;
+						let section = yard[ type ];
+						let inYard = Object.keys( section ).length;
 						let capacity = yard.capacity[ type ];
 						if ( -1 === capacity || capacity > inYard ) {
+
+							if ( name in CONFIGURATION.aggro ) {
+								let aggro = CONFIGURATION.aggro[ name ];
+
+								let conflict = false;
+								let why = '';
+
+								for ( let other in section ) {
+									why = other;
+									conflict = other in aggro;
+									if ( !conflict ) {
+										let tags = CONFIGURATION.dogs[ other ];
+										for ( let k = 0 ; k < tags.length && conflict ; k++ ) {
+											let tag = tags[ k ] ;
+											conflict = tag in aggro;
+											if ( conflict ) {
+												why = other + ' is ' + tag;
+											}
+										}
+									}
+									console.log( 'check ' + name + ' vs ' + other + ' -> ' + conflict );
+									if ( conflict ) {
+										console.log( 'CONFLICT: ' + name + ' and ' + other );
+										break;
+									}
+								}
+								if ( conflict ) {
+									conflicted.push( name + ' and ' + why );
+									continue;
+								}
+							}
+
 							yard[ type ][ name ] = tags;
 							assigned = yard.name;
 						}
 					}
+
 					console.log( 'schedule: ' + name + ' who is ' + tags.join( ' and ' ) + '> ' + type + ' to ' + assigned );
+					if ( !assigned ) unassigned.push( name );
+				}
+
+				if ( conflicted.length ) {
+					get( 'conflicted' ).innerHTML = 'conflicted: ' + conflicted.join( ',' );
+				}
+				if ( unassigned.length ) {
+					get( 'unassigned' ).innerHTML = 'unassigned: ' + unassigned.join( ',' );
 				}
 
 				console.log( JSON.stringify( yards ) ) ;
 
-				let types = 'big little'.split( ' ' );
-
 				/* show in the page */
+
 				let yardsE = get( 'yards' );
 				yardsE.innerHTML = '';
 				for ( let i = 0 ; i < yards.length ; i++ ) {
 					let yard = yards[ i ];
-					console.log( JSON.stringify( yard ) );
-					//{"name":"yard1","capacity":{"big":7,"little":0},"assigned":{"big":5,"little":0},"big":["Belle","Huckleberry","KP","Lulu O","Madison"],"little":[]}
-					let tmi = '';
 
-					for ( let j = 0 ; j < types.length ; j++ ) {
-						let t = types[ j ];
+					let tmi = '';
+					for ( let j = 0 ; j < TYPES.length ; j++ ) {
+						let t = TYPES[ j ];
 						let y = yard[ t ];
 						if ( !Object.keys( y ).length ) continue;
 
@@ -99,18 +147,16 @@
 							);
 							dogs += `
 								<dog>
-									<nfo>
 										<name>:name:</name>
 										<tags>:tags:</tags>
 										<aggro>:aggro:</aggro>
-									</nfo>
 								</dog>
 							`.replace( /:name:/g, name ).replace( /:tags:/, tags ).replace( /:aggro:/g, aggro );
 						}
 
 						tmi += `
 							<:type:>
-								<yardName>:type:</yardName>
+								<yardType>:type:</yardType>
 								:dogs:
 							</:type:>
 						`.replace( /:type:/g, t ).replace( /:dogs:/, dogs )
@@ -118,7 +164,7 @@
 
 					yardsE.innerHTML += `
 						<yard>
-							<name>:name:</name>
+							<yardName>:name::</yardName>
 							:tmi:
 						</yard>
 					`.replace( /:name:/g, yard.name ).replace( /:tmi:/g, tmi );
@@ -146,16 +192,16 @@
 						for ( let k = 0 ; k < ag.length ; k++ ) {
 							if ( j === k ) continue;
 							let m = ag[ k ];
-							if ( !( n in aggro ) ) {
-								aggro[ n ] = {}
-							}
+							if ( !( n in aggro ) ) { aggro[ n ] = {} }
+							if( !( m in aggro ) ) { aggro[ m ] = {} }
+
 							aggro[ n ][ m ] = 1;
+							aggro[ m ][ n ] = 1;
 						}
 					}
 				}
 				CONFIGURATION.aggro = aggro;
 			}
-
 
 			const makeUi = function() {
 				let dogs = get( 'dogs' );
@@ -179,13 +225,17 @@
 				return document.getElementsByTagName( tag )[ 0 ];
 			};
 
+			////
+
+			const TYPES = 'big little'.split( ' ' );
+
 			const CONFIGURATION = {
 				dogs: {
 					"Abbey": [ "big", "dominant" ],
 					"Abbie": [ "little" ],
 					"Agnes": [ "little" ],
 					"Arlo": [ "little" ],
-					"Badge": [ "little" ],
+					"Badge": [ "big" ], //???
 					"Baley": [ "little" ],
 					"Banjo": [ "big" ],
 					"Beau": [ "big" ],
@@ -305,7 +355,6 @@
 					[ "Patch", "George K." ],
 					[ "Luna R.", "Ruby" ],
 					[ "Shep", "Emmett" ],
-					[ "Beau and Groot", "Luna D." ], [ "Beau and Groot", "Emmett" ], [ "Beau and Groot", "Waylon" ],
 					[ "Luna C.", "Millie" ],
 					[ "Patch", ":curly" ],
 					[ "Abbey", ":dominant" ],
@@ -316,6 +365,7 @@
 					// think this is the same as the "Beau and Groot" entries...
 					[ "Beau", "Luna D." ], [ "Beau", "Emmett" ], [ "Beau", "Waylon" ],
 					[ "Groot", "Luna D." ], [ "Groot", "Emmett" ], [ "Groot", "Waylon" ]
+					//[ "Beau and Groot", "Luna D." ], [ "Beau and Groot", "Emmett" ], [ "Beau and Groot", "Waylon" ],
 				]
 				, yards:{
 					  yard1: {capacity:{big:7,little:0}}
@@ -326,8 +376,10 @@
 		</script>
 		<style>
 			dogs {
+				position:absolute;
+				top:3em;
+				left:1em;
 				display:inline-block;
-				height:33em;
 				overflow:scroll;
 			}
 			dog {
@@ -343,29 +395,60 @@
 				width:12em;
 			}
 			button {
-				position:relative;
-				top:-30em;
+				position:absolute;
+				top:13em;
+				left:40%;
 			}
 
 			yards {
+				position:absolute;
+				right:1em;
+				top:3em;
 				display:inline-block;
-				height:33em;
 				overflow:scroll;
-				border:1px solid black;
+				padding-left:4em;
 			}
 			yard {
 				display:block;
-				border:1px solid black;
+				padding-bottom:2em;
 			}
 			yardName { 
 				display:block;
-				font-weight:700;
+				font-weight:600;
+			}
+			yardType {
+				display:block;
+				font-weight:500;
+			}
+			aggro {
+				color:#DD3;
+			}
+			big {
+				display:block;
+				padding-top:1em;
+				padding-bottom:1em;
+			}
+			litle {
+				display:block;
+				padding-top:1em;
+				padding-bottom:1em;
+			}
+			resolved {
+				display:block;
+			}
+			unassigned {
+				display:block;
+				color:red;
 			}
 		</style>
 	</HEAD>
 	<BODY>
-		<dogs></dogs>
-		<button>assign</button>
-		<yards></yards>
+		<conflicted></conflicted>
+		<unassigned></unassigned>
+		<div>
+			<dogs></dogs>
+			<button>assign</button>
+			<yards></yards>
+		</div>
 	</BODY>
 </HTML>
