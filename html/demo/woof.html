@@ -1,0 +1,371 @@
+<HTML>
+	<HEAD>
+		<TITLE>woof</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				frenemies();
+				makeUi();
+				if ( -1 != document.location.toString().indexOf( 'testMode' ) ) test();
+			}; 
+
+			const test = function() {
+				/* select some random dogs and schedule them */
+				let count = 4 + Math.floor( Math.random() * 10 );
+				let tmp = document.getElementsByTagName( 'input' );
+				let inputs = [];
+				for ( let i = 0 ; i < tmp.length ; i++ ) inputs.push( tmp[ i ] );
+				inputs.sort( (a,b)=>Math.random()-Math.random() ).slice( 0, count ).map( (v,i)=>v.click() );
+				get( 'button' ).click();
+			};
+
+
+			const schedule = function() {
+				let yards = [];
+
+				for ( let name in CONFIGURATION.yards ) {
+					let yard = CONFIGURATION.yards[ name ];
+					yards.push(
+						{
+							name:name,
+							capacity:yard.capacity,
+							big:{},
+							little:{}
+						}
+					);
+				}
+
+				/* initial assignment */
+
+				let inputs = document.getElementsByTagName( 'input' );
+				for ( let i = 0 ; i < inputs.length ; i++ ) {
+					if ( !inputs[ i ].checked ) continue;
+					let name = inputs[ i ].value;
+					let tags = CONFIGURATION.dogs[ name ];
+
+					let big = false;
+					for ( let j = 0 ; j < tags.length && !big ; j++ ) {
+						if ( 'big' === tags[ j ] ) {
+							big = true;
+						}
+					}
+
+					let type = big ? 'big' : 'little';
+					let assigned = false;
+
+					for ( let j = 0 ; j < yards.length && !assigned ; j++ ) {
+						let yard = yards[ j ];
+						let inYard = Object.keys( yard[ type ] ).length;
+						let capacity = yard.capacity[ type ];
+						if ( -1 === capacity || capacity > inYard ) {
+							yard[ type ][ name ] = tags;
+							assigned = yard.name;
+						}
+					}
+					console.log( 'schedule: ' + name + ' who is ' + tags.join( ' and ' ) + '> ' + type + ' to ' + assigned );
+				}
+
+				console.log( JSON.stringify( yards ) ) ;
+
+				let types = 'big little'.split( ' ' );
+
+				/* show in the page */
+				let yardsE = get( 'yards' );
+				yardsE.innerHTML = '';
+				for ( let i = 0 ; i < yards.length ; i++ ) {
+					let yard = yards[ i ];
+					console.log( JSON.stringify( yard ) );
+					//{"name":"yard1","capacity":{"big":7,"little":0},"assigned":{"big":5,"little":0},"big":["Belle","Huckleberry","KP","Lulu O","Madison"],"little":[]}
+					let tmi = '';
+
+					for ( let j = 0 ; j < types.length ; j++ ) {
+						let t = types[ j ];
+						let y = yard[ t ];
+						if ( !Object.keys( y ).length ) continue;
+
+						let dogs = '';
+						for ( let name in y ) {
+							tags = y[ name ];
+							let aggro = (
+								name in CONFIGURATION.aggro 
+								? Object.keys( CONFIGURATION.aggro[ name ] ) 
+								: ''
+							);
+							dogs += `
+								<dog>
+									<nfo>
+										<name>:name:</name>
+										<tags>:tags:</tags>
+										<aggro>:aggro:</aggro>
+									</nfo>
+								</dog>
+							`.replace( /:name:/g, name ).replace( /:tags:/, tags ).replace( /:aggro:/g, aggro );
+						}
+
+						tmi += `
+							<:type:>
+								<yardName>:type:</yardName>
+								:dogs:
+							</:type:>
+						`.replace( /:type:/g, t ).replace( /:dogs:/, dogs )
+					}
+
+					yardsE.innerHTML += `
+						<yard>
+							<name>:name:</name>
+							:tmi:
+						</yard>
+					`.replace( /:name:/g, yard.name ).replace( /:tmi:/g, tmi );
+				}
+
+
+		//<yards></yards>
+/*
+				, yards:[
+					  {name:"yard1",capacity:{big:7,little:0}}
+					, {name:"yard2",capacity:{big:0,little:999}}
+					, {name:"yard3",capacity:{big:7,little:0}}
+				]
+*/
+			}
+			
+			/* this makes it a little easier to deal with the frenemies */
+			const frenemies = function() {
+				let aggro = {};
+				for ( let i = 0 ; i < CONFIGURATION.frenemies.length ; i++ ) {
+					let ag = CONFIGURATION.frenemies[ i ];
+
+					for ( let j = 0 ; j < ag.length ; j++ ) {
+						let n = ag[ j ];
+						for ( let k = 0 ; k < ag.length ; k++ ) {
+							if ( j === k ) continue;
+							let m = ag[ k ];
+							if ( !( n in aggro ) ) {
+								aggro[ n ] = {}
+							}
+							aggro[ n ][ m ] = 1;
+						}
+					}
+				}
+				CONFIGURATION.aggro = aggro;
+			}
+
+
+			const makeUi = function() {
+				let dogs = get( 'dogs' );
+				for ( let name in CONFIGURATION.dogs ) {
+					let tags = CONFIGURATION.dogs[ name ].join( ' and ' );
+					dogs.innerHTML += `
+						<dog>
+							<input type="checkbox" value=":name:"></input>
+							<nfo>
+								<name>:name:</name>
+								<tags>:tags:</tags>
+							</nfo>
+						</dog>
+					`.replace( /:name:/g, name ).replace( /:tags:/g, tags );
+				}
+
+				get( 'button' ).onclick = schedule;
+			};
+
+			const get = function( tag ) {
+				return document.getElementsByTagName( tag )[ 0 ];
+			};
+
+			const CONFIGURATION = {
+				dogs: {
+					"Abbey": [ "big", "dominant" ],
+					"Abbie": [ "little" ],
+					"Agnes": [ "little" ],
+					"Arlo": [ "little" ],
+					"Badge": [ "little" ],
+					"Baley": [ "little" ],
+					"Banjo": [ "big" ],
+					"Beau": [ "big" ],
+					"Belle": [ "big" ],
+					"Benny": [ "big" ],
+					"Billy": [ "big" ],
+					"Bindi": [ "big" ],
+					"Buddy": [ "big" ],
+					"Candy": [ "big" ],
+					"Cannoli": [ "big" ],
+					"Carl": [ "big" ],
+					"Charlie": [ "little" ],
+					"Charlie H": [ "big" ],
+					"Chaz": [ "little" ],
+					"Chewy": [ "big", "curly" ],
+					"Chip": [ "big" ],
+					"Clover": [ "big" ],
+					"Cooper": [ "big", "curly" ],
+					"Cotton": [ "little" ],
+					"Cowboy": [ "big" ],
+					"Crumpet": [ "little" ],
+					"Daisy": [ "little" ],
+					"Dobby": [ "little" ],
+					"Duke B": [ "big" ],
+					"Emmett": [ "big", "curly" ],
+					"Ethel": [ "big" ],
+					"Finn": [ "big" ],
+					"George K": [ "big" ],
+					"Ginger": [ "big" ],
+					"Groot": [ "big" ],
+					"Happy": [ "big" ],
+					"Harvey": [ "little" ],
+					"Hazel": [ "little" ],
+					"Hershey": [ "little" ],
+					"Hobbes": [ "big" ],
+					"Huba": [ "big" ],
+					"Huck": [ "big" ],
+					"Huckleberry": [ "big" ],
+					"Isla": [ "big", "curly" ],
+					"Jackson": [ "big" ],
+					"Jetta": [ "big" ],
+					"KP": [ "big" ],
+					"Kaia": [ "little" ],
+					"Kava": [ "big" ],
+					"Koda": [ "little" ],
+					"Little Beau": [ "little" ],
+					"Lucky": [ "big" ],
+					"Lulu O": [ "big" ],
+					"Lulu X": [ "little" ],
+					"Luna A": [ "big" ],
+					"Luna C": [ "big", "dominant" ],
+					"Luna D": [ "big" ],
+					"Luna R": [ "big", "dominant" ],
+					"Madison": [ "big" ],
+					"Maggie": [ "big" ],
+					"Makaira": [ "big" ],
+					"Marlene": [ "big" ],
+					"Marley": [ "big" ],
+					"Mattis": [ "little" ],
+					"Max": [ "little" ],
+					"Millie": [ "big" ],
+					"Mookie": [ "little" ],
+					"Morgan": [ "big" ],
+					"Nala": [ "little" ],
+					"Nikos": [ "big" ],
+					"Nola": [ "little" ],
+					"Odie": [ "big" ],
+					"Patch": [ "big" ],
+					"Pucci": [ "little" ],
+					"Quincy": [ "big" ],
+					"Raider": [ "big" ],
+					"Raleigh": [ "little" ],
+					"Reed": [ "little" ],
+					"Reggie": [ "little" ],
+					"Remi": [ "big" ],
+					"Reynolds": [ "big" ],
+					"Riesling": [ "big" ],
+					"Riley": [ "big" ],
+					"Roxy": [ "big" ],
+					"Ruby": [ "big" ],
+					"Russell": [ "little" ],
+					"Samson": [ "big" ],
+					"Sandy": [ "big" ],
+					"Sarge": [ "big", "dominant" ],
+					"Savannah": [ "big" ],
+					"Serafina": [ "big" ],
+					"Shelby": [ "little" ],
+					"Shep": [ "big" ],
+					"Skeeter": [ "little" ],
+					"Sophie D": [ "little" ],
+					"Sophie N": [ "big" ],
+					"Steve": [ "little" ],
+					"Sugar": [ "little", "curly" ],
+					"Sully": [ "little" ],
+					"Taco": [ "big" ],
+					"Tela": [ "big", "curly" ],
+					"Thatcher": [ "big" ],
+					"Tina": [ "big", "dominant" ],
+					"Vash": [ "big" ],
+					"Waylon": [ "big" ],
+					"Willie": [ "big" ],
+					"Willow": [ "big" ],
+					"Witzy": [ "little" ],
+					"Xena": [ "big" ],
+					"Zeppelin": [ "big" ]
+				}
+				, frenemies: [
+					[ "Agnes", "Luna R." ], [ "Agnes", "Jetta" ],
+					[ "Odie", "Huck" ],
+					[ "Abbey", "Luna R." ],
+					[ "Banjo", "Huba" ], [ "Banjo", "Emmett" ], [ "Banjo", "Ginger" ],
+					[ "Riesling", "Patch" ], [ "Riesling", "Badge" ], [ "Riesling", "Emmett" ], [ "Riesling", "Nikos" ],
+					[ "Huckleberry", "Jackson" ],
+					[ "Isla", "Patch" ],
+					[ "George K.", "Cotton" ],
+					[ "KP", "Vash" ],
+					[ "Patch", "George K." ],
+					[ "Luna R.", "Ruby" ],
+					[ "Shep", "Emmett" ],
+					[ "Beau and Groot", "Luna D." ], [ "Beau and Groot", "Emmett" ], [ "Beau and Groot", "Waylon" ],
+					[ "Luna C.", "Millie" ],
+					[ "Patch", ":curly" ],
+					[ "Abbey", ":dominant" ],
+					[ "Emmett", ":dominant" ],
+					[ "Emmett", ":dominant" ],
+					[ "Luna R.", ":dominant" ],
+					[ "Ginger", "Millie" ],
+					// think this is the same as the "Beau and Groot" entries...
+					[ "Beau", "Luna D." ], [ "Beau", "Emmett" ], [ "Beau", "Waylon" ],
+					[ "Groot", "Luna D." ], [ "Groot", "Emmett" ], [ "Groot", "Waylon" ]
+				]
+				, yards:{
+					  yard1: {capacity:{big:7,little:0}}
+					, yard2: {capacity:{big:0,little:-1}}
+					, yard3: {capacity:{big:7,little:0}}
+				}
+			};
+		</script>
+		<style>
+			dogs {
+				display:inline-block;
+				height:33em;
+				overflow:scroll;
+			}
+			dog {
+				display:block;
+			}
+			name {
+				display:inline-block;
+				width:7em;
+				font-weight:bold;
+			}
+			tags {
+				display:inline-block;
+				width:12em;
+			}
+			button {
+				position:relative;
+				top:-30em;
+			}
+
+			yards {
+				display:inline-block;
+				height:33em;
+				overflow:scroll;
+				border:1px solid black;
+			}
+			yard {
+				display:block;
+				border:1px solid black;
+			}
+			yardName { 
+				display:block;
+				font-weight:700;
+			}
+		</style>
+	</HEAD>
+	<BODY>
+		<dogs></dogs>
+		<button>assign</button>
+		<yards></yards>
+	</BODY>
+</HTML>
