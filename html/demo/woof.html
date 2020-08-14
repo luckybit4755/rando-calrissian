@@ -26,94 +26,24 @@
 			};
 
 			const schedule = function() {
-				/* create a structure to handle the scheduling */
-				let yards = [];
-
-				for ( let name in CONFIGURATION.yards ) {
-					let yard = CONFIGURATION.yards[ name ];
-					yards.push(
-						{
-							name:name,
-							capacity:yard.capacity,
-							big:{},
-							little:{}
-						}
-					);
-				}
 
 				/* initial assignment */
 
-				let tmp = document.getElementsByTagName( 'input' );
-				let inputs = [];
-				for ( let i = 0 ; i < tmp.length ; i++ ) {
-					inputs.push( tmp[ i ] );
-				}
-				inputs = inputs.sort( (a,b)=>Math.random() - Math.random() );
-
-				let unassigned = [];
-				let conflicted = [];
-
+				let names = [];
+				let inputs = document.getElementsByTagName( 'input' );
 				for ( let i = 0 ; i < inputs.length ; i++ ) {
-					if ( !inputs[ i ].checked ) continue;
-					let name = inputs[ i ].value;
-					let tags = CONFIGURATION.dogs[ name ];
-
-					let big = false;
-					for ( let j = 0 ; j < tags.length && !big ; j++ ) {
-						if ( 'big' === tags[ j ] ) {
-							big = true;
-						}
+					let input = inputs[ i ];
+					if ( input.checked ) {
+						names.push( input.value );
 					}
-
-					let type = big ? 'big' : 'little';
-					let assigned = false;
-
-					for ( let j = 0 ; j < yards.length && !assigned ; j++ ) {
-						let yard = yards[ j ];
-						let section = yard[ type ];
-						let inYard = Object.keys( section ).length;
-						let capacity = yard.capacity[ type ];
-						if ( -1 === capacity || capacity > inYard ) {
-
-							if ( name in CONFIGURATION.aggro ) {
-								let aggro = CONFIGURATION.aggro[ name ];
-
-								let conflict = false;
-								let why = '';
-
-								for ( let other in section ) {
-									why = other;
-									conflict = other in aggro;
-									if ( !conflict ) {
-										let tags = CONFIGURATION.dogs[ other ];
-										for ( let k = 0 ; k < tags.length && conflict ; k++ ) {
-											let tag = tags[ k ] ;
-											conflict = tag in aggro;
-											if ( conflict ) {
-												why = other + ' is ' + tag;
-											}
-										}
-									}
-									console.log( 'check ' + name + ' vs ' + other + ' -> ' + conflict );
-									if ( conflict ) {
-										console.log( 'CONFLICT: ' + name + ' and ' + other );
-										break;
-									}
-								}
-								if ( conflict ) {
-									conflicted.push( name + ' and ' + why );
-									continue;
-								}
-							}
-
-							yard[ type ][ name ] = tags;
-							assigned = yard.name;
-						}
-					}
-
-					console.log( 'schedule: ' + name + ' who is ' + tags.join( ' and ' ) + '> ' + type + ' to ' + assigned );
-					if ( !assigned ) unassigned.push( name );
 				}
+				names = names.sort( (a,b)=>Math.random() - Math.random() );
+
+				let schedule = createSchedule( names );
+
+				let yards = schedule.yards;
+				let conflicted = schedule.conflicted;
+				let unassigned = schedule.unassigned;
 
 				if ( conflicted.length ) {
 					get( 'conflicted' ).innerHTML = 'conflicted: ' + conflicted.join( ',' );
@@ -128,8 +58,13 @@
 
 				let yardsE = get( 'yards' );
 				yardsE.innerHTML = '';
-				for ( let i = 0 ; i < yards.length ; i++ ) {
-					let yard = yards[ i ];
+
+				for ( let yardName in yards ) {
+					let yard = yards[ yardName ];
+
+					let yardElement = nu( 'yard' );
+					yardsE.appendChild( yardElement );
+					yardElement.add( nu( 'yardName', yardName ) );
 
 					let tmi = '';
 					for ( let j = 0 ; j < TYPES.length ; j++ ) {
@@ -139,47 +74,98 @@
 
 						let dogs = '';
 						for ( let name in y ) {
-							tags = y[ name ];
-							let aggro = (
-								name in CONFIGURATION.aggro 
-								? Object.keys( CONFIGURATION.aggro[ name ] ) 
-								: ''
-							);
-							dogs += `
-								<dog>
-										<name>:name:</name>
-										<tags>:tags:</tags>
-										<aggro>:aggro:</aggro>
-								</dog>
-							`.replace( /:name:/g, name ).replace( /:tags:/, tags ).replace( /:aggro:/g, aggro );
+							yardElement.add( createDogElement( name ) );
 						}
+					}
+				}
+			}
 
-						tmi += `
-							<:type:>
-								<yardType>:type:</yardType>
-								:dogs:
-							</:type:>
-						`.replace( /:type:/g, t ).replace( /:dogs:/, dogs )
+			const createSchedule = function( names ) {
+				let yards = createYards();
+
+				let unassigned = [];
+				let conflicted = [];
+
+				for ( let i = 0 ; i < names.length ; i++ ) {
+					let name = names[ i ];
+					let tags = CONFIGURATION.dogs[ name ];
+
+					console.log( name + ' -> ' + tags );
+
+					let big = false;
+					for ( let j = 0 ; j < tags.length && !big ; j++ ) {
+						if ( 'big' === tags[ j ] ) {
+							big = true;
+						}
 					}
 
-					yardsE.innerHTML += `
-						<yard>
-							<yardName>:name::</yardName>
-							:tmi:
-						</yard>
-					`.replace( /:name:/g, yard.name ).replace( /:tmi:/g, tmi );
+					let type = big ? 'big' : 'little';
+					let assigned = false;
+
+					for ( let yardName in yards ) {
+						let yard = yards[ yardName ];
+						let section = yard[ type ];
+						let inYard = Object.keys( section ).length;
+						let capacity = yard.capacity[ type ];
+
+						if ( -1 !== capacity && inYard >= capacity ) continue;
+
+						let conflict = false;
+						for ( let other in section ) {
+							conflict = checkConflict( name, other );
+							if ( conflict ) {
+								conflicted.push( conflict );
+								break;
+							}
+						}
+						if ( conflict ) continue;
+
+						yard[ type ][ name ] = tags;
+						assigned = yardName;
+					}
+
+					console.log( 'schedule: ' + name + ' who is ' + tags.join( ' and ' ) + '> ' + type + ' to ' + assigned );
+					if ( !assigned ) unassigned.push( name );
 				}
 
+				return { yards:yards, conflicted:conflicted, unassigned:unassigned }
+			};
 
-		//<yards></yards>
-/*
-				, yards:[
-					  {name:"yard1",capacity:{big:7,little:0}}
-					, {name:"yard2",capacity:{big:0,little:999}}
-					, {name:"yard3",capacity:{big:7,little:0}}
-				]
-*/
-			}
+			const createYards = function() {
+				let yards = {};
+				for ( let name in CONFIGURATION.yards ) {
+					let yard = CONFIGURATION.yards[ name ];
+					yards[ name ] = { capacity:yard.capacity, big:{}, little:{} }
+				}
+				return yards;
+			};
+
+			const checkConflict = function( name, other ) {
+				let conflict = false;
+
+				let wayz = [ [name,other], [other,name] ];
+				for ( let i = 0 ; i < wayz.length && !conflict ; i++ ) {
+					let a = wayz[ i ][ 0 ];
+					let b = wayz[ i ][ 1 ];
+					if ( !( a in CONFIGURATION.aggro ) ) continue;
+					let aggro = CONFIGURATION.aggro[ a ];
+
+					if ( b in aggro ) {
+						conflict = a + ' vs ' + b;
+						break;
+					}
+
+					let tags = CONFIGURATION.dogs[ b ];
+					for ( let j = 0 ; j < tags.length && conflict ; j++ ) {
+						let tag = tags[ k ] ;
+						if ( tags in aggro ) {
+							conflict = a + ' and ' + b + ' is ' + tag;
+						}
+					}
+				}
+
+				return conflict;
+			};
 			
 			/* this makes it a little easier to deal with the frenemies */
 			const frenemies = function() {
@@ -193,10 +179,12 @@
 							if ( j === k ) continue;
 							let m = ag[ k ];
 							if ( !( n in aggro ) ) { aggro[ n ] = {} }
-							if( !( m in aggro ) ) { aggro[ m ] = {} }
-
 							aggro[ n ][ m ] = 1;
-							aggro[ m ][ n ] = 1;
+
+							if ( 0 != m.indexOf( ':' ) ) {
+								if ( !( m in aggro ) ) { aggro[ m ] = {} }
+								aggro[ m ][ n ] = 1;
+							}
 						}
 					}
 				}
@@ -206,19 +194,38 @@
 			const makeUi = function() {
 				let dogs = get( 'dogs' );
 				for ( let name in CONFIGURATION.dogs ) {
-					let tags = CONFIGURATION.dogs[ name ].join( ' and ' );
-					dogs.innerHTML += `
-						<dog>
-							<input type="checkbox" value=":name:"></input>
-							<nfo>
-								<name>:name:</name>
-								<tags>:tags:</tags>
-							</nfo>
-						</dog>
-					`.replace( /:name:/g, name ).replace( /:tags:/g, tags );
+					let dog = createDogElement( name );
+					let inn = nu( 'input', false, {type:'checkbox',value:name} );
+
+					dog.prepend( inn );
+					dogs.appendChild( dog );
 				}
 
 				get( 'button' ).onclick = schedule;
+			};
+
+			const createDogElement = function( name ) {
+				let dog = nu( 'dog' );
+				dog.add( nu( 'name', name ) );
+				dog.add( nu( 'tags', CONFIGURATION.dogs[ name ].join( ', ' ) ) );
+
+				if ( name in CONFIGURATION.aggro ) {
+					let ag = Object.keys( CONFIGURATION.aggro[ name ] ).join( ',' );
+					dog.add( nu( 'aggro', ag ) );
+				}
+				return dog;
+			};
+		
+			const nu = function( tag, txt, attributes ) {
+				let e = document.createElement( tag );
+				e.add = function( g ) { e.appendChild( g ) }
+				if ( txt ) {
+					e.add( document.createTextNode( txt ) );
+				}
+				if ( attributes ) {
+					for ( let k in attributes ) e[ k ] = attributes[ k ];
+				}
+				return e;
 			};
 
 			const get = function( tag ) {
@@ -238,7 +245,7 @@
 					"Badge": [ "big" ], //???
 					"Baley": [ "little" ],
 					"Banjo": [ "big" ],
-					"Beau": [ "big" ],
+					"Beau and Groot": [ "big" ],
 					"Belle": [ "big" ],
 					"Benny": [ "big" ],
 					"Billy": [ "big" ],
@@ -265,7 +272,6 @@
 					"Finn": [ "big" ],
 					"George K": [ "big" ],
 					"Ginger": [ "big" ],
-					"Groot": [ "big" ],
 					"Happy": [ "big" ],
 					"Harvey": [ "little" ],
 					"Hazel": [ "little" ],
@@ -362,10 +368,7 @@
 					[ "Emmett", ":dominant" ],
 					[ "Luna R.", ":dominant" ],
 					[ "Ginger", "Millie" ],
-					// think this is the same as the "Beau and Groot" entries...
-					[ "Beau", "Luna D." ], [ "Beau", "Emmett" ], [ "Beau", "Waylon" ],
-					[ "Groot", "Luna D." ], [ "Groot", "Emmett" ], [ "Groot", "Waylon" ]
-					//[ "Beau and Groot", "Luna D." ], [ "Beau and Groot", "Emmett" ], [ "Beau and Groot", "Waylon" ],
+					[ "Beau and Groot", "Luna D." ], [ "Beau and Groot", "Emmett" ], [ "Beau and Groot", "Waylon" ]
 				]
 				, yards:{
 					  yard1: {capacity:{big:7,little:0}}
@@ -387,12 +390,12 @@
 			}
 			name {
 				display:inline-block;
-				width:7em;
+				width:9em;
 				font-weight:bold;
 			}
 			tags {
 				display:inline-block;
-				width:12em;
+				width:9em;
 			}
 			button {
 				position:absolute;
@@ -402,7 +405,7 @@
 
 			yards {
 				position:absolute;
-				right:1em;
+				left:38em;
 				top:3em;
 				display:inline-block;
 				overflow:scroll;
