@@ -1,0 +1,326 @@
+<HTML>
+	<HEAD>
+		<TITLE>mandelbrot</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.onload = function() {
+				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				let context = canvas.getContext( '2d' );
+				let w = canvas.width;
+				let h = canvas.height;
+
+				let state = {
+					region : {
+						y:{min:-1.2,size:2.4},
+						x:{min:-2.5,size:3.5}
+					},
+					down: false,
+					busy: false,
+					canvas: canvas,
+					context: context,
+					max: 1024,
+					superMax: 8192
+				}
+				state.imageData = mandelbrotIt( context, canvas.width, canvas.height, state.max, state.region );
+
+				canvas.onmousedown = (e) => {
+					if ( state.busy ) return;
+					state.e = e;
+					state.down = mouso(state);
+				};
+
+				console.onblur = () => { 
+					if ( state.busy ) return;
+					state.down = false;
+					context.putImageData( state.imageData, 0, 0 );
+				};
+
+				canvas.onmousemove = ( e ) => {
+					if ( !state.down || state.busy ) return;
+					state.e = e;
+					mouseMove( state );
+				};
+				canvas.onmouseup = (e) => {
+					if ( !state.down || state.busy ) return;
+					state.e = e;
+					mouseUp( state );
+				};
+			};
+
+			const mandelbrotIt = ( context, w, h, max, region ) => {
+				let mandelbrot = true ? vMandelbrot : wikipediaMandelbrot;
+
+				let idx = 0;
+				let imageData = context.getImageData( 0, 0, w, h );
+
+				let start = new Date().getTime();
+
+				//let shift = [16,8,0];//.sort((a,b)=>Math.random()-Math.random());
+
+				let xInc = region.x.size / w;
+				let yInc = region.y.size / h;
+
+				let y0 = region.y.min;
+				let x0 = region.x.min;
+				let y,x,c,v;
+
+				for ( let y = 0 ; y < h ; y++, y0 += yInc ) {
+					x0 = region.x.min;
+					for ( let x = 0 ; x < w ; x++, x0 += xInc ) {
+						let v = mandelbrot( x0, y0, max ) / max;
+						let c = Math.pow( v / max, 0.2 ) * 255 * 255 * 255;
+						imageData.data[ idx++ ] = ( c >> 0 ) & 0xFF;
+						imageData.data[ idx++ ] = ( c >> 8 ) & 0xFF;
+						imageData.data[ idx++ ] = ( c >> 16 ) & 0xFF;
+						imageData.data[ idx++ ] = 255;
+					}
+				}
+				context.putImageData( imageData, 0, 0 );
+
+				let stop = new Date().getTime();
+				let diff = stop - start;
+
+				let div = document.getElementsByTagName( 'div' )[ 0 ];
+				div.innerHTML = max + ': ' + diff + 'ms';
+
+				return imageData;
+			};
+
+			const ComplexNumber = function(x=0,y=0) {
+				this.x = x; // real
+				this.y = y; // imaginary
+			};
+
+			const _ComplexNumber_multiply = (a,b,tmp) => {
+				// a.xr * b.xr <- r
+				// a.xr * b.yi <- i
+				// a.yi * b.xr <- i
+				// a.yi * b.yi -> - a.yr * by.yr <- r
+				//...
+				// r: a.x * b.x - a.y * b.y
+				// i: a.x * b.y + a.y * b.x
+				tmp.x = a.x * b.x - a.y * b.y;
+				tmp.y = a.x * b.y + a.y * b.x;
+				a.x = tmp.x;
+				a.y = tmp.y;
+			};
+
+			const _ComplexNumber_square = (a,tmp) => {
+				_ComplexNumber_multiply( a, a, tmp );
+			}
+			const _ComplexNumber_add = (a,b) => {
+				a.x += b.x;
+				a.y += b.y;
+			};
+					
+			// f(z) = z * z + c
+			const _ComplexNumber_mandy = (z,c,tmp) => {
+				_ComplexNumber_square( z, tmp );
+				z.x = tmp.x + c.x;
+				z.y = tmp.y + c.y;
+			};
+
+			const vMandelbrot = (x,y,max) => {
+				return vMandelbrotOptimized(x,y,max);
+				return vMandelbrotClean(x,y,max);
+			}
+
+			// 530ms at 1024x600 for 1000
+			const vMandelbrotClean = (x,y,max) => {
+				let c = new ComplexNumber(x,y);
+				let z = new ComplexNumber();
+				let t = new ComplexNumber();
+
+				let i = 0;
+				for ( i = 0 ; i < max && z.x*z.x + z.y*z.y < 4 ; i++ ) {
+					_ComplexNumber_mandy( z,c,t );
+				}
+
+				return i;
+			};
+
+			// 483ms at 1024x600 for 1000
+			const vMandelbrotOptimized = (x,y,max) => {
+				let zR = x;
+				let zI = y;
+				let zRR = x * x;
+				let zII = y * y;
+				let zRI = x * y;
+				let i = 0;
+				for ( i = 0 ; i < max && zRR + zII < 4 ; i++, zRI = zR * zI ) {
+					zRR = zR * zR;
+					zII = zI * zI;
+					zR = zRR - zII + x;
+					zI = zRI + zRI + y;
+					/*
+						tR = ( zR * zR ) - ( zI * zI ) + x; // let tR...
+						zI = ( zR * zI ) + ( zI * zR ) + y;
+						zR = tR;
+					*/
+				}
+
+				return i;
+			};
+
+			const wikipediaMandelbrot = (x,y0,max) => {
+				return wikipediaMandelbrotNaive(x,y0,max);
+				return wikipediaMandelbrotOptimized(x,y0,max);
+			};
+
+			// https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Unoptimized_na%C3%AFve_escape_time_algorithm
+			// 481ms at 1024x600 for 1000
+			const wikipediaMandelbrotNaive = (x0,y0,max) => {
+				/* 
+					z = x + iy;
+					z2 = x^2 + i2xy - y^2
+					c = x + ix
+				*/
+			
+				let x = x0;
+				let y = y0;
+				let xx = x * x;
+				let yy = y * y;
+				let xy;
+
+				let i = 0;
+				for ( i = 0 ; i < max && xx + yy < 4 ; i++ ) {
+					xx = x * x;
+					yy = y * y;
+					xy = x * y;
+					x = xx - yy + x0;
+					y = xy + xy + y0;
+				}
+				return i;
+			};
+
+			// https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Optimized_escape_time_algorithms
+			// 520ms at 1024x600 for 1000
+			const wikipediaMandelbrotOptimized = (x0,y0,max) => {
+				let x2 = 0;
+				let y2 = 0;
+				let x = 0;
+				let y = 0;
+
+				let i = 0;
+				for ( i = 0 ; i < max ; i++ ) {
+					if ( x2 + y2 > 4 ) break;
+					y  = 2 * x * y + y0;
+					x  = x2 - y2 + x0;
+					x2 = x * x;
+					y2 = y * y;
+				}
+				return i;
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+			// interactive ui stuff
+
+			const mouso = (state) => {
+				let w = state.canvas.width;
+				let h = state.canvas.height;
+				let rect = state.canvas.getBoundingClientRect();
+				state.context.putImageData( state.imageData, 0, 0 );
+				return mapToRegion( state.e.x - rect.x, state.e.y - rect.y, w, h, state.region );
+			};
+
+			const mapToRegion = ( x, y, w, h, region ) => {
+				return {
+					x: x / w * region.x.size + region.x.min,
+					y: y / h * region.y.size + region.y.min,
+					px: x,
+					py: y,
+					w: w,
+					h: h
+				}
+			};
+
+			const mouseMove = ( state ) => {
+				let r = mouso( state );
+				let x = Math.min( r.px, state.down.px );
+				let y = Math.min( r.py, state.down.py );
+				let w = Math.max( r.px, state.down.px ) - x;
+				let h = Math.max( r.py, state.down.py ) - y;
+
+				state.context.strokeStyle = 'red';
+				state.context.beginPath();
+				state.context.rect( x, y, w, h );
+				state.context.closePath();
+				state.context.stroke();
+			}
+			const mouseUp = ( state ) => {
+					let up = mouso( state );
+
+					let xMin = Math.min( state.down.x, up.x );
+					let xMax = Math.max( state.down.x, up.x );
+
+					let yMin = Math.min( state.down.y, up.y );
+					let yMax = Math.max( state.down.y, up.y );
+
+					let r = {
+						x:{min:xMin,size:xMax-xMin},
+						y:{min:yMin,size:yMax-yMin}
+					}
+
+					console.log(
+						JSON.stringify({
+							region:r,
+							max:state.max
+						})
+					);
+
+					state.region = r;
+					state.busy = true;
+					state.w = state.canvas.width;
+					state.h = state.canvas.height;
+
+					let msg = 'hold up...';
+					let div = document.getElementsByTagName( 'div' )[ 0 ];
+					div.innerHTML = msg;
+					console.log( 'drawing:' + state.max );
+
+					state.context.putImageData( state.imageData, 0, 0 );
+					state.context.fillStyle = 'rgba(0,0,0,0.7)';
+					state.context.fillRect( 0, 0, state.w, state.h );
+
+					state.context.font = '16px Arial';
+					state.context.fillStyle = 'black';
+					state.context.fillText( msg, 33, 33 );
+					state.context.fillStyle = 'white';
+					state.context.fillText( msg, 34, 34 );
+
+					mandelbrotIt( state.context, state.w, state.h, 100, state.region ); 
+
+					// might be better to use a time budget or some measure of entropy
+					while ( true ) {
+						let start = new Date().getTime();
+						state.imageData = mandelbrotIt( state.context, state.w, state.h, state.max, state.region );
+						let stop = new Date().getTime();
+						let diff = stop - start;
+						if ( diff > 1000 ) break;
+						state.max *= 2;
+						if ( state.max > state.superMax) {
+							state.max = state.superMax; // sorry..
+							break;
+						}
+					}
+
+					console.log( 'drew' );
+					state.busy = false;
+					state.down = false;
+			};
+		</script>
+	</HEAD>
+	<BODY>
+		<!--
+			<canvas width="100" height="60"></canvas>
+		-->
+		<canvas width="800" height="800"></canvas>
+		<div></div>
+	</BODY>
+</HTML>
