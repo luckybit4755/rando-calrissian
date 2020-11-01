@@ -1,0 +1,158 @@
+<HTML>
+	<HEAD>
+		<TITLE>tmp</TITLE>
+	   	<script type="text/javascript">
+			const FPS = 40;
+			window.onload = function() {
+				// thanks to https://gpfault.net/posts/mandelbrot-webgl.txt.html
+
+				const shaders = {
+					vertex:`
+						precision highp float;
+						attribute vec4 aPosition;
+						void main() {
+							gl_Position = aPosition;
+						}
+					`
+					, fragment:`
+						precision highp float;
+						uniform float uCanvasSize;
+						uniform vec2 uCenter;
+						uniform float uZoom;
+						uniform float uSize;
+
+						void main(void) {
+							vec2 xy = gl_FragCoord.xy / uCanvasSize;
+							float size = uSize * uZoom;
+							vec2 c = uCenter - vec2( size * 0.5 ) + xy * size;
+
+							float zR = c.x;
+							float zI = c.y;
+							float zRR = zR * zR;
+							float zII = zI * zI;
+							float zRI = zR * zI;
+
+							int i;
+							int max = 1000;
+							for (int t = 0; t < 1000 * 10 ; t++) {
+									i = t;
+								if ( t > max || zRR + zRI > 4.0 ) { 
+									break;
+								}
+								zRI = zR * zI;
+								zRR = zR * zR;
+								zII = zI * zI;
+								zR = zRR - zII + c.x;
+								zI = zRI + zRI + c.y;
+							}
+
+							float v = float(i) / float(max);
+/*
+							float n = 255.0;
+							float color = v * n * n * n;
+							float c_r = mod( color, n ) / n;
+							color /= n;
+							float c_g = mod( color, n ) / n;
+							color /= n;
+							float c_b = mod( color, n ) / n;
+							gl_FragColor = vec4(c_r, c_g, c_b, 1.0 );
+							gl_FragColor = vec4(v,v,v,1.0);
+*/
+							float u = v * 0.25;
+							u *= u;
+							gl_FragColor = vec4(v,0,u,1.0);
+
+							if ( 0.01 > length( xy - vec2(0.5,0.5) ) ) {
+								gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+							}
+						}
+					`
+				}
+
+				let setup = Glo.demoSetup( shaders );
+				//gestureUpOnThis( function() { return Utilo.fullscreen( setup.canvas ) } );
+
+				Glo.data( setup.gl, setup.program, 'aPosition', 
+					[
+						-1,+1,0,     +1,+1,0,     -1,-1,0,
+						-1,-1,0,     +1,+1,0,     +1,-1,0,
+					]
+				);
+
+				let uz = {};
+				'uCanvasSize uZoom uCenter uSize'.split( ' ' ).forEach(v=>{
+					uz[ v ] = setup.gl.getUniformLocation( setup.program, v );
+				});
+
+				let uZoom = 1.0;
+				let uSize = 4.0;
+				let uCenter = {x:-0.5,y:0.0};
+				let goalCenter = {x:-0.5,y:0.0};
+				let zoomChange = 1.0;
+				let down = false;
+
+				const defaultMoveTo = 0.01;
+				const maxMoveTo = 0.20;
+				let moveTo = defaultMoveTo;
+
+				let draw = function() {
+					setup.gl.uniform1f( uz.uCanvasSize, setup.canvas.width );
+					setup.gl.uniform1f( uz.uSize, uSize );
+					setup.gl.uniform1f( uz.uZoom, uZoom );
+					setup.gl.uniform2f( uz.uCenter, uCenter.x, uCenter.y );
+					setup.gl.drawArrays( setup.gl.TRIANGLES, 0,  3 * 2 );
+					uZoom *= zoomChange;
+
+						uCenter.x += moveTo * ( goalCenter.x - uCenter.x );
+						uCenter.y += moveTo * ( goalCenter.y - uCenter.y );
+						moveTo *= 1.11;
+						if ( moveTo > maxMoveTo ) moveTo = maxMoveTo;
+				};
+
+				const recenter = ( e ) => {
+					let rect = setup.canvas.getBoundingClientRect();
+					let x = ( e.x - rect.x ) / setup.canvas.width;
+					let y = ( e.y - rect.y ) / setup.canvas.height;
+					y = 1 - y;
+
+					let size = uSize * uZoom;
+					let z = uZoom * uSize; 
+					let xP = ( uCenter.x - z * 0.5 ) + x * z;
+					let yP = ( uCenter.y - z * 0.5 ) + y * z;
+					goalCenter.x = xP;
+					goalCenter.y = yP;
+					return {x:x,y:y};
+				};
+
+				setup.canvas.onmousedown = function( e ) {
+					down = recenter( e );
+					zoomChange = e.buttons & 1 ? 0.99 : 1.01; // mouse wheel trick!
+				};
+				setup.canvas.oncontextmenu = function(e){return false;} // for right click...
+
+				setup.canvas.onmousemove = function( e ) {
+					if ( !down ) return;
+					recenter( e );
+				};
+				setup.canvas.onmouseup = function( e ) {
+					zoomChange = 1.0;
+					goalCenter.x = uCenter.x;
+					goalCenter.y = uCenter.y;
+					down = false;
+				};
+
+				Utilo.frame( draw, FPS ).start();
+			}; 
+
+			const gestureUpOnThis = function( callback ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress =
+				document.onclick = document.onmouseover = document.keypress = callback;
+			};
+		</script>
+		<style> body { font-family: sans-serif; } </style>
+		<script type="text/javascript" src="rume-4-glo-min.js"></script>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+	</BODY>
+</HTML>
