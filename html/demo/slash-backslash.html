@@ -1,0 +1,47 @@
+<HTML>
+	<HEAD>
+		<TITLE>slash-backslash</TITLE>
+		<script type="text/javascript">
+			// https://10print.org/
+			const COLZ = 80;
+			const ROWZ = 24;
+
+			const sbs = () => {
+				return Math.random() < 0.5 ? '/' : '\\';
+			};
+
+			window.onload = () => {
+				let pre = document.createElement( 'pre' );
+				document.body.appendChild( pre );
+
+				let lines = [];
+				const addLine = function() {
+					let s = '';
+					for ( let i = 0 ; i < COLZ ; i++ ) s += sbs();
+					lines.unshift( s );
+					lines.slice( 0, ROWZ );
+
+					pre.innerHTML = lines.join( '\n' );
+
+					setTimeout( function() { requestAnimationFrame( addLine ) }, 1000 * 0.77 );
+				}
+				addLine();
+			}; 
+		</script>
+		<style>
+			pre {
+				font-family: monospace;
+				font-weight:bold;
+				font-height:0.8em;
+				font-size: 64px;
+				line-height:0.7em;
+				letter-spacing:-0.25em;
+			}
+			body {
+				color: #7ab3e2;
+				background: #0066a2;
+			}
+		</style>
+	</HEAD>
+	<BODY></BODY>
+</HTML>
