@@ -3,6 +3,9 @@
 		<TITLE>slash-backslash</TITLE>
 		<script type="text/javascript">
 			// https://10print.org/
+			// 10 Print Chr$(205.5+Rnd(1)); : Goto 10
+			// awk 'BEGIN {while(1) printf rand() < 0.5 ? "/" : "\\"}'
+
 			const COLZ = 80;
 			const ROWZ = 24;
 
@@ -36,6 +39,9 @@
 				font-size: 64px;
 				line-height:0.7em;
 				letter-spacing:-0.25em;
+				position:absolute;
+				top:-1em;
+				left:-0.2em;
 			}
 			body {
 				margin:0px;
