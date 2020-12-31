@@ -63,6 +63,9 @@
 				let radius = logo.width * 0.25;
 				let angle = 0;
 
+				doTheThing( document.body, function() { fullscreen( document.body ) } );
+
+
 				/* draw some stuff */
 
 				const drawData = function( color, data, mininum ) {
@@ -189,6 +192,24 @@
 				/* initial call to draw function */
 
 				draw();
+			};
+
+			const doTheThing = function( element, cb ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress = 
+				document.onclick = document.onmouseover = document.keypress = element.onclick = 
+				element.on = cb;
+			}
+
+			/* try 17 zillion ways to make the element fullscreen */
+			const fullscreen = function( element ) {
+				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in element ) {
+						element[ f ]();
+						break;
+					}
+				}
 			};
 		</script>
 		<style>
