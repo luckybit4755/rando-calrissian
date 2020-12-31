@@ -1,0 +1,55 @@
+<HTML>
+	<HEAD>
+		<TITLE>slash-backslash</TITLE>
+		<script type="text/javascript">
+			// https://10print.org/
+			// 10 Print Chr$(205.5+Rnd(1)); : Goto 10
+			// awk 'BEGIN {while(1) printf rand() < 0.5 ? "/" : "\\"}'
+
+			const COLZ = 80;
+			const ROWZ = 24;
+
+			const sbs = () => {
+				return Math.random() < 0.5 ? '/' : '\\';
+			};
+
+			window.onload = () => {
+				let pre = document.createElement( 'pre' );
+				document.body.appendChild( pre );
+
+				let lines = [];
+				const addLine = function() {
+					let s = '';
+					for ( let i = 0 ; i < COLZ ; i++ ) s += sbs();
+					lines.unshift( s );
+					lines.slice( 0, ROWZ );
+
+					pre.innerHTML = lines.join( '\n' );
+
+					setTimeout( function() { requestAnimationFrame( addLine ) }, 1000 * 0.77 );
+				}
+				addLine();
+			}; 
+		</script>
+		<style>
+			pre {
+				font-family: monospace;
+				font-weight:bold;
+				font-height:0.8em;
+				font-size: 64px;
+				line-height:0.7em;
+				letter-spacing:-0.25em;
+				position:absolute;
+				top:-1em;
+				left:-0.2em;
+			}
+			body {
+				margin:0px;
+				padding:0px;
+				color: #7ab3e2;
+				background: #0066a2;
+			}
+		</style>
+	</HEAD>
+	<BODY></BODY>
+</HTML>
