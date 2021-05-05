@@ -1,0 +1,136 @@
+<HTML>
+	<HEAD>
+		<TITLE>editor</TITLE>
+		<script type="text/javascript">
+			window.addEventListener('load', () => {
+				if( !false ) {
+					document.getElementsByTagName( 'a' )[ 0 ].click();
+					//setTimeout( function() {window.location.reload (false)}, 1000);
+				}
+			} );
+		</script>
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const STORAGE_ITEM_NAME = 'editor_vgvm_script';
+
+			let container = document.createElement( 'div' );
+			container.style.top = '1em';
+			container.style.left = '1em';
+			container.style.zIndex = 7;
+			container.style.border = '2px solid #224';
+			container.style.borderRadius = '4px';
+			container.style.padding = '.2em';
+			container.style.background = '#448';
+			container.style.position = 'absolute';
+
+			let header = document.createElement( 'div' );
+			header.innerHTML = 'Editor';
+			header.style.zIndex = 8;
+			header.style.padding = '.3em';
+			header.style.cursor = 'move';
+			header.style.background = '#66A';
+			header.style.color = '#ddc';
+			header.style.fontFamily = 'sans-serif';
+			header.style.fontWeight = '600';
+			header.style.fontSize = 'large';
+			container.appendChild( header );
+
+			let x = document.createElement( 'span' );
+			x.innerHTML = 'x';
+			x.style.borderTop = x.style.borderLeft     = '2px solid #99D';
+			x.style.borderBottom = x.style.borderRight = '2px solid #448';
+			x.style.display = 'inline-block';
+			x.style.position = 'absolute';
+			x.style.right = '.4em';
+			x.style.top = '.3em';
+			x.style.fontSize = 'normal';
+			x.style.width = x.style.height = '.8em';
+			x.style.paddingLeft = x.style.paddingBottom = '.3em';
+			x.style.cursor = 'default';
+			header.appendChild( x );
+
+			let editor = document.createElement('textarea');
+			editor.rows=24;
+			editor.cols=77;
+			editor.style.padding = '.5em';
+			editor.style.background = '#224';
+			editor.style.color = '#DDA';
+			editor.style.fontFamily = 'monospace';
+			editor.style.fontWeight = '600';
+			editor.style.fontSize = 'large';
+			editor.value = window.localStorage.getItem( STORAGE_ITEM_NAME );
+			if ( !editor.value ) editor.value = 'console.log(\'hello editor!\`);';
+			container.appendChild( editor );
+
+			let error = document.createElement('pre');
+			error.style.padding = '.5em';
+			error.style.color = '#FAA';
+			editor.style.fontWeight = 'bold';
+			container.appendChild( error );
+
+
+			let run = document.createElement('button');
+			run.style.display = 'block';
+			run.innerHTML = 'run';
+			run.style.width = '100%';
+			run.style.fontSize = 'large';
+			container.appendChild( run );
+
+			/* ------------------------------------------------------------------ */
+
+			x.onclick = () => {
+				document.body.removeChild( container );
+			};
+
+			run.onclick = () => {
+				try {
+					error.innerHTML = 'running...';
+					eval( editor.value );
+					error.innerHTML = '';
+					window.localStorage.setItem( STORAGE_ITEM_NAME, editor.value );
+				} catch ( e ) {
+					error.innerHTML = e.toString();
+					console.log(e);
+				}
+
+			};
+
+			editor.onkeypress = ( e ) => {
+				if ( 'Enter' === e.key && ( e.ctrlKey || e.altKey ) ) {
+					run.click();
+				}
+			};
+
+			header.onmousedown = ( e ) => {
+				e = e || window.event;
+				e.preventDefault();
+				header.downer = {x:e.clientX,y:e.clientY};
+				document.onmousemove = ( e ) => {
+					if ( !header.downer ) return;
+					
+					e = e || window.event;
+					e.preventDefault();
+					let dx = e.clientX - header.downer.x;
+					let dy = e.clientY - header.downer.y;
+					container.style.top = ( container.offsetTop + dy ) + 'px';
+					container.style.left = ( container.offsetLeft + dx ) + 'px';
+					header.downer.x = e.clientX;
+					header.downer.y = e.clientY;
+				};
+		    };
+
+			header.onmouseup = header.blur = ( e ) => {
+				header.downer = false;
+			};
+
+			document.body.appendChild(container);
+
+		} )();">editor</a>
+	</BODY>
+</HTML>
