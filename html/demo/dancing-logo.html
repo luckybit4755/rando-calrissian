@@ -5,6 +5,12 @@
 		<script type="text/javascript">
 			const FPS = 24;
 
+			let maxFrequency = 0;
+			let maxTime = 0;
+
+			let originalLogoWidth = 0;
+			let originalLogoHeight = 0;
+
 			window.onload = function() {
 				try {
 					microphone_analyser_start();
@@ -51,8 +57,14 @@
 				let canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 				let context = canvas.getContext( '2d' );
 
+				originalLogoWidth = logo.width;
+				originalLogoHeight = logo.height;
+
 				let radius = logo.width * 0.25;
 				let angle = 0;
+
+				doTheThing( document.body, function() { fullscreen( document.body ) } );
+
 
 				/* draw some stuff */
 
@@ -72,10 +84,12 @@
 					context.beginPath();
 					for ( let i = 0; i < data.length ; i++, x+= sliceWidth ) {
 						let v = data[ i ];
-						sum += v;
-						if ( v > mininum ) count++;
 						let y = canvas.height * v / 256.0;
 						( 0 === i ) ? context.moveTo( x, y ) : context.lineTo( x, y );
+
+						if ( i < data.length * .25 ) continue; // higher frequencies..
+						sum += v;
+						if ( v > mininum ) count++;
 						if( 0 === i || v < min ) {
 							min = v;
 							minAt = i;
@@ -117,6 +131,36 @@
 					let timeDomainInfo = drawData( 'red', timeDomain );
 					let frequencyInfo = drawData( 'blue', frequency );
 
+					let timeValue      = timeDomainInfo.sum;
+					let frequencyValue = frequencyInfo.sum;
+
+					if ( timeValue      > maxTime      ) maxTime      = timeValue;
+					if ( frequencyValue > maxFrequency ) maxFrequency = frequencyValue;
+
+					let ratioTime      = timeValue      / maxTime;
+					let ratioFrequency = frequencyValue / maxFrequency;
+
+					let x = window.innerWidth  * 0.5;
+					let y = window.innerHeight * 0.5 ;
+
+					let ratio = ratioFrequency;
+					//ratio = ratioTime;
+
+					let q = .7;
+					let p = 1. - q;
+					let f = .4
+					let w = originalLogoWidth  * ( q * ratio + p + f );
+					let h = originalLogoHeight * ( q * ratio + p + f );
+
+					console.log( originalLogoWidth, originalLogoHeight, w, h, ratioTime, ratioFrequency );
+
+					logo.style.left = ( x - w * 0.5 ) + 'px';
+					logo.style.top  = ( y - h * 0.5 ) + 'px';
+					logo.style.width = w;
+					logo.style.height = h;
+
+
+/*
 					let f = frequencyInfo.average / 66;
 					let g = ( 129 - timeDomainInfo.average ) / 1.5;
 					//console.log( timeDomainInfo.average + ' and ' + frequencyInfo.average + ' so ' + f + ' and ' + g );
@@ -142,12 +186,30 @@
 
 					logo.style.left = ( x - logo.width * 0.5 ) + 'px';
 					logo.style.top = ( y - logo.height * 0.5 ) + 'px';
-
+*/
 				};
 
 				/* initial call to draw function */
 
 				draw();
+			};
+
+			const doTheThing = function( element, cb ) {
+				document.body.onclick = document.body.onmouseover = document.body.keypress = 
+				document.onclick = document.onmouseover = document.keypress = element.onclick = 
+				element.on = cb;
+			}
+
+			/* try 17 zillion ways to make the element fullscreen */
+			const fullscreen = function( element ) {
+				var fz = 'webkitRequestFullscreen requestFullScreen mozRequestFullScreen msRequestFullscreen webkitRequestFullscreen webkitRequestFullscreen'.split( ' ' );
+				for ( var i = 0 ; i < fz.length ; i++ ) {
+					var f = fz[ i ];
+					if ( f in element ) {
+						element[ f ]();
+						break;
+					}
+				}
 			};
 		</script>
 		<style>
