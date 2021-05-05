@@ -18,20 +18,22 @@
 	<BODY>
 		<a href="javascript:( function() {
 			const STORAGE_ITEM_NAME = 'editor_vgvm_script';
+			let z = 2000;
 
 			let container = document.createElement( 'div' );
 			container.style.top = '1em';
 			container.style.left = '1em';
-			container.style.zIndex = 7;
+			container.style.zIndex = z;
 			container.style.border = '2px solid #224';
 			container.style.borderRadius = '4px';
 			container.style.padding = '.2em';
 			container.style.background = '#448';
 			container.style.position = 'absolute';
+			container.id = STORAGE_ITEM_NAME;
 
 			let header = document.createElement( 'div' );
 			header.innerHTML = 'Editor';
-			header.style.zIndex = 8;
+			header.style.zIndex = z++;
 			header.style.padding = '.3em';
 			header.style.cursor = 'move';
 			header.style.background = '#66A';
@@ -65,7 +67,7 @@
 			editor.style.fontWeight = '600';
 			editor.style.fontSize = 'large';
 			editor.value = window.localStorage.getItem( STORAGE_ITEM_NAME );
-			if ( !editor.value ) editor.value = 'console.log(\'hello editor! contents saved on successful execution\');';
+			if ( !editor.value ) editor.value = 'console.log(\'hello editor! contents can be saved to local storage\');';
 			container.appendChild( editor );
 
 			let error = document.createElement('pre');
@@ -74,13 +76,22 @@
 			editor.style.fontWeight = 'bold';
 			container.appendChild( error );
 
+			let buttons = document.createElement( 'div' );
+			container.appendChild( buttons );
 
 			let run = document.createElement('button');
-			run.style.display = 'block';
+			run.style.display = 'inline-block';
 			run.innerHTML = 'run';
-			run.style.width = '100%';
+			run.style.width = '50%';
 			run.style.fontSize = 'large';
-			container.appendChild( run );
+			buttons.appendChild( run );
+
+			let save = document.createElement('button');
+			save.style.display = 'inline-block';
+			save.innerHTML = 'save';
+			save.style.width = '50%';
+			save.style.fontSize = 'large';
+			buttons.appendChild( save );
 
 			/* ------------------------------------------------------------------ */
 
@@ -88,22 +99,29 @@
 				document.body.removeChild( container );
 			};
 
+			save.onclick = () => {
+				window.localStorage.setItem( STORAGE_ITEM_NAME, editor.value );
+				error.innerHTML = 'saved';
+			};
+
 			run.onclick = () => {
 				try {
 					error.innerHTML = 'running...';
 					eval( editor.value );
-					error.innerHTML = '';
-					window.localStorage.setItem( STORAGE_ITEM_NAME, editor.value );
+					error.innerHTML = 'ran successfully';
 				} catch ( e ) {
 					error.innerHTML = e.toString();
 					console.log(e);
 				}
-
 			};
 
 			editor.onkeypress = ( e ) => {
 				if ( 'Enter' === e.key && ( e.ctrlKey || e.altKey ) ) {
 					run.click();
+				} else {
+					if ( /(^saved$|^ran successfully$|^$)/.test( error.innerHTML ) ) {
+						error.innerHTML = 'modified';
+					}
 				}
 			};
 
