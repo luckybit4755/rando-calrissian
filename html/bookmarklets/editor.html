@@ -65,7 +65,7 @@
 			editor.style.fontWeight = '600';
 			editor.style.fontSize = 'large';
 			editor.value = window.localStorage.getItem( STORAGE_ITEM_NAME );
-			if ( !editor.value ) editor.value = 'console.log(\'hello editor!\`);';
+			if ( !editor.value ) editor.value = 'console.log(\'hello editor! contents saved on successful execution\');';
 			container.appendChild( editor );
 
 			let error = document.createElement('pre');
