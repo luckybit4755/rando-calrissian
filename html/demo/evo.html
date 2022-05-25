@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+	<HEAD>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+
+		<TITLE>evo</TITLE>
+		<script type="text/javascript">
+			/**
+			 *
+			 * Darlin' little nubbin's with a bittle neural
+			 * brain... that are dtf.. if they live
+			 *
+			 */
+			class Nub {
+				constructor( hiddenCount = null ) {
+					this.age = 0;
+					this.location = [0,0];
+					this.couldMove = true;
+
+					// inputs from the environment / etc
+
+					this.inputs = new Array( 14 ).fill( 0 ).map( _=>r1() );
+					this.layers = [ this.inputs ];
+				
+					// configurable hidden layers	
+
+					this.hiddenCount = hiddenCount;
+					if ( this.hiddenCount ) {
+						this.hiddenCount.forEach( size => 
+							this.layers.push( new Array( size ).fill( 0 ).map( _=>r1() ) )
+						);
+					}
+
+					// 8 output layers to move in different directions
+
+					this.outputs = new Array( 8 ).fill( 0 ).map( _=>r1() );
+					this.layers.push( this.outputs );
+
+					// randomly assign the weights
+
+					this.weights = new Array( this.layers.length - 1 ).fill( 0 ) .map( (_,i)=> {
+						const current = this.layers[ i ];
+						const next = this.layers[ i+1 ];
+						const weight = new Array( current.length ).fill( 0 ).map( _=> 
+							new Array( next.length ).fill( 0 ).map( _=>r1() )
+						)
+						return weight;
+					});
+
+					// try out biases
+
+					this.biases = this.layers.map( layer => 
+						new Array( layer.length ).fill( 0 ).map( _=>r1() )
+					);
+
+					this.color = this.fingerprint();
+				}
+
+				input( i, board, generation ) {
+					const now = new Date().getTime() / 1000.0 / 100.0;
+
+					if ( i < OFFSETS.length ) {
+						// look in 8 directions
+						return occupied( this, board, OFFSETS[ i ] ) ? 1 : -1; 
+					} else {
+						switch ( i - OFFSETS.length ) {
+							case 0: return this.position[ 0 ] / board.length; 
+							case 1: return this.position[ 1 ] / board.length;
+							case 2: return r1();
+							case 3: return Math.cos( now ); 
+							case 4: return 2 * ( this.age / generation ) -1;
+							case 5: return this.couldMove ? 1 : -1;
+						}
+					}
+				}
+
+				move( evo ) {
+					const board = evo.board;
+					const generation = evo.generation;
+
+					// initialize the inputs
+
+					// 8 direction occupied checks ; 2 positional
+					// 1 x random, cosine, age, couldMove
+					this.inputs.forEach( (v,i) => {
+						const b = this.biases[ 0 ][ i ];
+						const k = 0; // TODO: keep some state?
+						this.inputs[ i ] = this.input( i, board, generation ) + v * k + b;
+					});
+
+					// forward propagation
+					this.weights.forEach( (weight,i) => {
+						const a = this.layers[ i ];
+						const next = this.layers[ i + 1 ];
+						next.forEach( (v,j)=> {
+							const b = this.biases[ i + 1 ][ j ];
+							const k = 0; // TODO: keep some state
+							next[ j ] = v * k + b;
+						});
+
+						// this is wack cuz layers are not like [ [1],[2] ], just [1,2] ...
+						const aRows = 1;
+						const aCols = a.length;
+
+						const weightRows = weight.length;
+						const weightCols = weight[0].length;
+
+						if ( aCols != weightRows || weightCols != next.length ) {
+							const message = `size error: ${aRows}x${aCols} * ${weightRows}x${weightCols} -> ${aRows}x${weightCols} vs 1 x ${next.length}`;
+							throw new Error( message );
+						}
+
+						// adapted from https://www.tutorialspoint.com/algorithm-for-matrix-multiplication-in-javascript
+						for (let r = 0; r < aRows; ++r) {
+							for (let c = 0; c < weightCols; ++c) {
+								for (let k = 0; k < aCols; ++k) {
+									//m[r][c] += a[r][k] * weight[k][c];
+									next[c] += a[k] * weight[k][c];
+									if ( isNaN( next[ c ] ) ) {
+										const message = `NaN: next[${c}] = ${next[c]} = a[${k}] * weight[${k}][${c}] = ${a[k]} * ${weight[k][c]};`;
+										throw new Error( message );
+									}
+								}
+							}
+						}
+
+						next.forEach( (v,j) => next[ j ] = Math.tanh( v ) );
+					});
+
+					//console.log( 'inputs:', this.inputs );
+					//console.log( 'outputs:', this.outputs );
+
+					// collect
+
+					const impulse = this.outputs.reduce( (impulse,v,i)=> {
+						return ( v > 0 && v < Math.random() ) ? impulse : arrayAdd( impulse, OFFSETS[ i ] );
+					}, [0,0]);
+					impulse.forEach( (v,i) => impulse[ i ] = Math.max( -1, Math.min( 1, v ) ) );
+
+					// verify and move 
+
+					this.couldMove = true;
+					if ( !( 0 == impulse[ 0 ] && 0 == impulse[ 1 ] ) ) {
+						if ( occupied( this, board, impulse ) ) {
+							this.couldMove = false;
+						} else {
+							const position = arrayAdd( this.position, impulse );
+							boardSet( board, this.position, null );
+							this.position = position;
+							boardSet( board, this.position, this );
+						}
+					}
+
+					this.age++;
+				}
+
+				rut( that, mutationRate = 1 / 1000 ) {
+					const kid = new Nub( this.hiddenCount );
+
+					this.layers.forEach( (thisLayer,i) => {
+						const kidLayer = kid.layers[ i ];
+						const thatLayer = that.layers[ i ];
+						return this.dna( kidLayer, thisLayer, thatLayer );
+						kidLayer.forEach( (v,j) => {
+							kidLayer[ j ] = (
+								( Math.random() < mutationRate ) 
+								? v
+								: Math.random() < .5 ? thisLayer[ j ] : thatLayer[ j ]
+							);
+						});
+					});
+
+					this.weights.forEach( (thisWeight,i) => {
+						const kidWeight = kid.weights[ i ];
+						const thatWeight = that.weights[ i ];
+						kidWeight.forEach( (kidRow,j) => {
+							const thisRow = thisWeight[ j ];
+							const thatRow = thatWeight[ j ];
+							kidRow.forEach( (v,k) => {
+								kidRow[ k ] = (
+									( Math.random() < mutationRate ) 
+									? v
+									: Math.random() < .5 ? thisRow[ k ] : thatRow[ k ]
+								);
+							});
+						});
+					});
+
+					this.biases.forEach( (thisBias,i) => {
+						const kidBias = kid.biases[ i ];  
+						const thatBias = that.biases[ i ]; // 1d array
+						this.dna( kidBias, thisBias, thatBias, mutationRate );
+					});
+
+					kid.color = this.fingerprint();
+					return kid;
+				}
+
+				dna( kid, dad, mom, mutationRate ) {
+					kid.forEach( (v,j) => {
+						kid[ j ] = (
+							( Math.random() < mutationRate ) 
+							? v
+							: Math.random() < .5 ? mom[ j ] : dad[ j ]
+						);
+					});
+				}
+
+				fingerprint() {
+					let hash = 0;
+					this.layers.forEach( layer => layer.forEach( v => hash = this._hash( hash, v ) ) );
+					this.weights.forEach( (thisWeight,i) => {
+						thisWeight.forEach( row => row.forEach( v => hash = this._hash( hash, v ) ) )
+					});
+					hash = ( hash & hash ) % Math.pow( 2, 24 );
+					return `rgb(${hash>>16&255},${hash>>8&255},${hash&255})`;
+				}
+
+				_hash( hash, v ) {
+					const n = 2;
+					v = Math.floor( v * n ) + n;
+					hash = ((hash<<2)-hash) + v;
+					//if ( hash > 22 && 0 == hash % 2 ) hash = hash / 2 + 1;
+					return hash;
+					//return hash & hash; // Convert to 32bit integer
+				}
+			};
+
+			class Evo {
+				// 0> 4:43, 7:90, 5,4,6:107
+				// 1> 4:52
+				configure( hidden = [4], size = 128, nubCount = 200, generation = 300, mechanism = 0, iterationsPerFrame = 10 ) {
+					this.size = size;
+					this.nubCount = nubCount;
+					this.generation = generation;
+					this.mechanism = mechanism
+					this.iterationsPerFrame = iterationsPerFrame;
+
+					// couple of cut-offs 
+					this.maxSurvival = 95; 
+					this.maxGenerations = 128;
+
+					this.fps = 22
+
+					this.nubs = new Array( this.nubCount ).fill( 0 ).map( _=>new Nub( hidden ) );
+					this.survivalCounts = [];
+
+					this.placeNubs();
+
+					this.canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+					this.context = this.canvas.getContext( '2d' );
+					this.context.font= '22px Comic-Sans'
+
+					this.w = parseInt( this.canvas.width );
+					this.h = parseInt( this.canvas.height );
+					this.scale = parseInt( this.w ) / this.size;
+
+					this.iteration = 0;
+					this.paused = 0;
+
+					this.lastSurviverCount = 0;
+					this.sarnathCounter = 0;
+
+					return this;
+				}
+
+				placeNubs() {
+					this.board = new Array( this.size ).fill( this.size ).map( _=> new Array( this.size ).fill( false ) );
+					this.nubs.forEach( nub=> {
+						while( true ) {
+							const r = Math.floor( Math.random() * this.size );
+							const c = Math.floor( Math.random() * this.size );
+							if ( !this.board[ r ][ c ] ) {
+								nub.position = [ r, c ];
+								boardSet( this.board, nub.position, nub );
+								break;
+							}
+						}
+					});
+				}
+
+				run() {
+					if ( this.paused-- > 0 ) {
+						return;
+					}
+					if ( this.iteration > this.maxGenerations * this.generation ) return;
+
+					this.clear();
+					this.drawMechanism();
+
+					let done = false;
+
+					for ( let b = 0 ; b < this.iterationsPerFrame && !done ; b++ ) {
+						this.iteration++;
+
+						this.nubs.forEach( nub=> {
+							nub.move( this );
+							// pretty busy but sort of fun... 
+							if ( b > this.iterationsPerFrame - 5 ) {
+								this.drawNub( nub );
+							}
+						});
+
+						if ( 0 == this.iteration % this.generation ) {
+							const survived = this.sarnath();
+							done = ( 0 == survived ) || ( survived >= this.maxSurvival );
+						}
+					}
+
+					if ( done ) {
+						this.clear( 'white' );
+						this.drawMechanism();
+						this.nubs.forEach( nub=> this.drawNub( nub ) );
+						this.drawGraph();
+						this.drawLegend();
+					} else {
+						this.drawGraph();
+						this.drawLegend();
+                    	setTimeout( () => requestAnimationFrame( ()=>this.run() ) , 1000 / this.fps );
+					}
+				}
+				
+				clear( color = 'rgba(255,255,255,.84)' ) {
+					this.context.fillStyle = color;
+					this.fillRect();
+				}
+
+				drawGraph() {
+					this.context.lineWidth = 3;
+					this.context.strokeStyle = 'green';
+					this.context.beginPath();
+					this.survivalCounts.forEach( (v,x)=> {
+						const y = this.h - this.h * v / 100;
+						x *= 10;
+						x ? this.context.lineTo( x,y ) : this.context.moveTo( x,y );
+
+					});
+					this.context.stroke()
+				}
+
+				drawLegend() {				
+					this.context.fillStyle = 'lightgray'
+					this.fillRect(22,4,233,22);
+
+					this.context.fillStyle = 'black';
+					const g = Math.floor( this.iteration / this.generation );
+					let i = '' + this.iteration % this.generation;
+					while ( i.length < 3 ) i = `0${i}`;
+					const m = `${g}.${i} = ${this.survivalCounts.slice(-3).join( ', ' )}`;
+					this.context.fillText( m, 22, 22 );
+
+					if ( this.sarnathCounter-- < 0 ) return;
+
+					this.context.fillStyle = 'red';
+					const s = `${this.lastSurviverCount} of ${this.nubCount} survived`;
+					this.context.fillText( s, this.w * .22, this.h * .77 );
+				}
+
+				drawNub( nub ) {
+					const r = nub.position[ 0 ];
+					const c = nub.position[ 1 ];
+					this.context.fillStyle = nub.color;
+					this.fillRect( 
+						c * this.scale,
+						r * this.scale,
+						this.scale, 
+						this.scale
+					);
+				}
+
+				fillRect( x = 0, y = 0, w = this.w, h = this.h ) {
+					this.context.fillRect( x, y, w, h);
+				}
+
+				fillArc( x = 0, y = 0, r = 33, s=0, e = 2 * Math.PI) {
+					this.context.beginPath();
+					this.context.arc( x,y,r,s,e );
+					this.context.closePath();
+					this.context.fill();
+					this.context.stroke();
+				}
+
+				drawMechanism() {
+					this.context.fillStyle = 'rgba(0,255,0,.4)';
+					const w = this.w * .5;
+					const h = this.h * .5;
+
+					switch( this.mechanism ) {
+						case 1:  this.fillRect( this.w * .75 ); break
+						case 2:  this.fillArc( w, h, h * .5 ); break;
+						default: this.fillRect( 0, this.h * .5 ); 
+					}
+				}
+
+				survived( nub ) {
+					const r = nub.position[ 0 ];
+					const c = nub.position[ 1 ];
+
+					const x = c * this.scale;
+					const y = r * this.scale;
+
+					const h = this.h * .5;
+
+					switch( this.mechanism ) {
+						case 1: return c > this.size * .75;
+						case 2: 
+							const xd = x - h;
+							const yd = y - h;
+							return ( xd * xd + yd * yd ) < ( h * h );
+						default: return r > this.size * .5;
+					}
+				}
+
+				sarnath() {
+					const winners = this.nubs.filter( nub => this.survived( nub ) );
+					this.lastSurviverCount = winners.length;
+					this.sarnathCounter = this.generation / this.iterationsPerFrame * .66;
+
+					//this.context.fillStyle = 'red';
+					//console.( `welcome to sarnath: ${winners.length} survived`, this.w * .22, this.h * .77 );
+
+					if ( !winners.length ) {
+						return 0;
+					}
+
+					//console.log( winners[ 0 ].color, 'is tinged with crimson' );
+					const percent = Math.floor( 100 * winners.length / this.nubCount );
+
+					this.survivalCounts.push( percent );
+					if ( this.survivalCounts.length > this.w / 10 ) {
+						this.survivalCounts = this.survivalCounts.slice( 1 );
+					}
+
+					// bit hacky... don't spawn if we are done...
+					if ( percent >= this.maxSurvival ) {
+						console.log( 'all done...' );
+						return percent;
+					}
+
+					const nextGeneration = new Array( this.nubCount ).fill( 0 ).map( _=> {
+						const mom = winners[ Math.floor( Math.random() * winners.length ) ];
+						const dad = winners[ Math.floor( Math.random() * winners.length ) ];
+						return dad.rut( mom );
+					});
+
+					this.nubs = nextGeneration;
+					this.placeNubs();
+
+					return percent;
+				}
+			};
+
+			const r1 = () => 2 * ( Math.random() - Math.random() );
+
+			const occupied = ( nub, board, offset = null) => {
+				const position = offset ? arrayAdd( nub.position, offset ) : nub.position;
+				// consider out of board to be occupied
+				if ( !inBounds( position, board ) ) return true;
+				return board[ position[0] ][ position[1] ];
+			};
+
+			const inBounds = ( position, board ) => {
+				const r = position[ 0 ];
+				const c = position[ 1 ];
+				return !( r < 0 || c < 0 || c >= board[ 0 ].length || r >= board.length );
+			}
+
+			const arrayAdd = (a,b) => a.map( (v,i)=>v+b[i]);
+
+			const boardSet = ( board, position, value ) => {
+				const r = position[ 0 ];
+				const c = position[ 1 ];
+				board[ r ][ c ] = value;
+			}
+
+			const OFFSETS = [
+				[-1, -0], //N
+				[+1, -0], //S
+				[-1, +1], //NE
+				[-0, +1], //E
+				[+1, +1], //SE
+				[-1, -1], //NW
+				[-0, -1], //W
+				[+1, -1]  //SW
+			];
+
+			let evo = null;
+			window.addEventListener('load', () => ( evo = new Evo().configure() ).run() );
+		</script>
+		<style>
+			body   { color:#ccb; background:black; font-family: sans-serif; margin:.5em; }
+			pre    { color:#8c8; }  
+			a      { color:#aad; text-decoration:none; }
+			canvas { display:inline-block; }
+			form    { display:inline-block; }
+			span   { display:inline-block; }
+			form {display:none};
+		</style>
+	</HEAD>
+	<BODY>
+		<canvas width="512" height="512"></canvas>
+		<form>
+			<span>hidden     <input width="8" name="hidden_" value="[4]"></input></span>
+			<span>size       <input width="8" name="size" value="128"></input></span>
+			<span>count      <input width="8" name="nubCount" value="200"></input></span>
+			<span>generation <input width="8" name="generation" value="300"></input></span>
+			<span>mechanism <select name="mechanism"></span>
+				<option>bottom half</option>
+				<option>right quarter</option>
+			</select></span>
+			<span>perFrame<select name="iterationsPerFrame">
+				<option>1</option>
+				<option>4</option>
+				<option selected="lul">10</option>
+				<option>20</option>
+			</select></span>
+			<span><button>evo</button>
+		</form>
+
+
+	</BODY>
+</HTML>
