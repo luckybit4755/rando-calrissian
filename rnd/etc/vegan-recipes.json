@@ -1,0 +1,170 @@
+{
+	"notes": [
+		"I keep my pastry blender in the freezer",
+		"for milk I use almond but soy is probly fine",
+		"1/3 recipe: 1 cup -> 5.3 tbsp , 1/3 cup -> 5.3 tsp, 1/2 cup -> 8 tsp, 1/4 cup -> 4 tsp, 1 tbsp -> 1   tsp",
+		"1/6 recipe: 1 cup  -> 8 tsp,    1/3 cup -> 2.6 tsp, 1/2 cup -> 4 tsp, 1/4 cup -> 2 tsp, 1 tbsp -> 1/2 tsp"
+	],
+	"conversions":[
+		{  "from":"cup",  "to":"tbsp", "is":16 },
+		{  "from":"tbsp", "to":"tsp",  "is":3 },
+		{  "from":"cup",  "to":"tsp",  "is":48 }
+	],
+	"recipes": {
+		"Banana Bread": {
+			"ingredients":[
+				{ "n":3,   "unit":"cup", "ingredient":"all-purpose flour" },
+				{ "n":1,   "unit":"cup", "ingredient":"white sugar" },
+				{ "n":0.5, "unit":"cup", "ingredient":"brown sugar" },
+				{ "n":2,   "unit":"tsp", "ingredient":"baking powder" },
+				{ "n":1,   "unit":"tsp", "ingredient":"baking soda" },
+				{ "n":2,   "unit":"tsp", "ingredient":"cinnamon" },
+				{ "n":1,   "unit":"tsp", "ingredient":"nutmeg" },
+				{ "n":1,   "unit":"tsp", "ingredient":"salt" },
+				{ "n":2,   "unit":"cup", "ingredient":"mashed ripe bananas" },
+				{ "n":1,   "unit":"cup", "ingredient":"oil" },
+				{ "n":1,   "unit":"cup", "ingredient":"milk" }
+			],
+			"steps":[
+				"preheat 350",
+				"mix dry",
+				"mix wet",
+				"mix both",
+				"bake 33 minutes"
+			],
+			"notes":[
+				"https://www.allrecipes.com/recipe/233146/vegan-banana-muffins/",
+				"muffin cups or oiled loaf pan",
+				"can just use all one type of sugar",
+				"dried or frozen berries and walnuts are nice",
+				"in my oven this takes more like 45 minutes to an hour",
+				"the last 15 minutes you can put aluminum foil over the top"
+			]
+		},
+		"Biscuits": {
+			"ingredients":[
+				"n":3,     "unit":"cup",  "ingredient":"all-purpose flour" },
+				"n":2,     "unit":"tbsp", "ingredient":"baking powder" },
+				"n":1,     "unit":"tbsp", "ingredient":"sugar" },
+				"n":1,     "unit":"tsp",  "ingredient":"salt" },
+				"q":"3/4", "unit":"tsp",  "ingredient":"cream of tartar" },
+				"q":"1/2", "unit":"cup",  "ingredient":"butter" },
+				"q":"1/4", "unit":"cup",  "ingredient":"shortening" },
+				"n":1,     "unit":"cup",  "ingredient":"milk" }
+			],
+			"steps":[
+				"preheat 450",
+				"mix dry",
+				"cut in shortening and butter with pastry blender and butter knife",
+				"should look like course crumbs",
+				"make a well",
+				"add milk all at once",
+				"mix very, very gently",
+				"turn onto silicone map and form gently into a dough",
+				"roll and cut or form into shape by hand",
+				"bake 11-15 minute"
+			],
+			"notes":[
+				"I double the baking powder from the BH book",
+				"I think you can substitute lemon juice for the tartar",
+				"you can use 3/4 cup butter instead of butter and shortening",
+				"this recipe makes a *lot*!!!",
+				"for 2 people, I make 1/3 of it",
+				"for 1 person I make 1/6",
+				"this is not a good recipe for the air fryer they say...",
+				"bit fiddly, just try not to overhandle and squish the butter"
+
+			]
+		},
+		"Shortbread": {
+			"ingredients":[
+				{ "q":"1 1/4",  "unit":"cup", "ingredient":"flour"  },
+				{ "q":"1/4",    "unit":"cup", "ingredient":"butter" },
+				{ "q":"1/4",    "unit":"cup", "ingredient":"sugar" }
+			],
+			"steps":[
+				"preheat 350",
+				"cut in the butter with a pastry blender and knife",
+				"form it into bars",
+				"bake 11-13 minutes"
+			],
+			"notes":[
+				"a silicone mat and spatula are good for forming",
+				"it is a constant battle to keep it from crumbling",
+				"I like to form it into a square, divide in forth and half each one",
+				"air fryer takes about 10 minutes",
+				"ratio is 5 flour to 1 butter and sugar"
+			]
+		},
+		"Pasta Noodles": {
+			"ingredients":[
+				{ "q":"2 1/4", "unit":"cup", "ingredient":"flour" },
+				{ "q":"1/2",   "unit":"tsp", "ingredient":"salt" },
+				{ "q":"3/4",   "unit":"cup", "ingredient":"water" },
+				{ "n":2",      "unit":"tsp", "ingredient":"oil" }
+			],
+			"steps":[
+				"mix as you would think to do :-P",
+				"knead for like 8-10 minutes, you will be sick of doing it",
+				"wrap in cling wrap and refridgerate 30 minutes... or not",
+				"roll it super thin (takes a while)",
+				"cut it into noodles",
+				"cook till done or serve it raw and act like it's a cultured culinary decision"
+			],
+			"notes":[
+				"https://biancazapatka.com/en/homemade-vegan-pasta/",
+				"I simplified this a lot",
+				"when I made it, it took a *long* time to cook well",
+				"al dente is Italian for 1/2 raw",
+				"pasta is from China",
+				"I'm from the south and we cook food until it is done here"
+			]
+		},
+		"Tortillas":{
+			"ingredients":[
+				{ "n":3,     "unit":"cup", "ingredient":"flour" },
+				{ "n":1,     "unit":"tsp", "ingredient":"baking powder" },
+				{ "n":1,     "unit":"tsp", "ingredient":"salt" },
+				{ "n":1,     "unit":"cup", "ingredient":"hot water" },
+				{ "q":"1/3", "unit":"cup", "ingredient":"oil" }
+			],
+			"steps":[
+				"mix dry",
+				"make well",
+				"add oil and make course crumbs",
+				"add water",
+				"knead 2 minutes till smooth and elastic",
+				"divide into 16th",
+				"make into a ball and roll flat",
+				"fry it or whatever you want"
+			],
+			"notes":[
+				"https://izzycooking.com/vegan-tortillas/",
+				"if you leave out the baking powder they will be flat",
+				"with the powder they are a bit poofy",
+				"both are nice",
+				"you can make 1/16: 3 tbsp flour, 1/16 baking powder and salt, 1 tsp water, 1 tsp oil"
+			]
+		},
+		"Pancakes": {
+			"ingredients":[
+				{ "n":1,     "unit":"cup",  "ingredient":"flour" },
+				{ "n":1,     "unit":"tbsp", "ingredient":"sugar" },
+				{ "n":2,     "unit":"tbsp", "ingredient":"baking powder" },
+				{ "n":"1/8", "unit":"tsp",  "ingredient":"salt" },
+				{ "n":1,     "unit":"cup",  "ingredient":"milk" },
+				{ "n":1,     "unit":"tbd",  "ingredient":"vanilla to taste" },
+				{ "n":2,     "unit":"tbsp", "ingredient":"oil" }
+			],
+			"steps":[
+					"heat and oil pan",
+					"mix dry ingredients",
+					"add wet ingredients",
+					"cook 'em"
+			],
+			"notes":[
+				"this makes a lot, for 2 people 1/2 is enough"
+			]
+		}
+	}
+}
