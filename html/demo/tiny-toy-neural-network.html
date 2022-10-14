@@ -1,0 +1,173 @@
+<HTML>
+	<HEAD>
+		<TITLE>tiny-toy-neural-network</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript"> 
+			// adapted from http://iamtrask.github.io/2015/07/12/basic-python-network/
+			window.addEventListener('load', () => { tinyToyNeuralNetworkDemo() } ); 
+
+			const tinyToyNeuralNetworkDemo = () => {
+				const trainingData = createTrainingData();
+				const threshold = .01;
+
+				const count = trainingData.inputs.length;
+				const elements = papersPlease();
+
+				fill( elements, 'info', `training with ${count} examples` );
+
+				let weights0 = null;
+				for ( let i = 0 ; i < 100 * 1000 ; i++ ) {
+					weights0 = train( trainingData.inputs, trainingData.labels, weights0 );
+					if ( weights0.error < threshold ) {
+						console.log( 'error:', weights0.error, '<', threshold, '@' + i );
+						break;
+					}
+					if ( 0 == i % 100 ) {
+						fill( elements, 'error', weights0.error );
+					}
+				}
+
+				const output = predict( trainingData.inputs, weights0 );
+				console.log( 'weights0', weights0 );
+				console.log( 'outputs', output.map( l => Math.round( l ) ) );
+
+				const correct = output.reduce( (s,l,i) => {
+					return s + ( Math.round( l ) == trainingData.labels[ i ] ) 
+				}, 0 );
+
+				console.log( 'correct:', correct, '/' , count, '=', correct / count );
+
+				console.log( predict( [0,0,0], weights0 ) );
+				console.log( predict( [0,.1,.1], weights0 ) );
+
+				console.log( predict( [0,1,1], weights0 ) );
+				console.log( predict( [1,0,0], weights0 ) );
+				console.log( predict( [1,1,1], weights0 ) );
+
+			};
+
+			const predict = ( inputs, weights0 ) => sigmoid( dot( inputs, weights0 ) );
+
+			// "full batch" training iteration of a single layer neural network
+			// * layer0 is the input
+			// * layer1 is the output
+			// weights0 is an NxM matrix, where:
+			// * input = inputs[ * ], eg inputs[ 0 ];
+			// * N = |input|  = input.length
+			// * M = |output| = output.length
+			// in this case: 3x1
+			const train = ( inputs, labels, weights0 = null ) => {
+				weights0 = weights0 || randomArray( inputs[ 0 ].length ); 
+				
+				// forward propagation
+				const layer0 = inputs;
+				const layer1 = predict( layer0, weights0 ); // aka the output
+
+				// difference from expected
+    			const layer1_error = labels.map( (v,i) => v - layer1[ i ] );
+
+				// the error weighted derivative
+				// multiply how much we missed by the
+				// slope of the sigmoid at the values in layer1
+    			const layer1_delta = derivative( layer1 ).map( (v,i) => v * layer1_error[ i ] );
+
+				const weightUpdate = dot( transpose( layer0 ), layer1_delta );
+				weights0 = weights0.map( (w,i) => w + weightUpdate[ i ] );
+
+				weights0.error = layer1_error.reduce( (s,v) => s + Math.abs( v ), 0 );
+
+				return weights0;
+			};
+
+			originalTrainingData = () => {
+				const inputs = [
+					[0,0,1],
+					[0,1,1],
+					[1,0,1],
+					[1,1,1]
+				];
+				return { inputs:inputs,labels:inputs.map( i => i[ 0 ] ) };
+			};
+
+			createTrainingData = ( count = 100 ) => {
+				const inputs = new Array( count );
+				const labels = new Array( count ).fill(0).map( (l,i) => {
+					l = Math.random() < .5 ? 0 : 1;
+					inputs[ i ] = new Array( 3 ).fill(0).map( v=>Math.random() );
+					inputs[ i ][ 0 ] = l;
+					return l;
+				});
+				return {inputs:inputs,labels:labels};
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+			// math junk
+
+			// the logistic function (https://en.wikipedia.org/wiki/Sigmoid_function)
+			const sigmoid = ( x ) => {
+				if( Array.isArray( x ) ) return x.map( v => sigmoid( v ) );
+				return 1 - 1 / ( 1 + Math.pow( 2.2, x ) );
+				return 1 - 1 / ( 1 + Math.pow( 2, x ) );
+				return 1 / ( 1 + Math.pow( 2, -x ) );
+				return 1 / ( 1 + Math.exp( -x ) );
+			};
+
+			const derivative = ( x ) => {
+				if( Array.isArray( x ) ) return x.map( v => derivative( v ) );
+				return x * ( 1 - x );
+			}
+
+			const dot = ( a, b ) => {
+				if ( Array.isArray( a[ 0 ] ) ) return a.map( v => dot( v, b ) );
+				if ( Array.isArray( b[ 0 ] ) ) return dot( b, a );
+				if ( a.length != b.length ) {
+					throw 'a and b must have same number of elements: ' + a + 'vs' + b;
+
+			};
+
+			const transpose = ( m ) => {
+				const t = new Array( m[ 0 ].length )
+					.fill( 0 )
+					.map( z => new Array( m.length ).fill( 0 ) )
+				;
+				t.forEach( (row,i) => row.forEach( (_,j) => t[ i ][ j ] = m[ j ][ i ] ) );
+				return t;
+			};
+
+			const randomArray = ( n ) => new Array( n ).fill( 0 ).map( v => Math.random() * 2 -1 );
+
+			/////////////////////////////////////////////////////////////////////////////
+			// html junk
+
+			const papersPlease = ( element = document.body, hasId = {} ) => {
+				if ( element.hasAttribute && element.hasAttribute( 'id' ) ) {
+					hasId[ element.getAttribute( 'id' ) ] = element;
+				}
+				for ( let i = 0 ; i < ( element.childNodes ? element.childNodes.length : 0 ) ; i++ ) {
+					papersPlease( element.childNodes[ i ], hasId );
+				}
+				return hasId;
+			}
+
+			const fill = ( hasId, name, text ) => {
+				hasId[ name ].innerHTML = text;
+			};
+
+			/////////////////////////////////////////////////////////////////////////////
+
+		</script>
+	</HEAD>
+	<BODY>
+		<div>
+			<a href="http://iamtrask.github.io/2015/07/12/basic-python-network/">http://iamtrask.github.io/2015/07/12/basic-python-network/</a>
+		</div>
+		<div id="info"></div>
+		<div>error:<span id="error"></span></div>
+	</BODY>
+</HTML>

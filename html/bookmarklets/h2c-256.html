@@ -1,0 +1,143 @@
+<HTML>
+	<HEAD>
+		<TITLE>h2c-256</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+				background:gray;
+			}
+		</style>
+
+		<script type="text/javascript">
+			window.addEventListener('load', () => {
+				if ( /auto/.test( document.location.toString() ) ) {
+					document.getElementsByTagName( 'a' )[ 0 ].click();
+				}
+			} );
+		</script>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const size = 256;
+			const halb = size / 2;
+
+			const click = () => {
+				console.log( 'gotcha...', html2canvas );
+				html2canvas(document.body).then(function(canvas) {
+					const context = canvas.getContext('2d');
+					canvas.setAttribute( 'tabindex', 1 );
+					canvas.style.border = '1px solid red';
+					canvas.style.zIndex = 9001;
+					canvas.style.position = 'absolute';
+					canvas.style.top = canvas.style.left = 0;
+					document.body.appendChild( canvas );
+
+					const w = canvas.width;
+					const h = canvas.height;
+					const og = context.getImageData( 0,0,w,h );
+
+					let captured = null;
+
+					const clear = () => {
+						context.putImageData( og, 0, 0 );
+					};
+
+					const at = (e) => {
+						return { x:e.clientX ,y:e.clientY };
+						return { x:e.offsetX ,y:e.offsetY };
+						return { x:e.x ,y:e.y };
+					};
+
+					const draw = (e) => {
+						const ur = at( e );
+						const x = e.x;
+						const y = e.y;
+
+						clear();
+
+						context.fillStyle = 'rgba( 0,0,0,.33)';
+						context.fillRect( x-halb,y-halb,size,size );
+
+						if ( captured ) { 
+							context.putImageData( captured, x-halb,y-halb );
+						} 
+
+						context.strokeStyle = 'red';
+						context.lineWidth = 4;
+						context.beginPath();
+						const q = halb - context.lineWidth;
+						context.moveTo( x-q, y-q );
+						context.lineTo( x+q, y-q );
+						context.lineTo( x+q, y+q );
+						context.lineTo( x-q, y+q );
+						context.closePath();
+						context.stroke();
+					};
+
+					canvas.addEventListener( 'click', (e)=>{
+						const ur = at( e );
+						const x = e.x - halb;
+						const y = e.y - halb;
+
+						clear();
+						captured = context.getImageData( x,y,size,size);
+
+						return draw(e);
+					});
+
+					canvas.addEventListener( 'mousemove', draw );
+
+					canvas.addEventListener( 'keydown', (e)=>{
+						if ( 'Escape' === e.key ) {
+							if ( captured ) {
+								captured = false;
+							} else {
+								document.body.removeChild( canvas );
+							}
+						}
+						if ( ' ' === e.key && captured ) {
+							canvas.setAttribute( 'width', size );
+							canvas.setAttribute( 'height', size );
+							canvas.width = canvas.height = size;
+							clear();
+
+							const dataURL = canvas.toDataURL('image/png');
+							const url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+							const downloadLink = document.createElement( 'a' );
+							downloadLink.setAttribute('href', url);
+							const name = 'c256-' + ( new Date().getTime() ) + '.png';
+							downloadLink.setAttribute( 'download', name );
+							downloadLink.click();
+
+							document.body.remove( canvas );
+						}
+
+						return false;
+					});
+				});	
+			};
+			const loaded = () => {
+				console.log( 'lul' );
+				click();
+			};
+
+			const id = 'h2c_script_element_vgvm';
+			if ( document.getElementById( id ) ) {
+				click();
+			} else {
+				const h2c_link = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+				const script = document.createElement( 'script' );
+				script.setAttribute( 'id', id );
+				script.setAttribute( 'type', 'text/javascript' );
+				script.setAttribute( 'src', h2c_link );
+				script.addEventListener( 'load', loaded );
+				document.head.appendChild( script );
+			}
+
+		} )();">hc2c-256</a>
+
+        <img src="images/usb.png" width=666></img>
+	
+	</BODY>
+</HTML>

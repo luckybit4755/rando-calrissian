@@ -1,0 +1,29 @@
+<HTML>
+	<HEAD>
+		<TITLE>hamo</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+		</style>
+
+		<script type="text/javascript">
+			/* window.addEventListener('load', () => {} ); */
+		</script>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const junk = () => { 
+				'live-badge wio-xplayer wio-xads-remove wio-xspb wio-xspa'.split( ' ' ).forEach( k => {
+					const live = document.getElementsByClassName( k );
+					for ( let i = 0 ; i < live.length ; i++ ) {
+						const what = 'live-badge' == k ? live[ i ].parentNode : live[ i ];
+						what.style.display = 'none';
+					}
+				});
+			}; 
+			setInterval( junk, 100 );
+		} )();">hamo</a>
+	</BODY>
+</HTML>

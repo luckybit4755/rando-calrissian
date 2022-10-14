@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+	<HEAD>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+
+		<TITLE>ovogo</TITLE>
+
+		<style>
+			body {
+				font-family: sans-serif;
+				background-image: url('Lunar_Base_by_David_A_Hardy.jpg');
+				background-repeat: no-repeat;
+				background-size: contain;
+			}
+			canvas {
+				opacity:.8;
+			}
+		</style>
+
+		<script type="text/javascript">
+
+			// https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472
+			// 0 = _ ; 1 = ┌ ; 2 = ┐ ; 3 = ┘ ; 4 = └ ; 5 = o
+			const DEFINITION = { 
+				rules: ( new Map()
+					.set( 'NORTH', new Map()
+						.set( 0, new Set([0,3,4,5]) )
+						.set( 1, new Set([0,3,4,5]) )
+						.set( 2, new Set([0,3,4,5]) )
+						.set( 3, new Set([2]) )
+						.set( 4, new Set([1]) )
+						.set( 5, new Set([0,3,4,5]) )
+					)
+					.set( 'EAST', new Map()
+						.set( 0, new Set([0,1,4,5]) )
+						.set( 1, new Set([2]) )
+						.set( 2, new Set([0,1,4,5]) )
+						.set( 3, new Set([0,1,4,5]) )
+						.set( 4, new Set([3]) )
+						.set( 5, new Set([0,1,4,5]) )
+					)
+				),
+				kules: ( new Map()
+					.set( 'NORTH', [
+						  [0,3,4,5]
+						, [0,3,4,5]
+						, [0,3,4,5]
+						, [2]
+						, [1]
+						, [0,3,4,5]
+					])
+					.set( 'EAST', [
+						  [0,1,4,5]
+						, [2]
+						, [0,1,4,5]
+						, [0,1,4,5]
+						, [3]
+						, [0,1,4,5]
+					])
+				),
+
+				// this is a spot to fiddle with the values distribution
+				random: () => Math.pow( Math.random(), 5. ),
+
+				drawTile: ( context, cell, x, y, size ) => {
+					const t = cell.t;
+					const text = null;//`${cell.s}:${t}`;
+
+					const s = size;
+					const r = size * .5;
+
+					const start = [.50, .75, .00, .25];
+					const stop  = [.75, 1.0, .25, .50];
+
+					const gray = 'gray';
+					const dull = '#988776';
+
+					rect( context, dull, x,y,size );
+					switch ( t ) {
+						case 0:  rect( context, dull, x,   y,   size, text ); break;
+						case 1:  arc(  context, gray,  x+s, y+s, r, start[t-1], stop[t-1], text ); break;
+						case 2:  arc(  context, gray,  x,   y+s, r, start[t-1], stop[t-1], text ); break;
+						case 3:  arc(  context, gray,  x,   y,   r, start[t-1], stop[t-1], text ); break;
+						case 4:  arc(  context, gray,  x+s, y,   r, start[t-1], stop[t-1], text ); break;
+						case 5:  arc(  context, gray,  x+r, y+r, r*.5, 0, 1, text ); break;
+						default: rect( context, 'red',   x,   y,   size, `error:${cell.s}` );
+					}
+				}
+			};
+
+			class Ovogo {
+				static DIRECTIONS = '>nsew'.split('').map((v,i,a)=>i?a[0][v]=v:a[i]={})[0];
+				
+				constructor( definition = DEFINITION, debug = false ) {
+					this.definition = definition;
+					this.debug = debug; 
+
+					for( const [direction,allowed] of definition.rules.entries() ) {
+						this[ direction ] = allowed;
+						this.count = allowed.size;
+
+						continue;
+						this.count = allowed.length;
+						this[ direction ] = allowed.map( a => new Set( a ) );
+					}
+
+					console.log( `count is ${this.count}` );
+				}
+
+				fill( canvas, size = 32 ) {
+					const w = parseInt( canvas.width );
+					const h = parseInt( canvas.height );
+
+					const r = h / size;
+					const c = w / size;
+					const tiles = this.createMap( r, c );
+					this.draw( canvas, size, tiles );
+				}
+
+				createMap( r, c ) {
+					const tiles = this.createTiles( r, c, this.count );
+					const counts = new Map();
+
+					tiles.forEach( row => row.forEach( cell => this.add( counts, cell ) ) );
+
+					let broke = false;
+					for ( let i = 0 ; i < r * c * 99 ; i++ ) {
+						const pick = this.pickNext( counts );
+					   	if ( !pick ) {
+							broke = true;
+							break;
+						}
+
+						const pickForTile = this.pickForTile( pick, tiles );
+						//pick.p.fill( false );
+						//pick.p[ pickForTile ] = true;
+
+						this.remove( counts, pick.n, pick );
+						pick.p = new Set([pickForTile]);
+						pick.n = pick.p.size;
+						pick.t = pickForTile;
+
+						this.percolateOut( pick, tiles, counts );
+					}
+					if ( !broke ) console.log( 'did not break...' );
+
+					return tiles;
+				}
+
+				pickNext( counts ) {
+					if ( !counts.size ) return null; // all done!
+					const fewest = Array.from( counts.keys() ).sort( (a,b)=>b-a).pop();
+					const candidates = [...counts.get( fewest )];
+					const index = Math.floor( candidates.length * Math.random() );
+					const pick = candidates[ index ];
+					return pick;
+				}
+
+				move( direction, tile, tiles ) {
+					switch ( direction ) {
+						case Ovogo.DIRECTIONS.n: return this.get( tiles, tile.r - 1, tile.c );
+						case Ovogo.DIRECTIONS.s: return this.get( tiles, tile.r + 1, tile.c );
+						case Ovogo.DIRECTIONS.e: return this.get( tiles, tile.r, tile.c + 1 );
+						case Ovogo.DIRECTIONS.w: return this.get( tiles, tile.r, tile.c - 1 );
+					}
+					throw new Error( `idk about ${direction}` );
+				}
+
+			  	// 0 = blank ; 1 = ┌ ; 2 =  ┐ ; 3 =  ┘ ; 4 = └
+				pickForTile( tile, tiles ) {
+					const at = `${tile.r},${tile.c}`;
+					if ( this.debug ) {
+						console.log( `picking for ${at}` );
+					}
+
+					let count = 0;
+					const counts = new Map();
+					for ( const [direction] of Object.keys( Ovogo.DIRECTIONS ) ) {
+						const neighbor = this.move( direction, tile, tiles );
+						if ( !neighbor ) continue;
+						count++;
+
+						const allowed = this.allowedTiles( direction, tile, neighbor );
+						Array.from( allowed ).forEach( t => 
+							counts.set( t, 1 + ( counts.has( t ) ? counts.get( t ) : 0 ) )
+						)
+					}
+
+					//console.log( count, 'and', counts );
+					const possible = new Set();
+					for ( const [t,n] of counts ) {
+						if ( n == count ) possible.add( t );
+					}
+
+					const ugg = Array.from( possible );
+					const index = Math.floor( ugg.length * this.definition.random() );
+					const pick = ugg[ index ];
+
+					const message = `picked ${tile.r},${tile.c} is ${pick}: from ${ugg}`;
+
+					if ( this.debug ) {
+						console.log( message );
+					}
+					if ( undefined === pick ) {
+						throw new Error( `you done goofed: ${message}` );
+					}
+
+					return pick;
+				}
+
+				get( tiles, r, c ) {
+					return (
+						( r < 0 || r >= tiles.length || c < 0 || c >= tiles[ 0 ].length )
+						? null
+						: tiles[ r ][ c ]
+					);
+				}
+
+
+				can( direction, a, b ) {
+					switch( direction ) {
+						case Ovogo.DIRECTIONS.n: return this.NORTH.get( a ).has( b );
+						case Ovogo.DIRECTIONS.s: return this.can( Ovogo.DIRECTIONS.n, b, a );
+						case Ovogo.DIRECTIONS.e: return this.EAST.get( a ).has( b );
+						case Ovogo.DIRECTIONS.w: return this.can( Ovogo.DIRECTIONS.e, b, a );
+					}
+
+					throw new Error( `unknow direction, magellan: ${direction}` );
+				}
+
+				// direction is from the tile to the neighbor...
+				allowedTiles( direction, tile, neighbor ) {
+					const allowed = new Set();
+					if ( !tile || !neighbor ) return allowed;
+					const at = `${tile.r},${tile.c}`;
+
+					for ( const [t] of tile.p.entries() ) {
+						for ( const [n] of neighbor.p.entries() ) {
+							if ( this.can( direction, t, n ) ) {
+								allowed.add( t );
+								if( this.debug ) {
+									console.log( `ok: ${at} : ${t} -> ${direction} -> ${n}` );
+								}
+							}
+						}
+					}
+
+					return allowed;
+				}
+
+				possibilitiesToString( tile ) {
+					return Array.from( tile.p ).join( ',' );
+				}
+
+				oppositeDirection( direction ) {
+					switch ( direction ) {
+						case Ovogo.DIRECTIONS.n: return Ovogo.DIRECTIONS.s;
+						case Ovogo.DIRECTIONS.s: return Ovogo.DIRECTIONS.n;
+						case Ovogo.DIRECTIONS.e: return Ovogo.DIRECTIONS.w;
+						case Ovogo.DIRECTIONS.w: return Ovogo.DIRECTIONS.e;
+					}
+					throw new Error( `what direction is ${direction}???` );
+				}
+
+				// this is bugged...
+				percolateOut( tile, tiles, counts, visited = new Set(), depth = 0 ) {
+					if ( depth > 333 ) {
+						throw new Error( 'i give up' );
+					}
+					for ( const [direction] of Object.keys( Ovogo.DIRECTIONS ) ) {
+						const neighbor = this.move( direction, tile, tiles );
+						if ( this.perker( tile, neighbor, direction, counts ) ) {
+							this.percolateOut( neighbor, tiles, counts, visited, depth + 1 );
+						}
+					}
+				}
+
+				// null counts is just for testing...
+				perker( tile, neighbor, direction, counts = null ) {
+					if ( !tile || !neighbor ) return false;
+
+					const opposite = this.oppositeDirection( direction );
+
+					const b4 = this.possibilitiesToString(neighbor);
+					if( this.debug ) {
+						console.log( '------------------------------------------------------------------' );
+						console.log( `PERK: ${tile.s}'s ${direction} is ${neighbor.s}` );
+						console.log( `PERK: ${tile.s}: ${tile.n}> ${this.possibilitiesToString(tile)}` );
+						console.log( `PERK: ${neighbor.s}: ${neighbor.n}> ${b4}` );
+						console.log( `PERK: opposite of ${direction} is ${opposite}` );
+					}
+
+					const allowed = this.allowedTiles( opposite, neighbor, tile );
+					if ( allowed.size == neighbor.n ) {
+						return false;
+					}
+
+					if( this.debug ) {
+						console.log( `PERK: allowed: ${Array.from(allowed).join(', ')}` );
+					}
+
+					// update the possibilities
+					for( const [n] of neighbor.p.entries() ) {
+						if ( !allowed.has( n ) ) {
+							neighbor.p.delete( n );
+						}
+					}
+
+					/// update the counts
+					if ( counts ) {
+						this.remove( counts, neighbor.n, neighbor );
+						neighbor.n = allowed.size;
+						this.add( counts, neighbor );
+					}
+
+					if( this.debug ) {
+						const l8 = this.possibilitiesToString(neighbor);
+						console.log( `PERK! ${neighbor.s}: ${neighbor.n} : ${b4} -> ${l8}` );
+						console.log( '------------------------------------------------------------------' );
+					}
+					return true;
+				}
+
+
+				createTiles( r, c, count ) {
+					return new Array( r )
+						.fill( 0 )
+						.map( (_,rr) => new Array( c )
+							.fill( 0 )
+							.map( 
+								(_,cc) => this.createTile( rr, cc, count )
+							)
+						)
+					;
+				}
+
+				createTile( r, c, count ) {
+					return {
+						  p: new Set( new Array( count ).fill(0).map((v,i)=>i) )
+						, n: count
+						, r: r
+						, c: c
+						, t: -1
+						, s: `${r},${c}`
+					};
+				}
+
+				add( counts, cell ) {
+					if ( 1 == cell.n ) {
+						for ( const [t] of cell.p.entries() ) cell.t = t;
+						return;
+					}
+					const cells = counts.has( cell.n ) ? counts.get( cell.n ) : new Set();
+					cells.add( cell );
+					counts.set( cell.n, cells );
+					if( this.debug ) {
+						console.log( 'add', cell.n );
+					}
+				}
+
+				remove( counts, oldCount, cell ) {
+					if ( !counts.has( oldCount ) ) {
+						throw new Error( `there are no cells which had ${oldCount}` );
+					}
+					const cells = counts.get( oldCount );
+					cells.delete( cell );
+					if ( !cells.size ) {
+						counts.delete( oldCount );
+					}
+				}
+
+				/////////////////////////////////////////////////////////////////////////////
+					
+				draw( canvas, size, tiles ) {
+					const context = canvas.getContext( '2d' );
+					tiles.forEach( (row,r) => row.forEach( (cell,c) => {
+						const x = c * size;
+						const y = r * size;
+						this.definition.drawTile( context, cell, x, y, size );
+					}));
+				}
+			};
+
+			window.addEventListener('load', () => { 
+				const canvas = document.getElementsByTagName( 'canvas')[ 0 ];
+				new Ovogo().fill( canvas );
+			} ); 
+
+
+			// somewhat dull utility code....
+
+			const rect = ( context, color, x, y, size, text = null ) => {
+				context.fillStyle = color;
+				context.beginPath();
+				context.strokeStyle = 'rgba(255,255,255,.3)';
+				context.rect( x,y,size,size );
+				context.closePath();
+				context.fill();
+				context.stroke();
+
+				if ( text ) {
+					context.strokeStyle = 'black';
+					context.fillStyle = context.strokeStyle;
+					context.fillText( text, x + size * .18, y + size * .19 );
+				}
+			};
+
+			const arc = ( context, color, x, y, radius, start, stop, text = null ) => {
+				context.fillStyle = color;
+
+				context.beginPath();
+				context.strokeStyle = 'black';
+				context.arc( x, y, radius, start * 2 * Math.PI, stop * 2 * Math.PI );
+				context.closePath();
+				context.stroke();
+				
+				context.beginPath();
+				context.moveTo(x,y);
+				context.arc( x, y, radius, start * 2 * Math.PI, stop * 2 * Math.PI );
+				context.closePath();
+				context.fill();
+
+				if ( text ) {
+					context.fillStyle = context.strokeStyle;
+					const tx = x + .66 * radius * Math.cos( (start+stop) * Math.PI );
+					const ty = y + .66 * radius * Math.sin( (start+stop) * Math.PI );
+					context.fillText( text, tx, ty );
+				}
+			};
+
+		</script>
+	</HEAD>
+	<BODY>
+		<canvas width="1024" height="1024"></canvas>
+</HTML>

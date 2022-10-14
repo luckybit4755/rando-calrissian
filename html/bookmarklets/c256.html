@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+	<HEAD>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+
+		<TITLE>c256</TITLE>
+		<script type="text/javascript">
+			window.addEventListener('load', () => {
+				if ( /auto/.test( document.location.toString() ) ) {
+					document.getElementsByTagName( 'a' )[ 0 ].click();
+				}
+			} );
+		</script>
+		<style>
+			body { color:#ccb; background:black; font-family: sans-serif; margin:.5em; }
+			pre  { color:#8c8; }  
+			a    { color:#aad; text-decoration:none; }
+		</style>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('2d');
+			canvas.setAttribute( 'width', 256 );
+			canvas.setAttribute( 'height', 256 );
+			canvas.setAttribute( 'tabindex', 1 );
+			canvas.style.zIndex = 9001;
+			canvas.style.position = 'absolute';
+			canvas.style.top = canvas.style.left = 0;
+			context.fillStyle = 'rgba( 255,255,255,.33)';
+			context.fillRect( 0,0,256,256 );
+			document.body.append( canvas );
+
+			let flash = 0;
+			let flashTo = null;
+			const flasher = () => {
+				switch ( flash++ % 3 ) {
+					case 0: canvas.style.border = '2px dashed red'; break;
+					case 1: canvas.style.border = '1px dashed white'; break;
+					default: canvas.style.border = '2px dashed black';
+				}
+				flashTo = setTimeout( function() { requestAnimationFrame( flasher ) }, 1000 / 3 );
+			};
+			flasher();
+
+			const mover = (e) => {
+				const x = e.clientX;
+				const y = e.clientY;
+				canvas.style.top  = ( y - 128 ) + 'px';
+				canvas.style.left = ( x - 128 ) + 'px';
+				e.preventDefault();
+				return false;
+			};
+			document.body.addEventListener( 'mousemove', mover );
+
+			let captured = false;
+			canvas.addEventListener( 'click', (e)=>{
+				const x = e.clientX;
+				const y = e.clientY;
+				const path = new Array();
+				const from = 'https://stackoverflow.com/questions/21051084/';
+
+				let img = null;
+				let over = document.elementFromPoint(x, y);
+				while ( over && over.tagName !== 'HTML') {
+					if ( 'IMG' === over.tagName ) {
+						img = over;
+						break;
+					}
+					path.push( over );
+					over.style.pointerEvents = 'none';
+        			over = document.elementFromPoint(x, y);
+				}
+				for ( const part of path ) {
+					part.style.pointerEvents = '';
+				}
+
+				if ( img ) {
+					const ix = img.offsetLeft;
+					const iy = img.offsetTop;
+
+					const sx = x - ix - 128;
+					const sy = y - iy - 128;
+
+					context.fillStyle = 'white';
+					context.fillRect( 0, 0, 256, 256 );
+					context.drawImage( img, sx, sy, 256,256, 0,0, 256,256 );
+
+					captured = true;
+				}
+			});
+
+			canvas.addEventListener( 'keydown', (e)=>{
+				if ( 'Escape' === e.key ) {
+					captured = false;
+					document.body.removeChild( canvas );
+					document.body.removeEventListener( 'mousemove', mover );
+					if ( flashTo ) {
+						clearInterval( flashTo );
+						flashTo = 0;
+					}
+					return;
+
+				}
+				if ( ' ' === e.key && captured ) {
+					console.log( 'need to save it...' );
+
+					const dataURL = canvas.toDataURL('image/png');
+					const url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+					const downloadLink = document.createElement( 'a' );
+					downloadLink.setAttribute('href', url);
+					const name = 'c256-' + ( new Date().getTime() ) + '.png';
+					downloadLink.setAttribute( 'download', name );
+					downloadLink.click();
+
+				}
+			});
+		} )();">c256</a>
+
+		<img src="images/usb.png"></img>
+	</BODY>
+</HTML>

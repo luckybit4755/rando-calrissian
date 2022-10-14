@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+	<HEAD>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+
+		<TITLE>isquare</TITLE>
+		<script type="text/javascript">
+			window.addEventListener('load', () => {
+				if( 0 ) document.getElementsByTagName('a')[0].click();
+			} );
+		</script>
+		<style>
+			body { color:#ccb; background:black; font-family: sans-serif; margin:.5em; }
+			pre  { color:#8c8; }  
+			a    { color:#aad; text-decoration:none; }
+		</style>
+	</HEAD>
+	<BODY>
+		<a href="javascript:( function() {
+			const XXX = /\.(jpg|jpeg|gif|png|bmp|tga)$/i;
+			const isquare = ( az ) => {
+				const images = [];
+				for ( let i = 0 ; i < az.length ; i++ ) {
+					const href = az[ i ].href;
+					if ( XXX.test( href ) ) {
+						images.push( href );
+					}
+				}
+				const square = Math.ceil( Math.sqrt( images.length ) );
+				console.log( images.length, 'so', square );
+
+				const html = images.map((image,i)=>{
+					const start = ( i + 0 )% square ? '' : '<div>\n';
+					const stop  = ( i + 1 )% square ? '' : '</div>\n\n';
+					const ilink = `<a href='${image}' target='${image}'><img src='${image}' style='display:inline'></img></a>`;
+					return `${start}\t${ilink}\n${stop}`;
+				}).join( '' ) + ( square * square == images.length ? '' : '</div>\n\n' );
+
+				console.log( html );
+				return html;
+			};
+			document.body.innerHTML = isquare( document.getElementsByTagName( 'a' ) );
+			document.head.innerHTML = '';
+		} )();">isquare</a>
+
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-00.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-01.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-02.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-03.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-04.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-05.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-06.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-07.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-08.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-09.png"></a></div>
+			<div><a href="images/vampira-drinking-blood-skull-6a6e07e1b7829e35f23ad0e8973f4e67-10.png"></a></div>
+	</BODY>
+</HTML>
