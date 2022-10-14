@@ -72,8 +72,18 @@
 				"for 2 people, I make 1/3 of it",
 				"for 1 person I make 1/6",
 				"this is not a good recipe for the air fryer they say...",
-				"bit fiddly, just try not to overhandle and squish the butter"
-
+				"bit fiddly, just try not to overhandle and squish the butter",
+				"the sugar is not enough to make it anything like sweet",
+				"1/6":[
+					{ "q":"1/2", "unit":"cup", "ingredient":"flour" },
+					{ "n":2,     "unit":"tsp", "ingredient":"baking powder" },
+					{ "n":1,     "unit":"tsp", "ingredient":"sugar" },
+					{ "q":"1/3", "unit":"tsp", "ingredient":"salt" },
+					{ "q":"1/4", "unit":"tsp", "ingredient":"cream of tartar" },
+					{ "n":4,     "unit":"tsp", "ingredient":"butter" },
+					{ "n":2,     "unit":"tsp", "ingredient":"shortenting" },
+					{ "q":"1/3", "unit":"cup", "ingredient":"milk" }
+				]
 			]
 		},
 		"Shortbread": {
